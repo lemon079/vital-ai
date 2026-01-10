@@ -25,6 +25,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${fontSans.variable} font-sans antialiased`}
+        suppressHydrationWarning={true}
       >
         <QueryProvider>
           <ThemeProvider
