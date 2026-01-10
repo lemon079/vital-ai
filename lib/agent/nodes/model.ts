@@ -1,19 +1,32 @@
 import { ChatOllama } from "@langchain/ollama";
+import { SystemMessage } from "@langchain/core/messages";
 import { AgentState } from "../state";
-import { processLabReference } from "../tools/lab-tools";
+import { compareLabTest, convertLabUnits } from "../tools/lab-tools";
+import { SYSTEM_PROMPT } from "../prompts";
 
 // Define the tools
-const tools = [processLabReference];
+const tools = [compareLabTest, convertLabUnits];
 
 // Define the model
-// Using the robust model defined in previous context
 const model = new ChatOllama({
-    model: "gpt-oss:20b-cloud",
-    temperature: 0,
+  model: "gpt-oss:20b-cloud",
+  temperature: 0,
 }).bindTools(tools);
 
+
 export async function callModel(state: typeof AgentState.State) {
-    const messages = state.messages;
-    const response = await model.invoke(messages);
-    return { messages: [response] };
+  const { messages, summary } = state;
+
+  // Prepend system message and summary context
+  const systemMsgContent = summary
+    ? `${SYSTEM_PROMPT}\n\n### Current Patient Report Summary:\n${summary}`
+    : SYSTEM_PROMPT;
+
+  const messagesWithSystem = [
+    new SystemMessage(systemMsgContent),
+    ...messages
+  ];
+
+  const response = await model.invoke(messagesWithSystem);
+  return { messages: [response] };
 }
