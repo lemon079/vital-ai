@@ -1,0 +1,3338 @@
+[
+  {
+    "test_name": "Acetaminophen (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 10.0,
+    "normal_high": 30.0,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Acetoacetic acid",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 1.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Acetone",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 2.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Acetylcholinesterase",
+    "specimen": "Red blood cells",
+    "gender": "Any",
+    "normal_low": 5.0,
+    "normal_high": 10.0,
+    "unit": "U/mL"
+  },
+  {
+    "test_name": "Activated partial thromboplastin time (APTT)",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 25.0,
+    "normal_high": 40.0,
+    "unit": "seconds"
+  },
+  {
+    "test_name": "Adenosine deaminasea",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 11.5,
+    "normal_high": 25.0,
+    "unit": "U/L"
+  },
+  {
+    "test_name": "Adrenocorticotropic hormone (ACTH) (see corticotropin) Alanineb (adult)",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 1.87,
+    "normal_high": 5.88,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Alanine aminotransferase (ALT, SGPT)b",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 10.0,
+    "normal_high": 40.0,
+    "unit": "U/L"
+  },
+  {
+    "test_name": "Albuminb",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 3.5,
+    "normal_high": 5.0,
+    "unit": "g/dL"
+  },
+  {
+    "test_name": "Alcohol dehydrogenasea",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 2.8,
+    "unit": "U/L"
+  },
+  {
+    "test_name": "Aldolasea,b",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 1.0,
+    "normal_high": 7.5,
+    "unit": "U/L"
+  },
+  {
+    "test_name": "Aldosteroneb (upright)",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 7.0,
+    "normal_high": 30.0,
+    "unit": "ng/dL"
+  },
+  {
+    "test_name": "Aldosterone",
+    "specimen": "Urine, 24 h",
+    "gender": "Any",
+    "normal_low": 3.0,
+    "normal_high": 20.0,
+    "unit": "μg/24 h"
+  },
+  {
+    "test_name": "Alkaline phosphataseb",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 50.0,
+    "normal_high": 120.0,
+    "unit": "U/L"
+  },
+  {
+    "test_name": "α -Acid glycoprotein 1",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 50.0,
+    "normal_high": 120.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "α -Macroglobulin 2",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 130.0,
+    "normal_high": 300.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Alcohol (see ethanol, isopropanol, methanol) Alprazolam (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 10.0,
+    "normal_high": 50.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Aluminum",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 6.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Alcohol (see ethanol, isopropanol, methanol) Amikacin (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 20.0,
+    "normal_high": 30.0,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Alanineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 1.87,
+    "normal_high": 5.89,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "α-Aminobutyric acidb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.08,
+    "normal_high": 0.36,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Arginineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.37,
+    "normal_high": 2.4,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Asparagineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.4,
+    "normal_high": 0.91,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Aspartic acidb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 0.3,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Citrullineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.2,
+    "normal_high": 1.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Cystineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.4,
+    "normal_high": 1.4,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Glutamic acidb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.2,
+    "normal_high": 2.8,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Glutamineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 6.1,
+    "normal_high": 10.2,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Glycineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.9,
+    "normal_high": 4.2,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Histidineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.5,
+    "normal_high": 1.7,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Hydroxyprolineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 0.55,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Isoleucineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.5,
+    "normal_high": 1.3,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Leucineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 1.0,
+    "normal_high": 2.3,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Lysineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 1.2,
+    "normal_high": 3.5,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Methionineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.1,
+    "normal_high": 0.6,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Ornithineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.4,
+    "normal_high": 1.4,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Phenylalanineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.6,
+    "normal_high": 1.5,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Prolineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 1.2,
+    "normal_high": 3.9,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Serineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.7,
+    "normal_high": 2.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Taurineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.3,
+    "normal_high": 2.1,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Threonineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.9,
+    "normal_high": 2.5,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Tryptophanb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.5,
+    "normal_high": 1.5,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Tyrosineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.4,
+    "normal_high": 1.6,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Valineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 1.7,
+    "normal_high": 3.7,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "α-Aminobutyric acidb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.08,
+    "normal_high": 0.36,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Amino acid fractionation Amiodarone (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 0.5,
+    "normal_high": 2.5,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "δ-Aminolevulinic acid",
+    "specimen": "Urine",
+    "gender": "Any",
+    "normal_low": 1.0,
+    "normal_high": 7.0,
+    "unit": "mg/24 h"
+  },
+  {
+    "test_name": "Amino acid fractionation Amitriptyline (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 80.0,
+    "normal_high": 250.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Ammonia (as NH )b 3",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 15.0,
+    "normal_high": 50.0,
+    "unit": "μg/dL"
+  },
+  {
+    "test_name": "Amino acid fractionation Amobarbital (therapeutic)",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 1.0,
+    "normal_high": 5.0,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Amino acid fractionation Amoxapine (therapeutic)",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 200.0,
+    "normal_high": 600.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Amylasea,b",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 27.0,
+    "normal_high": 130.0,
+    "unit": "U/L"
+  },
+  {
+    "test_name": "Amino acid fractionation Androstenedione,b male",
+    "specimen": "Serum",
+    "gender": "Male",
+    "normal_low": 75.0,
+    "normal_high": 205.0,
+    "unit": "ng/dL"
+  },
+  {
+    "test_name": "Amino acid fractionation Androstenedione,b female",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 85.0,
+    "normal_high": 275.0,
+    "unit": "ng/dL"
+  },
+  {
+    "test_name": "Angiotensin I",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 25.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Angiotensin II",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 10.0,
+    "normal_high": 60.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Angiotensin-converting enzyme (ACE)a,b",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 8.0,
+    "normal_high": 52.0,
+    "unit": "U/L"
+  },
+  {
+    "test_name": "Anion gap (Na+)−(Cl− + HCO −) 3",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 8.0,
+    "normal_high": 16.0,
+    "unit": "mEq/L"
+  },
+  {
+    "test_name": "Antidiuretic hormone (ADH, vasopressin) (varies with osmolality)",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 1.0,
+    "normal_high": 5.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Antiplasmin",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 80.0,
+    "normal_high": 130.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "Antithrombin activity",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 80.0,
+    "normal_high": 130.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "α -Antitrypsin 1",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 80.0,
+    "normal_high": 200.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Apolipoprotein Ab Male",
+    "specimen": "Serum",
+    "gender": "Male",
+    "normal_low": 80.0,
+    "normal_high": 151.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Apolipoprotein Ab Female",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 80.0,
+    "normal_high": 170.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Apolipoprotein Bb Male",
+    "specimen": "Serum, plasma",
+    "gender": "Male",
+    "normal_low": 50.0,
+    "normal_high": 123.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Apolipoprotein Bb Female",
+    "specimen": "Serum, plasma",
+    "gender": "Female",
+    "normal_low": 25.0,
+    "normal_high": 120.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Arginineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.37,
+    "normal_high": 2.4,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Arsenic (As)",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 23.0,
+    "unit": "μg/L"
+  },
+  {
+    "test_name": "Apolipoprotein Bb Arsenic (As) (chronic poisoning)",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 100.0,
+    "normal_high": 500.0,
+    "unit": "μg/L"
+  },
+  {
+    "test_name": "Apolipoprotein Bb Arsenic (As) (acute poisoning)",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 600.0,
+    "normal_high": 9300.0,
+    "unit": "μg/L"
+  },
+  {
+    "test_name": "Asparagineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.4,
+    "normal_high": 0.91,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Aspartate aminotransferase (AST, SGOT)a,b",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 20.0,
+    "normal_high": 48.0,
+    "unit": "U/L"
+  },
+  {
+    "test_name": "Aspartic acidb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 0.3,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Atrial natriuretic hormone",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 20.0,
+    "normal_high": 77.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Benzodiazepines (see individual drugs; alprazolam, chlordiazepoxide, diazepam, lorazepam) Beryllium (toxic)",
+    "specimen": "Urine",
+    "gender": "Any",
+    "normal_low": 20.0,
+    "normal_high": null,
+    "unit": "μg/L"
+  },
+  {
+    "test_name": "Bicarbonate",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 21.0,
+    "normal_high": 28.0,
+    "unit": "mEq/L"
+  },
+  {
+    "test_name": "Bile acids (total)",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 0.3,
+    "normal_high": 2.3,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Totalb",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 0.3,
+    "normal_high": 1.2,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Direct (conjugated)",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 0.2,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Biotin",
+    "specimen": "Whole blood, serum",
+    "gender": "Any",
+    "normal_low": 200.0,
+    "normal_high": 500.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Bilirubin Bismuth (therapeutic)",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 1.0,
+    "normal_high": 12.0,
+    "unit": "μg/L"
+  },
+  {
+    "test_name": "Pco 2",
+    "specimen": "Arterial blood",
+    "gender": "Any",
+    "normal_low": 35.0,
+    "normal_high": 45.0,
+    "unit": "mm Hg"
+  },
+  {
+    "test_name": "pH",
+    "specimen": "Arterial blood",
+    "gender": "Any",
+    "normal_low": 7.35,
+    "normal_high": 7.45,
+    "unit": "—"
+  },
+  {
+    "test_name": "Po 2",
+    "specimen": "Arterial blood",
+    "gender": "Any",
+    "normal_low": 80.0,
+    "normal_high": 100.0,
+    "unit": "mm Hg"
+  },
+  {
+    "test_name": "Brain natriuretic peptide (BNP)",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 100.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Blood urea nitrogen (BUN, see urea nitrogen) Bupropion (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 25.0,
+    "normal_high": 100.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "C1 esterase inhibitor",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 12.0,
+    "normal_high": 30.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Blood urea nitrogen (BUN, see urea nitrogen) C3 complementb",
+    "specimen": "Serum",
+    "gender": "Male",
+    "normal_low": 1200.0,
+    "normal_high": 1500.0,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Blood urea nitrogen (BUN, see urea nitrogen) C4 complementb",
+    "specimen": "Serum",
+    "gender": "Male",
+    "normal_low": 350.0,
+    "normal_high": 600.0,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "CA125",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 35.0,
+    "unit": "U/mL"
+  },
+  {
+    "test_name": "CA19-9",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 37.0,
+    "unit": "U/mL"
+  },
+  {
+    "test_name": "CA15-3",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 30.0,
+    "unit": "U/mL"
+  },
+  {
+    "test_name": "CA27.29",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 37.7,
+    "unit": "U/mL"
+  },
+  {
+    "test_name": "Blood urea nitrogen (BUN, see urea nitrogen) Cadmium (nonsmoker)",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 0.3,
+    "normal_high": 1.2,
+    "unit": "μg/L"
+  },
+  {
+    "test_name": "Blood urea nitrogen (BUN, see urea nitrogen) Caffeine (therapeutic, infants)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 8.0,
+    "normal_high": 20.0,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Calcitonin",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 19.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Calcium, ionized",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 4.6,
+    "normal_high": 5.08,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Calcium, total",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 8.2,
+    "normal_high": 10.2,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Calcium, normal diet",
+    "specimen": "Urine",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 250.0,
+    "unit": "mg/24 h"
+  },
+  {
+    "test_name": "Calciferol (see vitamin D) Carbamazepine (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 8.0,
+    "normal_high": 12.0,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Carbon dioxide",
+    "specimen": "Serum, plasma, venous blood",
+    "gender": "Any",
+    "normal_low": 22.0,
+    "normal_high": 28.0,
+    "unit": "mEq/L"
+  },
+  {
+    "test_name": "Carboxyhemoglobin (carbon monoxide), as fraction of hemoglobin saturation Nonsmoker",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 2.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "Carboxyhemoglobin (carbon monoxide), as fraction of hemoglobin saturation Toxic",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 20.0,
+    "normal_high": null,
+    "unit": "%"
+  },
+  {
+    "test_name": "β-Carotene",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 10.0,
+    "normal_high": 85.0,
+    "unit": "μg/dL"
+  },
+  {
+    "test_name": "Catecholamines, total (see norepinephrine) CEA, nonsmoker",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 3.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Catecholamines, total (see norepinephrine) CEA, smoker",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 5.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Ceruloplasminb",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 20.0,
+    "normal_high": 40.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Catecholamines, total (see norepinephrine) Chloramphenicol (therapeutic)",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 10.0,
+    "normal_high": 25.0,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Catecholamines, total (see norepinephrine) Chlordiazepoxide (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 0.7,
+    "normal_high": 1.0,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Chloride",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 96.0,
+    "normal_high": 106.0,
+    "unit": "mEq/L"
+  },
+  {
+    "test_name": "Chloride",
+    "specimen": "CSF",
+    "gender": "Any",
+    "normal_low": 118.0,
+    "normal_high": 132.0,
+    "unit": "mEq/L"
+  },
+  {
+    "test_name": "Catecholamines, total (see norepinephrine) Chlorpromazine (therapeutic, adult)",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 50.0,
+    "normal_high": 300.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Catecholamines, total (see norepinephrine) Chlorpromazine (therapeutic, child)",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 40.0,
+    "normal_high": 80.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Catecholamines, total (see norepinephrine) Chlorpropamide (therapeutic)",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 75.0,
+    "normal_high": 250.0,
+    "unit": "mg/L"
+  },
+  {
+    "test_name": "Optimal",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 60.0,
+    "normal_high": null,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Adequate",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 40.0,
+    "normal_high": 60.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "High risk for heart disease",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 40.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Optimal",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 100.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Near optimal",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 100.0,
+    "normal_high": 129.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Borderline high",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 130.0,
+    "normal_high": 159.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "High",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 160.0,
+    "normal_high": 189.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Very high",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 190.0,
+    "normal_high": null,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Desirable",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 200.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Borderline high",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 200.0,
+    "normal_high": 239.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "High",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 240.0,
+    "normal_high": null,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Desirable",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 170.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Borderline high",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 170.0,
+    "normal_high": 199.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "High",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 200.0,
+    "normal_high": null,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Chromium",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 0.7,
+    "normal_high": 28.0,
+    "unit": "μg/L"
+  },
+  {
+    "test_name": "Citrate",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 1.2,
+    "normal_high": 3.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Citrullineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.4,
+    "normal_high": 2.4,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Cholesterol total, children Clonazepam (therapeutic)",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 15.0,
+    "normal_high": 60.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Coagulation factor I (fibrinogen)",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 150.0,
+    "normal_high": 400.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Coagulation factor II (prothrombin)",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 60.0,
+    "normal_high": 140.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "Coagulation factor V",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 60.0,
+    "normal_high": 140.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "Coagulation factor VII",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 60.0,
+    "normal_high": 140.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "Coagulation factor VIII",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 50.0,
+    "normal_high": 200.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "Coagulation factor IX",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 60.0,
+    "normal_high": 140.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "Coagulation factor X",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 60.0,
+    "normal_high": 140.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "Coagulation factor XI",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 60.0,
+    "normal_high": 140.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "Coagulation factor XII",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 60.0,
+    "normal_high": 140.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "Cobalt",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 1.0,
+    "unit": "μg/L"
+  },
+  {
+    "test_name": "Cholesterol total, children Codeine (therapeutic)",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 10.0,
+    "normal_high": 100.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Hematocritb Male",
+    "specimen": "Whole blood",
+    "gender": "Male",
+    "normal_low": 41.0,
+    "normal_high": 50.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "Hematocritb Female",
+    "specimen": "Whole blood",
+    "gender": "Female",
+    "normal_low": 35.0,
+    "normal_high": 45.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "Hemoglobin (mass concentration)b Male",
+    "specimen": "Whole blood",
+    "gender": "Male",
+    "normal_low": 13.5,
+    "normal_high": 17.5,
+    "unit": "g/dL"
+  },
+  {
+    "test_name": "Hemoglobin (mass concentration)b Female",
+    "specimen": "Whole blood",
+    "gender": "Female",
+    "normal_low": 12.0,
+    "normal_high": 15.5,
+    "unit": "g/dL"
+  },
+  {
+    "test_name": "Hemoglobin (substance concentration, Hb [Fe]) Male",
+    "specimen": "Whole blood",
+    "gender": "Male",
+    "normal_low": 13.6,
+    "normal_high": 17.2,
+    "unit": "g/dL"
+  },
+  {
+    "test_name": "Hemoglobin (substance concentration, Hb [Fe]) Female",
+    "specimen": "Whole blood",
+    "gender": "Female",
+    "normal_low": 12.0,
+    "normal_high": 15.0,
+    "unit": "g/dL"
+  },
+  {
+    "test_name": "Mean corpuscular hemoglobin (MCH), mass concentrationb",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 27.0,
+    "normal_high": 33.0,
+    "unit": "pg/cell"
+  },
+  {
+    "test_name": "MCH, substance concentration, Hb [Fe]",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 27.0,
+    "normal_high": 33.0,
+    "unit": "pg/cell"
+  },
+  {
+    "test_name": "Mean corpuscular hemoglobin concentration (MCHC), mass concentration",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 33.0,
+    "normal_high": 37.0,
+    "unit": "g Hb/dL"
+  },
+  {
+    "test_name": "MCHC, substance concentration, Hb [Fe]",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 33.0,
+    "normal_high": 37.0,
+    "unit": "g Hb/dL"
+  },
+  {
+    "test_name": "Mean cell volume (MCV)b",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 80.0,
+    "normal_high": 100.0,
+    "unit": "μm3"
+  },
+  {
+    "test_name": "Platelet count",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 150.0,
+    "normal_high": 450.0,
+    "unit": "103 μL−1"
+  },
+  {
+    "test_name": "Red blood cell count Female",
+    "specimen": "Whole blood",
+    "gender": "Female",
+    "normal_low": 3.9,
+    "normal_high": 5.5,
+    "unit": "106 μL−1"
+  },
+  {
+    "test_name": "Red blood cell count Male",
+    "specimen": "Whole blood",
+    "gender": "Male",
+    "normal_low": 4.6,
+    "normal_high": 6.0,
+    "unit": "106 μL−1"
+  },
+  {
+    "test_name": "Reticulocyte countb",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 25.0,
+    "normal_high": 75.0,
+    "unit": "103 μL−1"
+  },
+  {
+    "test_name": "Reticulocyte countb (fraction)",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 0.5,
+    "normal_high": 1.5,
+    "unit": "% of RBCs"
+  },
+  {
+    "test_name": "White blood cell countb",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 4.5,
+    "normal_high": 11.0,
+    "unit": "103 μL−1"
+  },
+  {
+    "test_name": "Neutrophils",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 1800.0,
+    "normal_high": 7800.0,
+    "unit": "μL−1"
+  },
+  {
+    "test_name": "Bands",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 0.0,
+    "normal_high": 700.0,
+    "unit": "μL−1"
+  },
+  {
+    "test_name": "Lymphocytes",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 1000.0,
+    "normal_high": 4800.0,
+    "unit": "μL−1"
+  },
+  {
+    "test_name": "Monocytes",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 0.0,
+    "normal_high": 800.0,
+    "unit": "μL−1"
+  },
+  {
+    "test_name": "Eosinophils",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 0.0,
+    "normal_high": 450.0,
+    "unit": "μL−1"
+  },
+  {
+    "test_name": "Basophils",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 0.0,
+    "normal_high": 200.0,
+    "unit": "μL−1"
+  },
+  {
+    "test_name": "Neutrophils",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 56.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "Bands",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 3.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "Lymphocytes",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 34.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "Monocytes",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 4.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "Eosinophils",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 2.7,
+    "unit": "%"
+  },
+  {
+    "test_name": "Basophils",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 0.3,
+    "unit": "%"
+  },
+  {
+    "test_name": "Copperb",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 70.0,
+    "normal_high": 140.0,
+    "unit": "μg/dL"
+  },
+  {
+    "test_name": "Coproporphyrin",
+    "specimen": "Urine",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 200.0,
+    "unit": "μg/24 h"
+  },
+  {
+    "test_name": "Corticotropinb (08:00)",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 120.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "8:00",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 5.0,
+    "normal_high": 25.0,
+    "unit": "μg/dL"
+  },
+  {
+    "test_name": "16:00",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 3.0,
+    "normal_high": 16.0,
+    "unit": "μg/dL"
+  },
+  {
+    "test_name": "20:00",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": "50% of 08:00",
+    "unit": "μg/dL"
+  },
+  {
+    "test_name": "Cortisol, freeb",
+    "specimen": "Urine",
+    "gender": "Any",
+    "normal_low": 30.0,
+    "normal_high": 100.0,
+    "unit": "μg/24 h"
+  },
+  {
+    "test_name": "Time of day Cotinine (smoker)",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 16.0,
+    "normal_high": 145.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "C-peptide",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 0.5,
+    "normal_high": 3.5,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Time of day Creatine, male",
+    "specimen": "Serum",
+    "gender": "Male",
+    "normal_low": 0.2,
+    "normal_high": 0.7,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Time of day Creatine, female",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 0.3,
+    "normal_high": 0.9,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Creatine kinase (CK)a",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 50.0,
+    "normal_high": 200.0,
+    "unit": "U/L"
+  },
+  {
+    "test_name": "CK-MB fraction",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 6.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "Creatinineb",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 0.6,
+    "normal_high": 1.2,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Creatinine",
+    "specimen": "Urine",
+    "gender": "Any",
+    "normal_low": 1.0,
+    "normal_high": 2.0,
+    "unit": "g/24 h"
+  },
+  {
+    "test_name": "Creatinine clearance, glomerular filtration rate",
+    "specimen": "Serum, urine",
+    "gender": "Any",
+    "normal_low": 75.0,
+    "normal_high": 125.0,
+    "unit": "mL/min/1.73 m2"
+  },
+  {
+    "test_name": "C-telopeptide Men",
+    "specimen": "Serum, plasma",
+    "gender": "Male",
+    "normal_low": 60.0,
+    "normal_high": 700.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "C-telopeptide Premenopausal women",
+    "specimen": "Serum, plasma",
+    "gender": "Female",
+    "normal_low": 40.0,
+    "normal_high": 465.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "C-telopeptide Cyanide (toxic)",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 1.0,
+    "normal_high": null,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Cyclic adenosine monophosphate (cAMP)",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 4.6,
+    "normal_high": 8.6,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Cyanocobalamin (see vitamin B ) 12 Cyclosporine (toxic)",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 400.0,
+    "normal_high": null,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Cystineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.4,
+    "normal_high": 1.4,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "D-dimerb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": "Negative (<500)",
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Cyanocobalamin (see vitamin B ) 12 Dehydroepiandrosterone (DHEA) (unconjugated, male)b",
+    "specimen": "Plasma, serum",
+    "gender": "Male",
+    "normal_low": 180.0,
+    "normal_high": 1250.0,
+    "unit": "ng/dL"
+  },
+  {
+    "test_name": "Cyanocobalamin (see vitamin B ) 12 Dehydroepiandrosterone sulfate (DHEA-S) (male)b",
+    "specimen": "Plasma, serum",
+    "gender": "Male",
+    "normal_low": 10.0,
+    "normal_high": 619.0,
+    "unit": "μg/dL"
+  },
+  {
+    "test_name": "Cyanocobalamin (see vitamin B ) 12 Desipramine (therapeutic)",
+    "specimen": "Plasma, serum",
+    "gender": "Any",
+    "normal_low": 50.0,
+    "normal_high": 200.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Cyanocobalamin (see vitamin B ) 12 Diazepam (therapeutic)",
+    "specimen": "Plasma, serum",
+    "gender": "Any",
+    "normal_low": 100.0,
+    "normal_high": 1000.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Cyanocobalamin (see vitamin B ) 12 Digoxin (therapeutic)",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.5,
+    "normal_high": 2.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Cyanocobalamin (see vitamin B ) 12 Disopyramide (therapeutic)",
+    "specimen": "Plasma, serum",
+    "gender": "Any",
+    "normal_low": 2.8,
+    "normal_high": 7.0,
+    "unit": "mg/L"
+  },
+  {
+    "test_name": "Cyanocobalamin (see vitamin B ) 12 Doxepin (therapeutic)",
+    "specimen": "Plasma, serum",
+    "gender": "Any",
+    "normal_low": 150.0,
+    "normal_high": 250.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Chloride",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 96.0,
+    "normal_high": 106.0,
+    "unit": "mEq/L"
+  },
+  {
+    "test_name": "Carbon dioxide (CO ) 2",
+    "specimen": "Serum, plasma, venous blood",
+    "gender": "Any",
+    "normal_low": 22.0,
+    "normal_high": 28.0,
+    "unit": "mEq/L"
+  },
+  {
+    "test_name": "Potassium",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 3.5,
+    "normal_high": 5.0,
+    "unit": "mEq/L"
+  },
+  {
+    "test_name": "Sodiumb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 136.0,
+    "normal_high": 142.0,
+    "unit": "mEq/L"
+  },
+  {
+    "test_name": "Epinephrine (supine)",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 50.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Epinephrineb",
+    "specimen": "Urine",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 20.0,
+    "unit": "μg/24 h"
+  },
+  {
+    "test_name": "Erythrocyte count (see complete blood count, red blood cell count) Erythrocyte sedimentation rate (ESR)b",
+    "specimen": "Whole blood",
+    "gender": "Male",
+    "normal_low": 0.0,
+    "normal_high": 20.0,
+    "unit": "mm/h"
+  },
+  {
+    "test_name": "Erythropoietin",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 5.0,
+    "normal_high": 36.0,
+    "unit": "mU/mL"
+  },
+  {
+    "test_name": "Estradiol (E2, unconjugated),b female Follicular phase",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 20.0,
+    "normal_high": 350.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Estradiol (E2, unconjugated),b female Midcycle peak",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 150.0,
+    "normal_high": 750.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Estradiol (E2, unconjugated),b female Luteal phase",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 30.0,
+    "normal_high": 450.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Estradiol (E2, unconjugated),b female Postmenopausal",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": null,
+    "normal_high": 59.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Estradiol (E2, unconjugated),b female Estradiol (unconjugated),b male",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": null,
+    "normal_high": 20.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Estradiol (E2, unconjugated),b female Estriol (E3, unconjugated), males and nonpregnant females, varies with length of gestation",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": null,
+    "normal_high": 2.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Estrogens (total),b female Follicular phase",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 60.0,
+    "normal_high": 200.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Estrogens (total),b female Luteal phase",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 160.0,
+    "normal_high": 400.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Estrogens (total),b female Postmenopausal",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": null,
+    "normal_high": 130.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Estrogens (total),b female Estrogens (total),b male",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 20.0,
+    "normal_high": 80.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Estrone (E1),b female Follicular phase",
+    "specimen": "Plasma, serum",
+    "gender": "Female",
+    "normal_low": 100.0,
+    "normal_high": 250.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Estrone (E1),b female Luteal phase",
+    "specimen": "Plasma, serum",
+    "gender": "Female",
+    "normal_low": 15.0,
+    "normal_high": 200.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Estrone (E1),b female Postmenopausal",
+    "specimen": "Plasma, serum",
+    "gender": "Female",
+    "normal_low": 15.0,
+    "normal_high": 55.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Estrone (E1),b female Estrone (E1),b male",
+    "specimen": "Plasma, serum",
+    "gender": "Female",
+    "normal_low": 15.0,
+    "normal_high": 65.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Estrone (E1),b female Ethanol (ethyl alcohol) (legal intoxication—2 levels listed)",
+    "specimen": "Serum, whole blood",
+    "gender": "Female",
+    "normal_low": "80 / 100",
+    "normal_high": null,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Estrone (E1),b female Ethosuximide (therapeutic)",
+    "specimen": "Plasma, serum",
+    "gender": "Female",
+    "normal_low": 40.0,
+    "normal_high": 100.0,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Estrone (E1),b female Ethylene glycol (toxic)",
+    "specimen": "Plasma, serum",
+    "gender": "Female",
+    "normal_low": 30.0,
+    "normal_high": null,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Estrone (E1),b female Everolimus (therapeutic)",
+    "specimen": "Whole blood",
+    "gender": "Female",
+    "normal_low": 3.0,
+    "normal_high": 15.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Fatty acids (nonesterified)",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 8.0,
+    "normal_high": 25.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Fecal fat (as stearic acid)",
+    "specimen": "Stool",
+    "gender": "Any",
+    "normal_low": 2.0,
+    "normal_high": 6.0,
+    "unit": "g/day"
+  },
+  {
+    "test_name": "Estrone (E1),b female Felbamate (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Female",
+    "normal_low": 30.0,
+    "normal_high": 60.0,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Ferritinb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 15.0,
+    "normal_high": 200.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "α-Fetoproteinb",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 10.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Fibrinogen",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 150.0,
+    "normal_high": 400.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Fibrin breakdown products (fibrin split products)",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 10.0,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Folate (folic acid)",
+    "specimen": "Red blood cells",
+    "gender": "Any",
+    "normal_low": 166.0,
+    "normal_high": 640.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Folate (folic acid)",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 5.0,
+    "normal_high": 25.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Follicle-stimulating hormone (FSH),b female Follicular phase",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 1.37,
+    "normal_high": 9.9,
+    "unit": "mIU/mL"
+  },
+  {
+    "test_name": "Follicle-stimulating hormone (FSH),b female Ovulatory phase",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 6.17,
+    "normal_high": 17.2,
+    "unit": "mIU/mL"
+  },
+  {
+    "test_name": "Follicle-stimulating hormone (FSH),b female Luteal phase",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 1.09,
+    "normal_high": 9.2,
+    "unit": "mIU/mL"
+  },
+  {
+    "test_name": "Follicle-stimulating hormone (FSH),b female Postmenopausal",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 19.3,
+    "normal_high": 100.6,
+    "unit": "mIU/mL"
+  },
+  {
+    "test_name": "Follicle-stimulating hormone (FSH),b female FSHb male",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 1.42,
+    "normal_high": 15.4,
+    "unit": "mIU/mL"
+  },
+  {
+    "test_name": "Follicle-stimulating hormone (FSH),b female FSHb female",
+    "specimen": "Urine",
+    "gender": "Female",
+    "normal_low": 2.0,
+    "normal_high": 15.0,
+    "unit": "IU/24 h"
+  },
+  {
+    "test_name": "Follicle-stimulating hormone (FSH),b female FSHb male",
+    "specimen": "Urine",
+    "gender": "Female",
+    "normal_low": 3.0,
+    "normal_high": 12.0,
+    "unit": "IU/24 h"
+  },
+  {
+    "test_name": "Fructosamineb",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 1.5,
+    "normal_high": 2.7,
+    "unit": "mmol/L"
+  },
+  {
+    "test_name": "Follicle-stimulating hormone (FSH),b female Gabapentin (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Female",
+    "normal_low": 2.0,
+    "normal_high": 20.0,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Gastrin (fasting)",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 100.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Follicle-stimulating hormone (FSH),b female Gentamicin (therapeutic)",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 6.0,
+    "normal_high": 10.0,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Glucagonb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 20.0,
+    "normal_high": 100.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Glucoseb",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 70.0,
+    "normal_high": 110.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Glucose",
+    "specimen": "CSF",
+    "gender": "Any",
+    "normal_low": 50.0,
+    "normal_high": 80.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Glucose-6-phosphate dehydrogenase",
+    "specimen": "Red blood cells",
+    "gender": "Any",
+    "normal_low": 10.0,
+    "normal_high": 14.0,
+    "unit": "U/g of Hb"
+  },
+  {
+    "test_name": "Glutamic acidb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.2,
+    "normal_high": 2.8,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Glutamine",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 6.1,
+    "normal_high": 10.2,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "γ-Glutamyltransferase (GGT; γ-glutamyl transpeptidase)b Female",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": null,
+    "normal_high": 30.0,
+    "unit": "U/L"
+  },
+  {
+    "test_name": "γ-Glutamyltransferase (GGT; γ-glutamyl transpeptidase)b Male",
+    "specimen": "Serum",
+    "gender": "Male",
+    "normal_low": null,
+    "normal_high": 50.0,
+    "unit": "U/L"
+  },
+  {
+    "test_name": "Glycerol (free)b",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 1.5,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Glycineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.9,
+    "normal_high": 4.2,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Whole blood",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 4.0,
+    "normal_high": 5.6,
+    "unit": "% of total Hb"
+  },
+  {
+    "test_name": "Glycated hemoglobin (hemoglobin A1, A1c) Gold (therapeutic)",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 100.0,
+    "normal_high": 200.0,
+    "unit": "μg/dL"
+  },
+  {
+    "test_name": "Glycated hemoglobin (hemoglobin A1, A1c) Growth hormone, adult (GH, somatotropin)b",
+    "specimen": "Plasma, serum",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 10.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Glycated hemoglobin (hemoglobin A1, A1c) Haloperidol (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 5.0,
+    "normal_high": 20.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Haptoglobinb",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 40.0,
+    "normal_high": 180.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Hemoglobin A2b",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 2.0,
+    "normal_high": 3.5,
+    "unit": "% total Hb"
+  },
+  {
+    "test_name": "Hemoglobin A1c (see glycated hemoglobin) Hemoglobin Fb (fetal hemoglobin in adult)",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 2.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "Histidineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.5,
+    "normal_high": 1.7,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Homocysteine (total)",
+    "specimen": "Plasma, serum",
+    "gender": "Any",
+    "normal_low": 4.0,
+    "normal_high": 12.0,
+    "unit": "μmol/L"
+  },
+  {
+    "test_name": "Homovanillic acidb",
+    "specimen": "Urine",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 8.0,
+    "unit": "mg/24 h"
+  },
+  {
+    "test_name": "Hemoglobin A1c (see glycated hemoglobin) Human chorionic gonadotropin (hCG) (nonpregnant adult female)",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": null,
+    "normal_high": 3.0,
+    "unit": "mIU/mL"
+  },
+  {
+    "test_name": "β-Hydroxybutyric acid",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 0.21,
+    "normal_high": 2.81,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "5-Hydroxyindoleacetic acid (5-HIAA)",
+    "specimen": "Urine",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 25.0,
+    "unit": "mg/24 h"
+  },
+  {
+    "test_name": "17α-Hydroxyprogesterone,b female Follicular phase",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 15.0,
+    "normal_high": 70.0,
+    "unit": "ng/dL"
+  },
+  {
+    "test_name": "17α-Hydroxyprogesterone,b female Luteal phase",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 35.0,
+    "normal_high": 290.0,
+    "unit": "ng/dL"
+  },
+  {
+    "test_name": "17α-Hydroxyprogesterone,b female Postmenopausal",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": null,
+    "normal_high": 70.0,
+    "unit": "ng/dL"
+  },
+  {
+    "test_name": "17α-Hydroxyprogesterone,b female 17α- Hydroxyprogesterone,b male",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 27.0,
+    "normal_high": 199.0,
+    "unit": "ng/dL"
+  },
+  {
+    "test_name": "Hydroxyproline",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 0.55,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "5-Hydroxytryptamine (see serotonin) Ibuprofen (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 10.0,
+    "normal_high": 50.0,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "5-Hydroxytryptamine (see serotonin) Imipramine (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 150.0,
+    "normal_high": 250.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Immunoglobulin A (IgA)b",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 50.0,
+    "normal_high": 350.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Immunoglobulin D (IgD)",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 0.5,
+    "normal_high": 3.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Immunoglobulin E (IgE)",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 10.0,
+    "normal_high": 179.0,
+    "unit": "IU/mL"
+  },
+  {
+    "test_name": "Immunoglobulin G (IgG)b",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 600.0,
+    "normal_high": 1560.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Immunoglobulin M (IgM)b",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 54.0,
+    "normal_high": 222.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Insulin",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 5.0,
+    "normal_high": 20.0,
+    "unit": "μU/mL"
+  },
+  {
+    "test_name": "Inhibin A Males",
+    "specimen": "Serum",
+    "gender": "Male",
+    "normal_low": 1.0,
+    "normal_high": 3.6,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Inhibin A Female, early follicular",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 5.5,
+    "normal_high": 28.2,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Inhibin A Female, late follicular",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 19.5,
+    "normal_high": 102.3,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Inhibin A Female, midcycle",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 49.9,
+    "normal_high": 155.5,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Inhibin A Female, midluteal",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 13.2,
+    "normal_high": 159.6,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Inhibin A Female, postmenopausal",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 1.0,
+    "normal_high": 3.9,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Insulin-like growth factorb",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 130.0,
+    "normal_high": 450.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Iron (total)b",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 60.0,
+    "normal_high": 150.0,
+    "unit": "μg/dL"
+  },
+  {
+    "test_name": "Iron-binding capacity",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 250.0,
+    "normal_high": 400.0,
+    "unit": "μg/dL"
+  },
+  {
+    "test_name": "Isoleucineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.5,
+    "normal_high": 1.3,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Ionized calcium (see calcium) Isoniazid (therapeutic)",
+    "specimen": "Plasma or serum",
+    "gender": "Any",
+    "normal_low": 1.0,
+    "normal_high": 7.0,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Ionized calcium (see calcium) Isopropanol (toxic)",
+    "specimen": "Plasma, serum",
+    "gender": "Any",
+    "normal_low": 400.0,
+    "normal_high": null,
+    "unit": "mg/L"
+  },
+  {
+    "test_name": "Lactate (lactic acid)",
+    "specimen": "Arterial blood",
+    "gender": "Any",
+    "normal_low": 3.0,
+    "normal_high": 11.3,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Lactate (lactic acid)",
+    "specimen": "Venous blood",
+    "gender": "Any",
+    "normal_low": 4.5,
+    "normal_high": 19.8,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Lactate dehydrogenase (LDH, LD)",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 50.0,
+    "normal_high": 200.0,
+    "unit": "U/L"
+  },
+  {
+    "test_name": "Ionized calcium (see calcium) Lamotrigine (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 2.5,
+    "normal_high": 15.0,
+    "unit": "μg/dL"
+  },
+  {
+    "test_name": "Ionized calcium (see calcium) Lead (toxic)",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 5.0,
+    "normal_high": null,
+    "unit": "μg/dL"
+  },
+  {
+    "test_name": "Leucineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 1.0,
+    "normal_high": 2.3,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Leukocyte count (see complete blood count, white blood cell count) Levetiracetam (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 12.0,
+    "normal_high": 46.0,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Leukocyte count (see complete blood count, white blood cell count) Lidocaine (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 1.5,
+    "normal_high": 6.0,
+    "unit": "μmL g/mL"
+  },
+  {
+    "test_name": "Lipasea",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 0.0,
+    "normal_high": 160.0,
+    "unit": "U/L"
+  },
+  {
+    "test_name": "Lipoprotein(a) (Lp(a))",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 10.0,
+    "normal_high": 30.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Leukocyte count (see complete blood count, white blood cell count) Lithium (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 0.6,
+    "normal_high": 1.2,
+    "unit": "mEq/L"
+  },
+  {
+    "test_name": "Leukocyte count (see complete blood count, white blood cell count) Lorazepam (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 50.0,
+    "normal_high": 240.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Luteinizing hormone (LH),b female Follicular phase",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 2.0,
+    "normal_high": 15.0,
+    "unit": "mIU/L"
+  },
+  {
+    "test_name": "Luteinizing hormone (LH),b female Ovulatory peak",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 22.0,
+    "normal_high": 105.0,
+    "unit": "mIU/L"
+  },
+  {
+    "test_name": "Luteinizing hormone (LH),b female Luteal phase",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 0.6,
+    "normal_high": 19.0,
+    "unit": "mIU/L"
+  },
+  {
+    "test_name": "Luteinizing hormone (LH),b female Postmenopausal",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 16.0,
+    "normal_high": 64.0,
+    "unit": "mIU/L"
+  },
+  {
+    "test_name": "Luteinizing hormone (LH),b female Luteinizing hormone (LH),b male",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 2.0,
+    "normal_high": 12.0,
+    "unit": "mIU/L"
+  },
+  {
+    "test_name": "Lysineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 1.2,
+    "normal_high": 3.5,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Lysozyme (muramidase)",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 4.0,
+    "normal_high": 13.0,
+    "unit": "mg/L"
+  },
+  {
+    "test_name": "Magnesiumb",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 1.5,
+    "normal_high": 2.5,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Manganese",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 10.0,
+    "normal_high": 12.0,
+    "unit": "μg/L"
+  },
+  {
+    "test_name": "Lymphocytes (see complete blood count, white blood cell count) Maprotiline (therapeutic)",
+    "specimen": "Plasma, serum",
+    "gender": "Any",
+    "normal_low": 200.0,
+    "normal_high": 600.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "MCHC (see complete blood count) Meperidine (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 0.4,
+    "normal_high": 0.7,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Mercury",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 0.6,
+    "normal_high": 59.0,
+    "unit": "μg/L"
+  },
+  {
+    "test_name": "Metanephrines (total)b",
+    "specimen": "Urine",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 1.0,
+    "unit": "mg/24 h"
+  },
+  {
+    "test_name": "MCHC (see complete blood count) Methadone (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 100.0,
+    "normal_high": 400.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "MCHC (see complete blood count) Methanol (toxic)",
+    "specimen": "Whole blood, serum",
+    "gender": "Any",
+    "normal_low": 1.5,
+    "normal_high": null,
+    "unit": "mg/L"
+  },
+  {
+    "test_name": "Methemoglobin",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 0.24,
+    "unit": "g/dL"
+  },
+  {
+    "test_name": "Methemoglobin",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 1.0,
+    "unit": "% of total Hb"
+  },
+  {
+    "test_name": "Methionineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.1,
+    "normal_high": 0.6,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "MCHC (see complete blood count) Methsuximide (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 10.0,
+    "normal_high": 40.0,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "MCHC (see complete blood count) Methyldopa (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 1.0,
+    "normal_high": 5.0,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "MCHC (see complete blood count) Metoprolol (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 75.0,
+    "normal_high": 200.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Mexthotrexate Toxic 24 h after dose",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 10.0,
+    "normal_high": null,
+    "unit": "μmol/L"
+  },
+  {
+    "test_name": "Mexthotrexate Toxic 48 h after dose",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 1.0,
+    "normal_high": null,
+    "unit": "μmol/L"
+  },
+  {
+    "test_name": "Mexthotrexate Toxic 72 h after dose",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 0.1,
+    "normal_high": null,
+    "unit": "μmol/L"
+  },
+  {
+    "test_name": "β -Microglobulin 2",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 2.0,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Monocytes (see complete blood count, white blood cell count) Morphine (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 10.0,
+    "normal_high": 80.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Muramidase (see lysozyme) Mycophenolic acid (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 1.3,
+    "normal_high": 3.5,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Muramidase (see lysozyme) Naproxen (therapeutic)",
+    "specimen": "Plasma, serum",
+    "gender": "Any",
+    "normal_low": 50.0,
+    "normal_high": null,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Niacin (Vitamin B , 3 nicotinic acid)",
+    "specimen": "Plasma, serum",
+    "gender": "Any",
+    "normal_low": 0.5,
+    "normal_high": 8.45,
+    "unit": "ug/mL"
+  },
+  {
+    "test_name": "Nickel",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 1.0,
+    "normal_high": 28.0,
+    "unit": "μg/L"
+  },
+  {
+    "test_name": "Neutrophils (see complete blood count, white blood cell count) Nicotine (smoker)",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.01,
+    "normal_high": 0.05,
+    "unit": "mg/L"
+  },
+  {
+    "test_name": "Norepinephrineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 110.0,
+    "normal_high": 410.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Norepinephrineb",
+    "specimen": "Urine",
+    "gender": "Any",
+    "normal_low": 15.0,
+    "normal_high": 80.0,
+    "unit": "μg/24 h"
+  },
+  {
+    "test_name": "Neutrophils (see complete blood count, white blood cell count) Nortriptyline (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 50.0,
+    "normal_high": 150.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "N-telopeptide (BCE, bone collagen equivalents) Men",
+    "specimen": "Serum",
+    "gender": "Male",
+    "normal_low": 5.4,
+    "normal_high": 24.2,
+    "unit": "nmol BCE/L"
+  },
+  {
+    "test_name": "N-telopeptide (BCE, bone collagen equivalents) Premenopausal women",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 6.2,
+    "normal_high": 19.0,
+    "unit": "nmol BCE/L"
+  },
+  {
+    "test_name": "Ornithineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.4,
+    "normal_high": 1.4,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Osmolalityb",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 275.0,
+    "normal_high": 295.0,
+    "unit": "mOsm/kg H O 2"
+  },
+  {
+    "test_name": "Osmolality",
+    "specimen": "Urine",
+    "gender": "Any",
+    "normal_low": 250.0,
+    "normal_high": 900.0,
+    "unit": "mOsm/kg H O 2"
+  },
+  {
+    "test_name": "Osteocalcinb",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 3.0,
+    "normal_high": 13.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Oxalate",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 1.0,
+    "normal_high": 2.4,
+    "unit": "mg/L"
+  },
+  {
+    "test_name": "N-telopeptide (BCE, bone collagen equivalents) Oxazepam (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 0.2,
+    "normal_high": 1.4,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "N-telopeptide (BCE, bone collagen equivalents) Oxycodone (therapeutic)",
+    "specimen": "Plasma, serum",
+    "gender": "Any",
+    "normal_low": 10.0,
+    "normal_high": 100.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Oxygen, partial pressure (Po ) 2",
+    "specimen": "Arterial blood",
+    "gender": "Any",
+    "normal_low": 80.0,
+    "normal_high": 100.0,
+    "unit": "mm Hg"
+  },
+  {
+    "test_name": "Intactb",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 10.0,
+    "normal_high": 50.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "N-terminal specificb",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 8.0,
+    "normal_high": 24.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "C-terminal (mid- molecule)",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 0.0,
+    "normal_high": 340.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Parathyroid hormone Pentobarbital (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 1.0,
+    "normal_high": 5.0,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Pepsinogen Ib",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 28.0,
+    "normal_high": 100.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "pH (see blood gases) Phenobarbital (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 15.0,
+    "normal_high": 40.0,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Phenylalanineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.6,
+    "normal_high": 1.5,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "pH (see blood gases) Phenytoin (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 10.0,
+    "normal_high": 20.0,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Phosphatase, tartrate- resistant acid",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 1.5,
+    "normal_high": 4.5,
+    "unit": "U/L"
+  },
+  {
+    "test_name": "Phosphorus (inorganic)b",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 2.3,
+    "normal_high": 4.7,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Phosphorus (inorganic)b",
+    "specimen": "Urine",
+    "gender": "Any",
+    "normal_low": 0.4,
+    "normal_high": 1.3,
+    "unit": "g/24 h"
+  },
+  {
+    "test_name": "Plasminogen",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 80.0,
+    "normal_high": 120.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "Plasminogen activator inhibitor activity",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 3.0,
+    "normal_high": 56.0,
+    "unit": "mIU/mL"
+  },
+  {
+    "test_name": "Porphobilinogen deaminase",
+    "specimen": "Red blood cells",
+    "gender": "Any",
+    "normal_low": 7.0,
+    "normal_high": null,
+    "unit": "nmol/s/L"
+  },
+  {
+    "test_name": "Potassium",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 3.5,
+    "normal_high": 5.0,
+    "unit": "mEq/L"
+  },
+  {
+    "test_name": "Prealbumin— transthyretin",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 18.0,
+    "normal_high": 45.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Pregnanediol,b female Follicular phase",
+    "specimen": "Urine",
+    "gender": "Female",
+    "normal_low": null,
+    "normal_high": 2.6,
+    "unit": "mg/24 h"
+  },
+  {
+    "test_name": "Pregnanediol,b female Luteal phase",
+    "specimen": "Urine",
+    "gender": "Female",
+    "normal_low": 2.3,
+    "normal_high": 10.6,
+    "unit": "mg/24 h"
+  },
+  {
+    "test_name": "Pregnanediol,b female Pregnanediol,b male",
+    "specimen": "Urine",
+    "gender": "Female",
+    "normal_low": 0.0,
+    "normal_high": 1.9,
+    "unit": "mg/24 h"
+  },
+  {
+    "test_name": "Pregnanetriolb",
+    "specimen": "Urine",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 2.5,
+    "unit": "mg/24 h"
+  },
+  {
+    "test_name": "Pregnanediol,b female Primidone (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Female",
+    "normal_low": null,
+    "normal_high": "12 May",
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Pregnanediol,b female Procainamide (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Female",
+    "normal_low": null,
+    "normal_high": "10 Apr",
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Progesterone,b female Follicular phase",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 0.1,
+    "normal_high": 0.7,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Progesterone,b female Luteal phase",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 2.0,
+    "normal_high": 25.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Progesterone,b female Progesterone,b male",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 0.13,
+    "normal_high": 0.97,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Prolactin (nonlactating subject)",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 1.0,
+    "normal_high": 25.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Prolineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 1.2,
+    "normal_high": 3.9,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Progesterone,b female Propoxyphene (therapeutic)",
+    "specimen": "Serum",
+    "gender": "Female",
+    "normal_low": 0.1,
+    "normal_high": 0.4,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Progesterone,b female Propanolol (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Female",
+    "normal_low": 50.0,
+    "normal_high": 100.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Protein (total)b",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 6.0,
+    "normal_high": 8.0,
+    "unit": "g/dL"
+  },
+  {
+    "test_name": "Protein C activity",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 70.0,
+    "normal_high": 140.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "Albumin",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 52.0,
+    "normal_high": 65.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "α -Globulin 1",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 2.5,
+    "normal_high": 5.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "α -Globulin 2",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 7.0,
+    "normal_high": 13.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "β-Globulin",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 8.0,
+    "normal_high": 14.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "γ-Globulin",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 12.0,
+    "normal_high": 22.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "Albumin",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 3.2,
+    "normal_high": 5.6,
+    "unit": "g/dL"
+  },
+  {
+    "test_name": "α -Globulin 1",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 0.1,
+    "normal_high": 0.4,
+    "unit": "g/dL"
+  },
+  {
+    "test_name": "α -Globulin 2",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 0.4,
+    "normal_high": 1.2,
+    "unit": "g/dL"
+  },
+  {
+    "test_name": "β-Globulin",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 0.5,
+    "normal_high": 1.1,
+    "unit": "g/dL"
+  },
+  {
+    "test_name": "γ-Globulin",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 0.5,
+    "normal_high": 1.6,
+    "unit": "g/dL"
+  },
+  {
+    "test_name": "Protein S activity",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 70.0,
+    "normal_high": 140.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "Protein S free antigen",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 80.0,
+    "normal_high": 160.0,
+    "unit": "%"
+  },
+  {
+    "test_name": "Prothrombin time (PT)",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 10.0,
+    "normal_high": 13.0,
+    "unit": "seconds"
+  },
+  {
+    "test_name": "Protoporphyrin",
+    "specimen": "Red blood cells",
+    "gender": "Any",
+    "normal_low": 15.0,
+    "normal_high": 50.0,
+    "unit": "μg/dL"
+  },
+  {
+    "test_name": "Prostate-specific antigen (PSA)",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 0.0,
+    "normal_high": 4.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Pyridinium cross-links (deoxypyridinoline) Male",
+    "specimen": "Urine",
+    "gender": "Male",
+    "normal_low": 10.3,
+    "normal_high": 20.0,
+    "unit": "nmol/mmol creatinine"
+  },
+  {
+    "test_name": "Pyridinium cross-links (deoxypyridinoline) Premenopausal female",
+    "specimen": "Urine",
+    "gender": "Female",
+    "normal_low": 15.3,
+    "normal_high": 33.6,
+    "unit": "nmol/mmol creatinine"
+  },
+  {
+    "test_name": "Pyruvate (as pyruvic acid)",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 0.3,
+    "normal_high": 0.9,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Pyridoxine (see vitamin B ) 6 Quinidine (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 2.0,
+    "normal_high": 5.0,
+    "unit": "μg/mL"
+  },
+  {
+    "test_name": "Renin (normal-sodium diet)b",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 1.1,
+    "normal_high": 4.1,
+    "unit": "ng/mL/h"
+  },
+  {
+    "test_name": "Reticulocyte countb",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 25.0,
+    "normal_high": 75.0,
+    "unit": "103 μL−1"
+  },
+  {
+    "test_name": "Reticulocyte countb (fraction)",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 0.5,
+    "normal_high": 1.5,
+    "unit": "% of RBCs"
+  },
+  {
+    "test_name": "Rheumatoid factor",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 30.0,
+    "unit": "IU/mL"
+  },
+  {
+    "test_name": "Riboflavin (see vitamin B ) 2 Salicylates (therapeutic)",
+    "specimen": "Serum, plasma",
+    "gender": "Any",
+    "normal_low": 15.0,
+    "normal_high": 30.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Selenium",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 58.0,
+    "normal_high": 234.0,
+    "unit": "μg/L"
+  },
+  {
+    "test_name": "Serineb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 0.7,
+    "normal_high": 2.0,
+    "unit": "mg/dL"
+  },
+  {
+    "test_name": "Serotonin (5- hydroxytryptamine)",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 50.0,
+    "normal_high": 200.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Sedimentation rate (see erythrocyte sedimentation rate) Sertraline (therapeutic)",
+    "specimen": "Serum or plasma",
+    "gender": "Male",
+    "normal_low": 10.0,
+    "normal_high": 50.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Sex hormone-binding globulinb",
+    "specimen": "Serum",
+    "gender": "Any",
+    "normal_low": 0.5,
+    "normal_high": 1.5,
+    "unit": "μg/dL"
+  },
+  {
+    "test_name": "SPEP (see protein electrophoresis) Sirolimus (therapeutic)",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 4.0,
+    "normal_high": 20.0,
+    "unit": "ng/mL"
+  },
+  {
+    "test_name": "Sodiumb",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": 136.0,
+    "normal_high": 142.0,
+    "unit": "mEq/L"
+  },
+  {
+    "test_name": "Somatostatin",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 25.0,
+    "unit": "pg/mL"
+  },
+  {
+    "test_name": "Somatomedin C (see insulin-like growth factor) Strychnine (toxic)",
+    "specimen": "Whole blood",
+    "gender": "Any",
+    "normal_low": 0.5,
+    "normal_high": null,
+    "unit": "mg/L"
+  },
+  {
+    "test_name": "Substance P",
+    "specimen": "Plasma",
+    "gender": "Any",
+    "normal_low": null,
+    "normal_high": 240.0,
+    "unit": "pg/mL"
+  }
+]

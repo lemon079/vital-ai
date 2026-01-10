@@ -1,39 +1,39 @@
 
 import { pool } from '@/lib/db';
-import { ChatOllama } from "@langchain/ollama";
 import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import { NextResponse } from 'next/server';
+import { graph } from '@/lib/agent/graph';
 
 export async function POST(req: Request) {
     // Parse Payload
     // Format: { messages: [], chatId: string, userId: string, fileData?: { type: string, content: string } }
     // Note: userId should be securely derived from session in a real app, 
     // but here we accept it for simplicity/demo if validated.
-        const { messages, chatId, userId, fileData } = await req.json();
+    const { messages, chatId, userId, fileData } = await req.json();
 
-        if (!Array.isArray(messages) || messages.length === 0) {
-            return NextResponse.json({ error: "Invalid or missing messages array." }, { status: 400 });
-        }
+    if (!Array.isArray(messages) || messages.length === 0) {
+        return NextResponse.json({ error: "Invalid or missing messages array." }, { status: 400 });
+    }
 
-        let currentMessageContent = messages[messages.length - 1].content;
-        let fileContext = '';
-        
-        // Process file if provided
-        if (fileData) {
-            try {
-                if (fileData.type === 'pdf') {
-                    // For PDF, extract text from base64
-                    const pdfText = await extractTextFromPDF(fileData.content);
-                    fileContext = `\n\n=== MEDICAL LAB REPORT (PDF) ===\n${pdfText}\n=== END OF REPORT ===\n\nPlease analyze this medical lab report thoroughly. Identify any abnormal values, provide explanations, and flag any concerning results that may require medical attention.`;
-                } else if (fileData.type === 'image') {
-                    // For images, decode base64 for context
-                    fileContext = `\n\n=== MEDICAL IMAGE/REPORT ===\nAn image file has been uploaded. This appears to be a medical document or lab report image.\n=== END OF IMAGE ===\n\nNote: Image content analysis requires OCR or vision model integration. Please advise the user to upload a PDF version for detailed analysis, or describe the key values visible in the image.`;
-                }
-            } catch (error) {
-                console.error('File processing error:', error);
-                return NextResponse.json({ error: 'Failed to process uploaded file.' }, { status: 500 });
+    let currentMessageContent = messages[messages.length - 1].content;
+    let fileContext = '';
+
+    // Process file if provided
+    if (fileData) {
+        try {
+            if (fileData.type === 'pdf') {
+                // For PDF, extract text from base64
+                const pdfText = await extractTextFromPDF(fileData.content);
+                fileContext = `\n\n=== MEDICAL LAB REPORT (PDF) ===\n${pdfText}\n=== END OF REPORT ===\n\nPlease analyze this medical lab report thoroughly. Identify any abnormal values, provide explanations, and flag any concerning results that may require medical attention.`;
+            } else if (fileData.type === 'image') {
+                // For images, decode base64 for context
+                fileContext = `\n\n=== MEDICAL IMAGE/REPORT ===\nAn image file has been uploaded. This appears to be a medical document or lab report image.\n=== END OF IMAGE ===\n\nNote: Image content analysis requires OCR or vision model integration. Please advise the user to upload a PDF version for detailed analysis, or describe the key values visible in the image.`;
             }
+        } catch (error) {
+            console.error('File processing error:', error);
+            return NextResponse.json({ error: 'Failed to process uploaded file.' }, { status: 500 });
         }
+    }
 
     const client = await pool.connect();
 
@@ -71,22 +71,16 @@ export async function POST(req: Request) {
 
         // Build message history with file context appended to latest message
         const messageHistory = messages.map((m: any, index: number) => {
-            const content = index === messages.length - 1 && fileContext 
-                ? m.content + fileContext 
+            const content = index === messages.length - 1 && fileContext
+                ? m.content + fileContext
                 : m.content;
             return m.role === 'user' ? new HumanMessage(content) : new AIMessage(content);
         });
 
         const stream = await model.stream(messageHistory);
 
-        // 4. Stream Response and Save AI Message (Simulated here for streaming, actual save would need aggregation)
+        // 4. Stream Response and Save AI Message
         const encoder = new TextEncoder();
-
-        // For saving the FULL AI response, we need to aggregate the stream or save after.
-        // Since this is a stream response, we'll spawn a "fire and forget" save or simple aggregation
-        // NOTE: In a real edge runtime, you'd use `waitUntil` or save chunks. 
-        // Here we will just stream for UI and assume client state is enough for now, 
-        // OR ideally, we collect the full text to save to DB.
 
         // Let's collect full response to save
         let fullAIResponse = "";
@@ -94,20 +88,54 @@ export async function POST(req: Request) {
         const readableStream = new ReadableStream({
             async start(controller) {
                 for await (const chunk of stream) {
-                    const text = chunk.content as string;
-                    if (text) {
-                        fullAIResponse += text;
-                        controller.enqueue(encoder.encode(text));
+                    // Logic to handle graph chunk updates
+                    // Typically chunk is { nodeName: { messages: [AIMessage] } } for streaming updates
+                    // Or if streaming tokens, it might conform differently depending on stream mode.
+                    // For this basic setup, usually we watch for the "agent" node output which contains the AIMessage.
+
+                    // console.log("Chunk:", chunk);
+
+                    for (const nodeName in chunk) {
+                        const nodeState = (chunk as any)[nodeName];
+                        if (nodeState.messages && nodeState.messages.length > 0) {
+                            const lastMsg = nodeState.messages[nodeState.messages.length - 1];
+
+                            // If it is an AI Message with content, stream it
+                            // Note: This simplistic streaming assumes we get the full message at the end of the node execution
+                            // because we are using default .stream() which yields state updates, not tokens.
+                            // For token streaming, we'd need .streamEvents() or .streamLog().
+                            // For now, let's just send the content when available.
+
+                            if (lastMsg.content && typeof lastMsg.content === 'string') {
+                                // Avoid duplicating if multiple chunks send same partial? 
+                                // Actually LangGraph .stream() yields the *update*.
+                                // So if the agent node runs and returns a message, we get that message.
+                                const text = lastMsg.content;
+                                // Start of response or appending? 
+                                // With stream(), we get the NODE output.
+                                // The agent (LLM) node outputs the FULL AIMessage unless we configured it otherwise.
+
+                                // If we want token-by-token, we need a different approach.
+                                // However, satisfying the user request "follow quickstart" usually uses this simple stream loop.
+                                // The quickstart example just logs the chunk.
+
+                                fullAIResponse = text; // Capturing the final response from the agent node
+                                controller.enqueue(encoder.encode(text));
+                            }
+                        }
                     }
                 }
 
+                // If fullAIResponse is empty, we might not have gotten a standard text response (maybe just tool calls?)
+                // But normally the loop ends with a final AI message.
+
                 // Save AI Message after streaming
-                // Note: We need a new client connection or reuse if meaningful for non-blocking
-                // For simplicity in this demo, we'll do a quick separate query or just assume it happened
-                await pool.query( // Using pool directly for quick non-transactional save
-                    'INSERT INTO messages (chat_id, role, content) VALUES ($1, $2, $3)',
-                    [currentChatId, 'assistant', fullAIResponse]
-                );
+                if (fullAIResponse) {
+                    await pool.query(
+                        'INSERT INTO messages (chat_id, role, content) VALUES ($1, $2, $3)',
+                        [currentChatId, 'assistant', fullAIResponse]
+                    );
+                }
 
                 controller.close();
             },
@@ -130,11 +158,11 @@ async function extractTextFromPDF(base64Content: string): Promise<string> {
     try {
         // Decode base64 to buffer
         const buffer = Buffer.from(base64Content, 'base64');
-        
+
         // Use pdf-parse to extract text
         const pdfParse = require('pdf-parse');
         const data = await pdfParse(buffer);
-        
+
         return data.text || '[No text found in PDF]';
     } catch (error) {
         console.error('PDF extraction error:', error);
