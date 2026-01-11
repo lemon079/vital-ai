@@ -1,5 +1,6 @@
+
+import { submitOnboarding } from '@/lib/services/actions';
 import { useMutation } from '@tanstack/react-query';
-import { submitOnboarding } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 

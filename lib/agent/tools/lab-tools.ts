@@ -1,6 +1,7 @@
+
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
-import { findLabTest } from "@/lib/lab-data";
+import { findLabTest } from "@/lib/services/lab-data";
 
 // Unit conversion factors (simplified for common cases)
 const CONVERSION_RATES: Record<string, number> = {

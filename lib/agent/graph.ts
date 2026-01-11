@@ -1,47 +1,126 @@
+
 import { StateGraph, START, END } from "@langchain/langgraph";
-import { ToolNode } from "@langchain/langgraph/prebuilt";
 import { AgentState } from "./state";
+import { saveLabResultsTool } from "./tools/database-tools";
 import { compareLabTest, convertLabUnits } from "./tools/lab-tools";
-import { callModel } from "./nodes/model";
-import { summarizeReport } from "./nodes/summarizer";
-import { extractPdfData } from "./nodes/extractor";
 
-// Define the tool node
-const tools = [compareLabTest, convertLabUnits];
-const toolNode = new ToolNode(tools);
+// Import Agents
+import { conversationAgent } from "./nodes/conversation";
+import { labAnalysisAgent } from "./nodes/lab-analysis";
+import { clinicalSummaryAgent } from "./nodes/clinical-summary";
+import { executeTools } from "./nodes/execute-tools";
 
-// Define logic to determine if we should continue
-function shouldContinue(state: typeof AgentState.State) {
+// Define Tools
+const tools = [saveLabResultsTool, compareLabTest, convertLabUnits];
+
+/**
+ * ROUTER LOGIC
+ * Decides which agent to activate based on user input and state
+ */
+function routeStart(state: typeof AgentState.State) {
+    const { filePath, messages } = state;
+    const lastMessage = messages[messages.length - 1];
+    const content = typeof lastMessage.content === 'string' ? lastMessage.content.toLowerCase() : "";
+
+    // 1. If PDF is uploaded -> Lab Analysis Agent
+    if (filePath) {
+        console.log("[Router] PDF detected. Routing to lab_analysis");
+        return "lab_analysis";
+    }
+
+    // 2. If summary requested -> Clinical Summary Agent
+    // Triggers: "summary for doctor", "create summary", "appointment tomorrow"
+    if (
+        content.includes("summary for doctor") ||
+        content.includes("create summary") ||
+        content.includes("appointment tomorrow") ||
+        content.includes("generate summary")
+    ) {
+        console.log("[Router] Summary requested. Routing to clinical_summary");
+        return "clinical_summary";
+    }
+
+    // 3. Default -> Conversation Agent
+    console.log("[Router] Default routing to conversation");
+    return "conversation";
+}
+
+/**
+ * LAB AGENT ROUTING
+ * Checks if tool called or finished
+ */
+function routeLabAgent(state: typeof AgentState.State) {
     const messages = state.messages;
     const lastMessage = messages[messages.length - 1];
 
-    if (lastMessage && (lastMessage as any).tool_calls?.length) {
+    // If tool calls present, go to tools
+    if ((lastMessage as any).tool_calls?.length) {
+        console.log(`[Router] Lab Analysis made ${(lastMessage as any).tool_calls.length} tool calls. Routing to tools.`);
         return "tools";
     }
+
+    // Lab analysis complete - go to conversation to present results
+    console.log("[Router] Lab Analysis complete. Routing to conversation.");
+    return "conversation";
+}
+
+/**
+ * CONVERSATION ROUTING
+ * Checks if conversation should continue or if summary is needed
+ */
+function routeConversation(state: typeof AgentState.State) {
+    const messages = state.messages;
+    const lastMessage = messages[messages.length - 1];
+    const content = typeof lastMessage.content === 'string' ? lastMessage.content.toLowerCase() : "";
+
+    // Check if user is requesting summary
+    if (
+        content.includes("summary for doctor") ||
+        content.includes("create summary") ||
+        content.includes("appointment tomorrow") ||
+        content.includes("generate summary")
+    ) {
+        console.log("[Router] Summary requested from conversation. Routing to clinical_summary");
+        return "clinical_summary";
+    }
+
+    // Otherwise end the conversation
+    console.log("[Router] Conversation complete. Routing to END.");
     return END;
 }
 
-// Build the graph
+// Build the Graph
 const workflow = new StateGraph(AgentState)
-    .addNode("extractor", extractPdfData)
-    .addNode("summarizer", summarizeReport)
-    .addNode("agent", callModel)
+    // Nodes
+    .addNode("conversation", conversationAgent)
+    .addNode("lab_analysis", labAnalysisAgent)
+    .addNode("clinical_summary", clinicalSummaryAgent)
+    .addNode("tools", executeTools)
 
-    .addNode("tools", toolNode)
-
-    // Linear Flow: Start -> Extractor -> Summarizer -> Agent
-    // The nodes themselves handle "skip" logic by returning empty updates if criteria aren't met.
-    .addEdge(START, "extractor")
-    .addEdge("extractor", "summarizer")
-    .addEdge("summarizer", END)
-    // .addEdge("summarizer", "agent") // Temporarily bypassed per user request
-
-    // Agent flow
-    .addConditionalEdges("agent", shouldContinue, {
-        tools: "tools",
-        [END]: END,
+    // Starting point routing
+    .addConditionalEdges(START, routeStart, {
+        conversation: "conversation",
+        lab_analysis: "lab_analysis",
+        clinical_summary: "clinical_summary"
     })
-    .addEdge("tools", "agent");
 
-// Compile the graph
+    // Lab Analysis Flow
+    .addConditionalEdges("lab_analysis", routeLabAgent, {
+        tools: "tools",
+        conversation: "conversation" // ✅ FIXED: Go to conversation, not END
+    })
+
+    // Tools always return to lab analysis
+    .addEdge("tools", "lab_analysis")
+
+    // Conversation Flow - can go to summary or end
+    .addConditionalEdges("conversation", routeConversation, {
+        clinical_summary: "clinical_summary",
+        [END]: END
+    })
+
+    // Clinical Summary Flow
+    .addEdge("clinical_summary", END);
+
+// Compile with safety limits
 export const graph = workflow.compile();

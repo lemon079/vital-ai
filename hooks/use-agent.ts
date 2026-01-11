@@ -1,5 +1,5 @@
+
 import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
 import { toast } from 'sonner';
 
 export function useAgent() {
@@ -30,7 +30,9 @@ export function useAgent() {
                 aiResponse += decoder.decode(value);
             }
 
-            return { response: aiResponse };
+            const chatIdMatch = res.headers.get('X-Chat-Id');
+
+            return { response: aiResponse, chatId: chatIdMatch };
         },
         onError: () => {
             toast.error('Failed to send message. Please try again.');

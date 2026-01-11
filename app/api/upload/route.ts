@@ -1,5 +1,6 @@
+
+import { saveUploadedFile } from '@/lib/services/processing';
 import { NextResponse } from 'next/server';
-import { saveUploadedFile } from '@/lib/chat/file-processor';
 
 export async function POST(req: Request) {
     try {

@@ -1,7 +1,8 @@
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, FileText, AlertTriangle, ArrowRight } from "lucide-react";
+import { Activity, FileText, AlertTriangle, ArrowRight, Menu } from "lucide-react";
 import { ModeToggle } from '@/components/mode-toggle';
 
 export default function LandingPage() {
@@ -12,8 +13,10 @@ export default function LandingPage() {
         <div className="container flex h-16 items-center justify-between px-4 md:px-6">
           <div className="flex items-center gap-2">
             <Activity className="h-6 w-6 text-primary" />
-            <span className="text-lg font-bold">LabAnalyzer AI</span>
+            <span className="text-lg font-bold">VitalSense AI</span>
           </div>
+
+          {/* Desktop Nav */}
           <nav className="hidden md:flex gap-6">
             <Link className="text-sm font-medium hover:underline underline-offset-4" href="#features">
               Features
@@ -22,14 +25,14 @@ export default function LandingPage() {
               How It Works
             </Link>
           </nav>
+
           <div className="flex items-center gap-4">
             <ModeToggle />
-            <Button variant="ghost" asChild>
-              <Link href="/login">Log In</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/signup">Get Started</Link>
-            </Button>
+            <div className="hidden md:flex gap-2">
+              <Button asChild>
+                <Link href="/agent">Get Started</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -48,13 +51,13 @@ export default function LandingPage() {
                   Stop waiting for clarity. Our AI analyzes your lab reports instantly, flagging critical values and explaining results in plain English.
                 </p>
               </div>
-              <div className="space-x-4">
-                <Button size="lg" className="h-12 px-8" asChild>
-                  <Link href="/signup">
+              <div className="flex flex-col min-[400px]:flex-row gap-4 justify-center w-full max-w-sm min-[400px]:max-w-none">
+                <Button size="lg" className="h-12 px-8 w-full min-[400px]:w-auto" asChild>
+                  <Link href="/login">
                     Analyze My Report <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
-                <Button variant="outline" size="lg" className="h-12 px-8" asChild>
+                <Button variant="outline" size="lg" className="h-12 px-8 w-full min-[400px]:w-auto" asChild>
                   <Link href="#how-it-works">
                     Learn More
                   </Link>
@@ -154,11 +157,11 @@ export default function LandingPage() {
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl text-primary-foreground">Ready to understand your health?</h2>
               <p className="max-w-[600px] text-primary-foreground/90 md:text-xl font-medium">
-                Join others who use MediAnalyze to take control of their medical data.
+                Join others who use VitalSense to take control of their medical data.
               </p>
               <Button size="lg" variant="secondary" className="h-12 px-8 font-bold" asChild>
-                <Link href="/signup">
-                  Get Started for Free
+                <Link href="/agent">
+                  Start Analysis Now
                 </Link>
               </Button>
             </div>
@@ -167,7 +170,7 @@ export default function LandingPage() {
       </main>
 
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t font-light text-xs text-muted-foreground">
-        <p>© 2026 MediAnalyze AI. All rights reserved.</p>
+        <p>© 2026 VitalSense AI. All rights reserved.</p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
           <Link className="hover:underline underline-offset-4" href="#">
             Terms of Service
