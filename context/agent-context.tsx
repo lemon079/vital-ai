@@ -3,7 +3,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { toast } from "sonner";
-import { useAgent } from '@/hooks/use-agent';
 import { useUploadFile } from '@/hooks/use-upload-file';
 
 // Types
@@ -45,94 +44,51 @@ export function AgentProvider({
     const [messages, setMessages] = useState<Message[]>(initialMappedMessages);
     const [input, setInput] = useState('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [selectedText, setSelectedText] = useState<string>('');
     const [pdfUrl, setPdfUrl] = useState<string | null>(initialFileUrl || null);
     const [isPdfVisible, setIsPdfVisible] = useState(!!initialFileUrl);
     const [currentChatId, setCurrentChatId] = useState<string | null>(initialChatId || null);
     const [chatHistory, setChatHistory] = useState<ChatSession[]>(initialHistory);
 
-    const { mutate, isPending } = useAgent();
     const { uploadFile, isUploading: isFileUploading } = useUploadFile();
     const [isUploading, setIsUploading] = useState(false);
-
-    // Auth removed, using hardcoded ID
-    // const userId = CURRENT_USER_ID;
+    const [isLoading, setIsLoading] = useState(false);
 
     const fetchHistory = useCallback(async () => {
-        // History disabled for now
-        /*
-        try {
-            const res = await fetch(`/api/chats?userId=${userId}`);
-            if (res.ok) {
-                const data = await res.json();
-                setChatHistory(data.chats || []);
-            }
-        } catch (e) {
-            console.error("Failed to load history", e);
-        }
-        */
         setChatHistory([]);
     }, []);
 
-    // Fetch history only if we don't have it (client side navigation)
-    useEffect(() => {
-        // Disabled history fetching
-        // if (chatHistory.length === 0) {
-        //     fetchHistory();
-        // }
-    }, [fetchHistory]); // Run once on mount if empty
-
-    // Load initial chat if provided and different from current
-    // We use a ref or check to avoid double loading
     useEffect(() => {
         if (initialChatId && initialChatId !== currentChatId) {
-            // Avoid loading if we already have messages for this ID (simple cache check)
-            // But actually we might want to refresh. 
-            // Ideally `loadChat` handles the "am I already loading or loaded" check.
-            loadChatInternal(initialChatId);
+            setCurrentChatId(initialChatId);
         }
     }, [initialChatId]);
 
-
-    const loadChatInternal = useCallback(async (chatId: string) => {
+    const loadChat = async (chatId: string) => {
+        if (!chatId) return;
         try {
-            // Optimistic update
-            setCurrentChatId(chatId);
-
             const res = await fetch(`/api/chats/${chatId}`);
             if (res.ok) {
-                const data = await res.json();
-                if (data.messages) {
-                    const mapped = data.messages.map((m: any) => ({
-                        role: m.role.toLowerCase(),
-                        content: m.content
-                    }));
-                    setMessages(mapped);
-
-                    if (data.fileUrl) {
-                        setPdfUrl(data.fileUrl);
-                        setIsPdfVisible(true);
-                    } else {
-                        setPdfUrl(null);
-                        setIsPdfVisible(false);
-                    }
-                    // toast.success("Loaded chat history");
+                const chat = await res.json();
+                const mappedMessages = chat.messages?.map((m: any) => ({
+                    role: m.role.toLowerCase(),
+                    content: m.content
+                })) || [];
+                setMessages(mappedMessages);
+                setCurrentChatId(chat.id);
+                if (chat.file_url) {
+                    setPdfUrl(chat.file_url);
+                    setIsPdfVisible(true);
+                } else {
+                    setPdfUrl(null);
+                    setIsPdfVisible(false);
                 }
+            }
+            if (!pathname.includes(chatId)) {
+                router.push(`/agent/${chatId}`);
             }
         } catch (e) {
             toast.error("Failed to load chat");
-        }
-    }, []);
-
-    const loadChat = async (chatId: string) => {
-        // If clicking on sidebar, we update URL and let the page effect handle the load?
-        // OR we load directly and update URL shallowly.
-
-        // Strategy: Load data first, then update URL to match.
-        await loadChatInternal(chatId);
-
-        // Push URL if needed
-        if (pathname !== `/agent/${chatId}`) {
-            router.push(`/agent/${chatId}`);
         }
     };
 
@@ -186,33 +142,65 @@ export function AgentProvider({
             }
         }
 
-        const newMessages: Message[] = [...messages, { role: 'user', content: userMsg, fileInfo }];
+        const newMessages: Message[] = [
+            ...messages,
+            {
+                role: 'user',
+                content: userMsg,
+                fileInfo,
+                selectedText: selectedText || undefined
+            }
+        ];
         setMessages(newMessages);
         setSelectedFile(null);
+        setSelectedText(''); // Clear selection after sending
 
-        const payload = {
-            message: userMsg,
-            history: newMessages,
-            fileData,
-            userId: userId,
-            chatId: currentChatId || undefined
-        };
+        setIsLoading(true);
 
-        mutate(payload, {
-            onSuccess: (data) => {
-                setMessages((prev) => [...prev, { role: 'assistant', content: data.response }]);
-                if (data.chatId && data.chatId !== currentChatId) {
-                    setCurrentChatId(data.chatId);
-                    // Update URL silently if it's new
-                    window.history.replaceState(null, '', `/agent/${data.chatId}`);
-                    // Refresh history list to show the new chat
-                    fetchHistory();
-                }
-            },
-            onError: () => {
-                setMessages((prev) => [...prev, { role: 'assistant', content: 'Sorry, I am having trouble connecting to the medical brain right now.' }]);
+        try {
+            const payload = {
+                messages: newMessages,
+                fileData,
+                userId: userId,
+                chatId: currentChatId || undefined,
+                selectedText: selectedText || undefined
+            };
+
+            const res = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || 'Failed to send message');
             }
-        });
+
+            // Add AI response to messages
+            setMessages(prev => [...prev, {
+                role: 'assistant',
+                content: data.response
+            }]);
+
+            // Update chatId if needed
+            if (data.chatId && data.chatId !== currentChatId) {
+                setCurrentChatId(data.chatId);
+                window.history.replaceState(null, '', `/agent/${data.chatId}`);
+                fetchHistory(); // Refresh history to show new chat
+            }
+
+        } catch (error: any) {
+            console.error('Chat error:', error);
+            setMessages(prev => [...prev, {
+                role: 'assistant',
+                content: 'Sorry, I am having trouble connecting to the medical brain right now.'
+            }]);
+            toast.error('Failed to send message');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const processFile = async (file: File) => {
@@ -229,43 +217,60 @@ export function AgentProvider({
                     const url = result.fileUrl || URL.createObjectURL(file);
                     setPdfUrl(url);
                     setIsPdfVisible(true);
-                    setSelectedFile(null); // Clear the chip above input
+                    setSelectedFile(null);
                 }
 
                 const base64 = await fileToBase64(file);
-                let fileData: { type: string; content: string } | null = null;
-
-                if (file.type === 'application/pdf') {
-                    fileData = { type: 'pdf', content: base64 };
-                } else {
-                    fileData = { type: 'image', content: base64 };
-                }
-
-                const autoMsg = "Please analyze this uploaded report.";
-
                 const payload = {
-                    message: autoMsg,
-                    history: [],
-                    fileData,
+                    messages: messages.length > 0 ? messages : [
+                        { role: 'assistant', content: 'Hello! I am your Medical AI Assistant. Upload a lab report or ask me a health question.' }
+                    ],
+                    fileData: {
+                        type: file.type === 'application/pdf' ? 'pdf' : 'image',
+                        content: base64
+                    },
                     userId: userId,
                     chatId: currentChatId || undefined
                 };
 
-                mutate(payload, {
-                    onSuccess: (data) => {
-                        setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
-                        if (data.chatId) {
-                            setCurrentChatId(data.chatId);
-                            window.history.replaceState(null, '', `/agent/${data.chatId}`);
-                            if (!currentChatId) {
-                                fetchHistory();
-                            }
-                        }
-                    },
-                    onError: () => {
-                        setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I failed to analyze the report.' }]);
+                setIsLoading(true);
+
+                try {
+                    const res = await fetch('/api/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const data = await res.json();
+
+                    if (!res.ok) {
+                        throw new Error(data.error || 'Failed to analyze report');
                     }
-                });
+
+                    // Add AI response to messages
+                    setMessages(prev => [...prev, {
+                        role: 'assistant',
+                        content: data.response
+                    }]);
+
+                    // Update chatId if needed
+                    if (data.chatId && !currentChatId) {
+                        setCurrentChatId(data.chatId);
+                        window.history.replaceState(null, '', `/agent/${data.chatId}`);
+                        fetchHistory();
+                    }
+
+                } catch (error: any) {
+                    console.error('File processing error:', error);
+                    setMessages(prev => [...prev, {
+                        role: 'assistant',
+                        content: 'Sorry, I failed to analyze the report.'
+                    }]);
+                    toast.error(error.message || 'Failed to analyze report');
+                } finally {
+                    setIsLoading(false);
+                }
 
             } else {
                 setMessages(prev => [...prev, { role: 'assistant', content: 'Upload failed. Please try again.' }]);
@@ -284,12 +289,14 @@ export function AgentProvider({
             setInput,
             selectedFile,
             setSelectedFile,
+            selectedText,
+            setSelectedText,
             pdfUrl,
             isPdfVisible,
             setIsPdfVisible,
             currentChatId,
             chatHistory,
-            isPending,
+            isPending: isLoading,
             isUploading,
             isFileUploading,
             handleNewChat,

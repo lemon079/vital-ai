@@ -1,7 +1,17 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { Send, Paperclip, Bot, User, Menu, FileText, ImageIcon, Plus } from 'lucide-react';
+import { useEffect, useRef, useState, useCallback } from 'react';
+import dynamic from 'next/dynamic';
+import { Send, Paperclip, Bot, User, Menu, FileText, ImageIcon, Plus, X, Highlighter } from 'lucide-react';
+// import { PdfViewer } from '@/components/pdf-viewer';
+const PdfViewer = dynamic(() => import('@/components/pdf-viewer').then(mod => mod.PdfViewer), {
+    ssr: false,
+    loading: () => (
+        <div className="flex items-center justify-center h-full bg-muted/20">
+            <span className="text-sm text-muted-foreground animate-pulse">Loading PDF Viewer...</span>
+        </div>
+    )
+});
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -25,6 +35,8 @@ function AgentClientInner() {
         setInput,
         selectedFile,
         setSelectedFile,
+        selectedText,
+        setSelectedText,
         pdfUrl,
         isPdfVisible,
         setIsPdfVisible,
@@ -41,6 +53,47 @@ function AgentClientInner() {
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Floating tooltip for text selection
+    const [pendingText, setPendingText] = useState<string>('');
+    const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
+
+    const handleHighlight = useCallback(() => {
+        const selection = window.getSelection();
+        const text = selection?.toString().trim();
+        if (text && text.length > 0) {
+            const range = selection!.getRangeAt(0);
+            const rect = range.getBoundingClientRect();
+            setPendingText(text);
+            setTooltipPos({
+                x: rect.left + rect.width / 2,
+                y: rect.top - 10,
+            });
+        } else {
+            setPendingText('');
+            setTooltipPos(null);
+        }
+    }, []);
+
+    const confirmSelection = useCallback(() => {
+        setSelectedText(pendingText);
+        setPendingText('');
+        setTooltipPos(null);
+        window.getSelection()?.removeAllRanges();
+    }, [pendingText, setSelectedText]);
+
+    // Dismiss tooltip on click elsewhere
+    useEffect(() => {
+        const dismiss = (e: MouseEvent) => {
+            const target = e.target as HTMLElement;
+            if (!target.closest('[data-select-tooltip]')) {
+                setPendingText('');
+                setTooltipPos(null);
+            }
+        };
+        document.addEventListener('mousedown', dismiss);
+        return () => document.removeEventListener('mousedown', dismiss);
+    }, []);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -95,6 +148,7 @@ function AgentClientInner() {
         }
     };
 
+
     return (
         <div
             className="flex h-screen w-full flex-col bg-background relative"
@@ -102,6 +156,30 @@ function AgentClientInner() {
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
         >
+            {/* Floating "Select text" tooltip */}
+            {tooltipPos && pendingText && (
+                <div
+                    data-select-tooltip
+                    className="fixed z-100"
+                    style={{
+                        left: `${tooltipPos.x}px`,
+                        top: `${tooltipPos.y}px`,
+                        transform: 'translate(-50%, -100%)',
+                    }}
+                >
+                    <button
+                        onClick={confirmSelection}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-foreground text-background text-xs font-medium shadow-md hover:bg-foreground/90 transition-colors cursor-pointer"
+                    >
+                        <Highlighter size={12} />
+                        Select text
+                    </button>
+                    <div className="flex justify-center -mt-px">
+                        <div className="size-2.5 rotate-45 rounded-[2px] bg-foreground" />
+                    </div>
+                </div>
+            )}
+
             {/* Drag Overlay */}
             {dragActive && !pdfUrl && (
                 <div className="absolute inset-0 z-50 flex items-center justify-center bg-primary/10 backdrop-blur-sm border-2 border-dashed border-primary m-4 rounded-xl transition-all duration-200 pointer-events-none">
@@ -136,7 +214,7 @@ function AgentClientInner() {
                                     <Menu className="h-5 w-5" />
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+                            <SheetContent side="left" className="w-[260px] sm:w-[280px]">
                                 <SheetHeader>
                                     <SheetTitle className="flex items-center gap-2">
                                         <Bot className="h-5 w-5 text-primary" />
@@ -147,8 +225,12 @@ function AgentClientInner() {
                                     </SheetDescription>
                                 </SheetHeader>
                                 <div className="py-6">
-                                    <Button onClick={handleNewChat} className="w-full justify-start gap-2" size="lg">
-                                        <Plus className="h-5 w-5" />
+                                    <Button
+                                        onClick={handleNewChat}
+                                        variant="outline"
+                                        className="w-full gap-2 border-dashed border-2 hover:border-primary hover:bg-primary/5 transition-colors"
+                                    >
+                                        <Plus className="h-4 w-4" />
                                         New Chat
                                     </Button>
 
@@ -204,17 +286,17 @@ function AgentClientInner() {
                                     <Menu size={14} />
                                 </Button>
                             </div>
-                            <iframe
-                                src={pdfUrl}
-                                className="w-full flex-1"
-                                title="PDF Preview"
-                            />
+                            <PdfViewer url={pdfUrl} onHighlight={handleHighlight} />
                         </div>
                     </div>
                 )}
 
                 <div className={`flex flex-col h-full transition-all duration-300 ${pdfUrl && isPdfVisible ? 'w-full lg:w-1/2 h-1/2 lg:h-full' : 'w-full'}`}>
-                    <main className="flex-1 overflow-y-auto p-4 sm:p-6 scroll-smooth">
+                    <main
+                        className="flex-1 overflow-y-auto p-4 sm:p-6 scroll-smooth"
+                        style={{ scrollbarGutter: 'stable' }}
+                        onMouseUp={handleHighlight}
+                    >
                         <div className="mx-auto max-w-3xl space-y-6">
                             {messages.filter(msg => msg.role !== 'system' && msg.role !== 'tool').map((msg, idx) => (
                                 <div key={idx} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
@@ -235,6 +317,13 @@ function AgentClientInner() {
                                                     )}
                                                 </div>
                                                 <span className="font-medium truncate max-w-[200px]">{msg.fileInfo.name}</span>
+                                            </div>
+                                        )}
+                                        {msg.selectedText && (
+                                            <div className="mb-2 pl-3 border-l-2 border-primary/30">
+                                                <p className="text-xs text-muted-foreground italic line-clamp-3">
+                                                    "{msg.selectedText}"
+                                                </p>
                                             </div>
                                         )}
                                         <div className={`rounded-2xl px-5 py-3.5 text-sm leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-primary text-primary-foreground rounded-tr-none' : 'bg-card text-card-foreground border rounded-tl-none'}`}>
@@ -264,8 +353,24 @@ function AgentClientInner() {
 
                     <div className="border-t bg-background p-4 sm:p-6 pb-8">
                         <div className="mx-auto max-w-3xl">
+                            {/* Selected Text Badge */}
+                            {selectedText && (
+                                <div className="mb-3 flex items-center justify-between gap-3 px-3 py-2 bg-muted/40 border border-border/50 rounded-md">
+                                    <p className="text-xs text-muted-foreground italic truncate flex-1 pl-1 border-l-2 border-primary/30">
+                                        "{selectedText}"
+                                    </p>
+                                    <button
+                                        onClick={() => setSelectedText('')}
+                                        className="h-6 w-6 rounded-full hover:bg-muted-foreground/10 flex items-center justify-center transition-colors text-muted-foreground hover:text-foreground"
+                                        title="Clear selection"
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                </div>
+                            )}
+
                             <input ref={fileInputRef} type="file" accept="application/pdf,image/*" onChange={handleFileChange} className="hidden" />
-                            <form onSubmit={sendMessage} className="relative flex items-center gap-3 bg-muted/30 p-2 rounded-full border border-border focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all shadow-sm">
+                            <form onSubmit={sendMessage} className="relative flex items-center gap-3 bg-muted/30 p-2 rounded-full border border-border focus-within:border-gray-300 transition-all shadow-sm">
                                 <Button
                                     type="button"
                                     variant="ghost"
@@ -285,7 +390,7 @@ function AgentClientInner() {
                                     className="flex-1 bg-transparent border-0 shadow-none focus-visible:ring-0 text-base placeholder:text-muted-foreground h-10"
                                 />
 
-                                <Button type="submit" size="icon" disabled={isPending || (!input.trim() && !selectedFile)} className={`h-10 w-10 shrink-0 rounded-full transition-all ${(!input.trim() && !selectedFile) ? 'bg-muted text-muted-foreground' : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg'}`}>
+                                <Button type="submit" size="icon" disabled={isPending || (!input.trim() && !selectedFile)} className={`size-10 shrink-0 rounded-full ${(!input.trim() && !selectedFile) ? 'bg-muted text-muted-foreground' : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg'}`}>
                                     <Send size={18} className={(input.trim() || selectedFile) ? "ml-0.5" : ""} />
                                 </Button>
                             </form>

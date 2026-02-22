@@ -124,3 +124,42 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Markdown table styles for chat messages */
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+  font-size: 0.8125rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.prose thead {
+  background: var(--muted);
+}
+
+.prose th {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted-foreground);
+  border-bottom: 2px solid var(--border);
+}
+
+.prose td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.prose tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.prose tbody tr:nth-child(even) {
+  background: var(--muted);
+}

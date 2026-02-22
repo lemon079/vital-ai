@@ -1,14 +1,13 @@
-
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, FileText, AlertTriangle, ArrowRight, Menu } from "lucide-react";
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Activity, FileText, AlertTriangle, ArrowRight } from 'lucide-react';
 import { ModeToggle } from '@/components/mode-toggle';
 
 export default function LandingPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      {/* Navigation */}
+      {/* ── Navigation ─────────────────────────────────── */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
         <div className="container flex h-16 items-center justify-between px-4 md:px-6">
           <div className="flex items-center gap-2">
@@ -16,7 +15,6 @@ export default function LandingPage() {
             <span className="text-lg font-bold">VitalSense AI</span>
           </div>
 
-          {/* Desktop Nav */}
           <nav className="hidden md:flex gap-6">
             <Link className="text-sm font-medium hover:underline underline-offset-4" href="#features">
               Features
@@ -38,8 +36,8 @@ export default function LandingPage() {
       </header>
 
       <main className="flex-1">
-        {/* Hero Section */}
-        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-linear-to-b from-primary/5 to-background">
+        {/* ── Hero Section ──────────────────────────────── */}
+        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-linear-to-b from-primary/5 to-background overflow-hidden">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center space-y-4 text-center">
               <div className="space-y-2">
@@ -51,6 +49,7 @@ export default function LandingPage() {
                   Stop waiting for clarity. Our AI analyzes your lab reports instantly, flagging critical values and explaining results in plain English.
                 </p>
               </div>
+
               <div className="flex flex-col min-[400px]:flex-row gap-4 justify-center w-full max-w-sm min-[400px]:max-w-none">
                 <Button size="lg" className="h-12 px-8 w-full min-[400px]:w-auto" asChild>
                   <Link href="/login">
@@ -63,6 +62,7 @@ export default function LandingPage() {
                   </Link>
                 </Button>
               </div>
+
               <p className="text-xs text-muted-foreground">
                 *We do not diagnose. Always consult a physician for medical advice.
               </p>
@@ -70,7 +70,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Features Section */}
+        {/* ── Features Section ─────────────────────────── */}
         <section id="features" className="w-full py-12 md:py-24 lg:py-32 bg-background">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
@@ -84,8 +84,9 @@ export default function LandingPage() {
                 </p>
               </div>
             </div>
+
             <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 py-12 md:grid-cols-3">
-              <Card>
+              <Card className="h-full transition-shadow duration-300 hover:shadow-lg hover:shadow-primary/5">
                 <CardHeader>
                   <FileText className="h-10 w-10 text-primary mb-2" />
                   <CardTitle>Instant Parsing</CardTitle>
@@ -96,7 +97,8 @@ export default function LandingPage() {
                   </CardDescription>
                 </CardContent>
               </Card>
-              <Card>
+
+              <Card className="h-full transition-shadow duration-300 hover:shadow-lg hover:shadow-orange-500/5">
                 <CardHeader>
                   <AlertTriangle className="h-10 w-10 text-orange-500 mb-2" />
                   <CardTitle>Critical Alerts</CardTitle>
@@ -107,7 +109,8 @@ export default function LandingPage() {
                   </CardDescription>
                 </CardContent>
               </Card>
-              <Card>
+
+              <Card className="h-full transition-shadow duration-300 hover:shadow-lg hover:shadow-green-500/5">
                 <CardHeader>
                   <Activity className="h-10 w-10 text-green-500 mb-2" />
                   <CardTitle>Personalized Context</CardTitle>
@@ -122,7 +125,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* How It Works Section */}
+        {/* ── How It Works Section ─────────────────────── */}
         <section id="how-it-works" className="w-full py-12 md:py-24 lg:py-32 bg-muted/50">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
@@ -131,27 +134,26 @@ export default function LandingPage() {
                 Three simple steps to peace of mind.
               </p>
             </div>
+
             <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 py-12 md:grid-cols-3">
-              <div className="flex flex-col items-center space-y-2 text-center">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-xl">1</div>
-                <h3 className="text-xl font-bold">Upload Report</h3>
-                <p className="text-sm text-muted-foreground">Take a photo or upload a PDF of your lab results.</p>
-              </div>
-              <div className="flex flex-col items-center space-y-2 text-center">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-xl">2</div>
-                <h3 className="text-xl font-bold">AI Analysis</h3>
-                <p className="text-sm text-muted-foreground">Our medical agent parses and checks values against your profile.</p>
-              </div>
-              <div className="flex flex-col items-center space-y-2 text-center">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-xl">3</div>
-                <h3 className="text-xl font-bold">Get Insights</h3>
-                <p className="text-sm text-muted-foreground">Receive a clear summary of what's normal and what needs review.</p>
-              </div>
+              {[
+                { step: '1', title: 'Upload Report', desc: 'Take a photo or upload a PDF of your lab results.' },
+                { step: '2', title: 'AI Analysis', desc: 'Our medical agent parses and checks values against your profile.' },
+                { step: '3', title: 'Get Insights', desc: "Receive a clear summary of what's normal and what needs review." },
+              ].map((item) => (
+                <div key={item.step} className="flex flex-col items-center space-y-2 text-center">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-xl">
+                    {item.step}
+                  </div>
+                  <h3 className="text-xl font-bold">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground">{item.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* CTA Section */}
+        {/* ── CTA Section ──────────────────────────────── */}
         <section className="w-full py-12 md:py-24 lg:py-32 bg-primary text-primary-foreground">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
@@ -169,6 +171,7 @@ export default function LandingPage() {
         </section>
       </main>
 
+      {/* ── Footer ─────────────────────────────────────── */}
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t font-light text-xs text-muted-foreground">
         <p>© 2026 VitalSense AI. All rights reserved.</p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
