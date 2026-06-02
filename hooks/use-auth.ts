@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { signup, login } from '@/lib/actions';
+import { signup, login } from '@/lib/services/actions';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 

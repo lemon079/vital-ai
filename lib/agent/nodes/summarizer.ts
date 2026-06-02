@@ -1,7 +1,7 @@
 import { ChatOllama } from "@langchain/ollama";
 import { SystemMessage, HumanMessage } from "@langchain/core/messages";
 import { AgentState } from "../state";
-import { SUMMARIZER_PROMPT } from "../prompts";
+import { CLINICAL_SUMMARY_PROMPT } from "../prompts";
 
 // Use the same model or a lighter one if preferred/available. 
 // Using the same for consistency.
@@ -23,7 +23,7 @@ export async function summarizeReport(state: typeof AgentState.State) {
     // For now, if reportData is present, we assume it's new context to be summarized.
 
     const response = await model.invoke([
-        new SystemMessage(SUMMARIZER_PROMPT),
+        new SystemMessage(CLINICAL_SUMMARY_PROMPT),
         new HumanMessage(`Raw Report Text:\n\n${reportData}`)
     ]);
 

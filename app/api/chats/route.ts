@@ -1,6 +1,5 @@
-import { pool } from '@/lib/db';
 import { NextResponse } from 'next/server';
-import { getUserChats } from '@/lib/chat/db-service';
+import { getUserChats } from '@/lib/services/chat';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,14 +11,11 @@ export async function GET(req: Request) {
         return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
     }
 
-    const client = await pool.connect();
     try {
-        const chats = await getUserChats(client, userId);
+        const chats = await getUserChats(userId);
         return NextResponse.json({ chats });
     } catch (error) {
         console.error('Failed to get chats', error);
         return NextResponse.json({ error: 'Failed to fetch chats' }, { status: 500 });
-    } finally {
-        client.release();
     }
 }
