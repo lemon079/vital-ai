@@ -35,7 +35,7 @@ export async function saveUploadedFile(fileData: FileData, originalName?: string
         await fs.writeFile(filePath, buffer);
 
         const publicUrl = `/uploads/${fileName}`;
-        let extractedText = '';
+        const extractedText = '';
 
         if (fileData.type === 'pdf') {
             return {

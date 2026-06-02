@@ -8,7 +8,7 @@ A phased journey from a brownfield Next.js codebase with legacy database redunda
 
 ## Phases
 
-- [ ] **Phase 1: Agentic Diagnosis Guardrails & Logic** - Implement secure clinical reasoning and evidence-citation structures within LangGraph.
+- [x] **Phase 1: Agentic Diagnosis Guardrails & Logic** - Implement secure clinical reasoning and evidence-citation structures within LangGraph. (completed 2026-06-02)
 - [ ] **Phase 2: Conversation & Graph Flow Improvements** - Refine conversation and summary nodes to guide diagnostic follow-up prompts.
 - [ ] **Phase 3: Clean Client-Side State Management** - Refactor React client states to eliminate concurrency race conditions.
 - [ ] **Phase 4: Smooth UI/UX Visual Polish** - Polishing visual panels with rich loading skeletons and transition animations.
@@ -101,7 +101,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Agentic Diagnosis Guardrails & Logic | 0/2 | Not started | - |
+| 1. Agentic Diagnosis Guardrails & Logic | 0/2 | Complete    | 2026-06-02 |
 | 2. Conversation & Graph Flow Improvements | 0/2 | Not started | - |
 | 3. Clean Client-Side State Management | 0/1 | Not started | - |
 | 4. Smooth UI/UX Visual Polish | 0/1 | Not started | - |

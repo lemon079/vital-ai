@@ -17,11 +17,11 @@ Empowering patients with warm, accessible, and clinically grounded explanations 
 - ✓ [Persistent Clinical Model] — Prisma PostgreSQL relational schema mapping profiles, chats, reports, and messages.
 - ✓ [Credentialed Authentication] — Secure user registration, signups, and custom onboarding profiles.
 - ✓ [Consolidated Data Layer] — Type-safe database queries unified under Prisma Client (legacy raw SQL pools purged).
+- ✓ [Clinical Conclusion Synthesis] — Core clinical reasoning to synthesize symptoms and abnormal lab results to explain "why it is happening". (Validated in Phase 1)
+- ✓ [Factual Clinical Guardrails] — Safety guardrails ensuring disclaimers and concrete factual citations. (Validated in Phase 1)
 
 ### Active
 
-- [ ] [Clinical Conclusion Synthesis] — Core capability to synthesize conversational symptoms with abnormal lab results and output a highly personalized, friendly clinical conclusion explaining "why it is happening."
-- [ ] [Factual Clinical Guardrails] — Strict verification checks ensuring the AI never issues diagnostic statements or speculative clinical suggestions without concrete, cited lab values and direct patient evidence.
 - [ ] [Clean Dashboard State Management] — Refactoring client-side React state queries, mutation bindings, and visual panels to prevent race conditions during upload or prompt transitions.
 - [ ] [Smooth UI Visual Animations] — Enhancing the split-panel chatbot dashboard with rich micro-animations, loading skeletons, and interactive state feedback.
 
@@ -66,4 +66,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-02 after initialization*
+*Last updated: 2026-06-02 after Phase 1 completion*

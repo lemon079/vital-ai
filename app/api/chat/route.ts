@@ -31,7 +31,7 @@ export async function POST(req: Request) {
     console.warn("Chat request received without userId.");
   }
 
-  let currentMessageContent = messages[messages.length - 1].content;
+  const currentMessageContent = messages[messages.length - 1].content;
   let fileContext = "";
   let extractedReportData = "";
   let fileUrl: string | undefined;

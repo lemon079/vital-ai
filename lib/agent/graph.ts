@@ -5,6 +5,7 @@ import { conversationAgent } from "./nodes/conversation";
 import { labAnalysisAgent } from "./nodes/lab-analysis";
 import { clinicalSummaryAgent } from "./nodes/clinical-summary";
 import { executeTools } from "./nodes/execute-tools";
+import { guardrailsNode } from "./nodes/guardrails";
 
 /**
  * ROUTER LOGIC
@@ -92,19 +93,39 @@ function routeConversation(state: typeof AgentState.State) {
   return END;
 }
 
+/**
+ * GUARDRAILS ROUTING
+ * Checks if guardrails blocked the message; otherwise routes dynamically
+ */
+function routeGuardrails(state: typeof AgentState.State) {
+  const { isblocked } = state;
+  if (isblocked) {
+    console.log("[Router] Guardrails blocked the message. Routing to END.");
+    return END;
+  }
+
+  // Safe: proceed to routeStart dynamic routing
+  return routeStart(state);
+}
+
 // Build the Graph
 const workflow = new StateGraph(AgentState)
   // Nodes
+  .addNode("guardrails", guardrailsNode)
   .addNode("conversation", conversationAgent)
   .addNode("lab_analysis", labAnalysisAgent)
   .addNode("clinical_summary", clinicalSummaryAgent)
   .addNode("tools", executeTools)
 
-  // Starting point routing - directly to router
-  .addConditionalEdges(START, routeStart, {
+  // Starting point routing - START always runs safety guardrails first
+  .addEdge(START, "guardrails")
+
+  // Guardrails Conditional Edges - blocked messages go to END, safe messages route dynamically
+  .addConditionalEdges("guardrails", routeGuardrails, {
     conversation: "conversation",
     lab_analysis: "lab_analysis",
     clinical_summary: "clinical_summary",
+    [END]: END,
   })
 
   // Lab Analysis Flow

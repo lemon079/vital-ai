@@ -37,13 +37,32 @@ If the user asks for diagnosis or meds, set "safe": false and "reason": "I canno
 If irrelevant, set "safe": false and "reason": "I can only help with health-related questions and lab report analysis."
 `;
 
+export const MEDICAL_DISCLAIMER = `\n\n⚠️ **Medical Disclaimer:** VitalSense AI is an educational clinical assistant. It does not provide certified medical diagnoses, drug prescriptions, or clinical treatments. This tool does not replace a physical examination or consultation with a qualified healthcare professional.`;
+
 export async function guardrailsNode(state: typeof AgentState.State) {
     console.log("--- Guardrails Check ---");
-    const { messages } = state;
+    const { messages, reportData } = state;
     const lastMessage = messages[messages.length - 1];
 
     if (!lastMessage || typeof lastMessage.content !== 'string') {
         return {};
+    }
+
+    // 1. Check if user is requesting a clinical summary/conclusion
+    const contentLower = lastMessage.content.toLowerCase();
+    const isSummaryRequest = 
+        contentLower.includes("summary for doctor") || 
+        contentLower.includes("create summary") || 
+        contentLower.includes("appointment tomorrow") || 
+        contentLower.includes("generate summary");
+
+    // Evidence check: block clinical summaries/conclusions if there's no lab report uploaded
+    if (isSummaryRequest && (!reportData || reportData.trim().length === 0)) {
+        console.log("[Guardrails] Blocked summary request: No lab report data loaded.");
+        return {
+            messages: [new AIMessage("I cannot compile a clinical summary or conclusion without concrete, factual lab report evidence. Please upload your lab report PDF first so I can analyze it safely." + MEDICAL_DISCLAIMER)],
+            isblocked: true
+        };
     }
 
     try {
@@ -61,10 +80,10 @@ export async function guardrailsNode(state: typeof AgentState.State) {
         console.log(`[Guardrails] Message: "${lastMessage.content.substring(0, 50)}..." -> Safe: ${result.safe}`);
 
         if (!result.safe) {
-            // If unsafe, we return a refusal message and signal to END the conversation
+            // Append the prominent medical disclaimer block to refusal responses
+            const refusalMessage = (result.reason || "I cannot answer this request.") + MEDICAL_DISCLAIMER;
             return {
-                messages: [new AIMessage(result.reason || "I cannot answer this request.")],
-                // We use a special flag or just handle this in the graph conditional
+                messages: [new AIMessage(refusalMessage)],
                 isblocked: true
             };
         }
@@ -74,8 +93,10 @@ export async function guardrailsNode(state: typeof AgentState.State) {
 
     } catch (e) {
         console.error("[Guardrails] Error:", e);
-        // Fail open or closed? Usually fail closed for safety, but fail open for UX if simple error.
-        // Let's fail open for now but log it 
-        return { isblocked: false };
+        // Fail closed for clinical safety in production
+        return { 
+            messages: [new AIMessage("I encountered an issue processing safety guardrails. Please try again." + MEDICAL_DISCLAIMER)],
+            isblocked: true 
+        };
     }
 }
