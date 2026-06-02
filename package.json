@@ -6,7 +6,8 @@
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
-        "lint": "eslint"
+        "lint": "next lint",
+        "lint:fix": "eslint . --fix"
     },
     "dependencies": {
         "@langchain/community": "^1.1.3",
