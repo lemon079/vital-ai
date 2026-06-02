@@ -206,7 +206,20 @@ export function AgentProvider({
     const processFile = async (file: File) => {
         if (file.type === 'application/pdf' || file.type.startsWith('image/')) {
             setSelectedFile(file);
-            setMessages(prev => [...prev, { role: 'assistant', content: 'Analyzing your report... Please wait.' }]);
+            
+            // Build the user upload message representation
+            const userUploadMsg = {
+                role: 'user' as const,
+                content: `[Uploaded: ${file.name}]`,
+                fileInfo: { name: file.name, type: (file.type === 'application/pdf' ? 'pdf' : 'image') as any }
+            };
+
+            // Set message state to show user uploaded message + analyzing placeholder
+            setMessages(prev => [
+                ...prev,
+                userUploadMsg,
+                { role: 'assistant', content: 'Analyzing your report... Please wait.' }
+            ]);
 
             const result = await uploadFile(file);
 
@@ -221,10 +234,15 @@ export function AgentProvider({
                 }
 
                 const base64 = await fileToBase64(file);
+                
+                // Build updated messages array to send to the API (including the user upload message)
+                const updatedMessages = [
+                    ...messages,
+                    userUploadMsg
+                ];
+
                 const payload = {
-                    messages: messages.length > 0 ? messages : [
-                        { role: 'assistant', content: 'Hello! I am your Medical AI Assistant. Upload a lab report or ask me a health question.' }
-                    ],
+                    messages: updatedMessages,
                     fileData: {
                         type: file.type === 'application/pdf' ? 'pdf' : 'image',
                         content: base64
@@ -248,11 +266,19 @@ export function AgentProvider({
                         throw new Error(data.error || 'Failed to analyze report');
                     }
 
-                    // Add AI response to messages
-                    setMessages(prev => [...prev, {
-                        role: 'assistant',
-                        content: data.response
-                    }]);
+                    // Remove placeholder and add real response
+                    setMessages(prev => {
+                        const placeholderIndex = prev.findIndex(m => m.role === 'assistant' && m.content === 'Analyzing your report... Please wait.');
+                        if (placeholderIndex !== -1) {
+                            const newMsgs = [...prev];
+                            newMsgs[placeholderIndex] = {
+                                role: 'assistant',
+                                content: data.response
+                            };
+                            return newMsgs;
+                        }
+                        return [...prev, { role: 'assistant', content: data.response }];
+                    });
 
                     // Update chatId if needed
                     if (data.chatId && !currentChatId) {
@@ -263,17 +289,36 @@ export function AgentProvider({
 
                 } catch (error: any) {
                     console.error('File processing error:', error);
-                    setMessages(prev => [...prev, {
-                        role: 'assistant',
-                        content: 'Sorry, I failed to analyze the report.'
-                    }]);
+                    setMessages(prev => {
+                        const placeholderIndex = prev.findIndex(m => m.role === 'assistant' && m.content === 'Analyzing your report... Please wait.');
+                        if (placeholderIndex !== -1) {
+                            const newMsgs = [...prev];
+                            newMsgs[placeholderIndex] = {
+                                role: 'assistant',
+                                content: 'Sorry, I failed to analyze the report.'
+                            };
+                            return newMsgs;
+                        }
+                        return [...prev, { role: 'assistant', content: 'Sorry, I failed to analyze the report.' }];
+                    });
                     toast.error(error.message || 'Failed to analyze report');
                 } finally {
                     setIsLoading(false);
                 }
 
             } else {
-                setMessages(prev => [...prev, { role: 'assistant', content: 'Upload failed. Please try again.' }]);
+                setMessages(prev => {
+                    const placeholderIndex = prev.findIndex(m => m.role === 'assistant' && m.content === 'Analyzing your report... Please wait.');
+                    if (placeholderIndex !== -1) {
+                        const newMsgs = [...prev];
+                        newMsgs[placeholderIndex] = {
+                            role: 'assistant',
+                            content: 'Upload failed. Please try again.'
+                        };
+                        return newMsgs;
+                    }
+                    return [...prev, { role: 'assistant', content: 'Upload failed. Please try again.' }];
+                });
                 setSelectedFile(null);
             }
 

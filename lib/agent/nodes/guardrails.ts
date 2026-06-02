@@ -42,14 +42,20 @@ export const MEDICAL_DISCLAIMER = `\n\n⚠️ **Medical Disclaimer:** VitalSense
 export async function guardrailsNode(state: typeof AgentState.State) {
     console.log("--- Guardrails Check ---");
     const { messages, reportData } = state;
-    const lastMessage = messages[messages.length - 1];
+    
+    // Find the last human message in history to evaluate safety
+    const lastHumanMessage = [...messages].reverse().find(m => {
+        const type = typeof m._getType === "function" ? m._getType() : (m as any).role;
+        return type === "human" || type === "user";
+    });
 
-    if (!lastMessage || typeof lastMessage.content !== 'string') {
-        return {};
+    if (!lastHumanMessage || typeof lastHumanMessage.content !== 'string') {
+        console.log("[Guardrails] No user message found in history. Skipping safety check.");
+        return { isblocked: false };
     }
 
     // 1. Check if user is requesting a clinical summary/conclusion
-    const contentLower = lastMessage.content.toLowerCase();
+    const contentLower = lastHumanMessage.content.toLowerCase();
     const isSummaryRequest = 
         contentLower.includes("summary for doctor") || 
         contentLower.includes("create summary") || 
@@ -68,7 +74,7 @@ export async function guardrailsNode(state: typeof AgentState.State) {
     try {
         const response = await model.invoke([
             new SystemMessage(GUARDRAIL_PROMPT),
-            new SystemMessage(`User Message: "${lastMessage.content}"`)
+            new SystemMessage(`User Message: "${lastHumanMessage.content}"`)
         ]);
 
         const content = typeof response.content === "string" ? response.content : "";
@@ -77,7 +83,7 @@ export async function guardrailsNode(state: typeof AgentState.State) {
         const jsonStr = content.replace(/```json/g, "").replace(/```/g, "").trim();
         const result = JSON.parse(jsonStr);
 
-        console.log(`[Guardrails] Message: "${lastMessage.content.substring(0, 50)}..." -> Safe: ${result.safe}`);
+        console.log(`[Guardrails] Message: "${lastHumanMessage.content.substring(0, 50)}..." -> Safe: ${result.safe}`);
 
         if (!result.safe) {
             // Append the prominent medical disclaimer block to refusal responses
