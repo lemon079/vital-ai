@@ -43,9 +43,8 @@ export async function guardrailsNode(state: typeof AgentState.State) {
     console.log("--- Guardrails Check ---");
     const { messages, reportData } = state;
     
-    // Find the last human message in history to evaluate safety
     const lastHumanMessage = [...messages].reverse().find(m => {
-        const type = typeof m._getType === "function" ? m._getType() : (m as any).role;
+        const type = typeof m.getType === "function" ? m.getType() : (m as any).role;
         return type === "human" || type === "user";
     });
 

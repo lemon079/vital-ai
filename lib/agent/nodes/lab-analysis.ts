@@ -74,7 +74,7 @@ export async function labAnalysisAgent(state: typeof AgentState.State) {
 
   // GUARDRAIL: Check if tool was already called
   const lastMsg = messages.length > 0 ? messages[messages.length - 1] : null;
-  const toolAlreadyCalled = lastMsg?._getType() === "tool";
+  const toolAlreadyCalled = lastMsg?.getType() === "tool";
 
   if (toolAlreadyCalled) {
     console.log(
@@ -90,7 +90,7 @@ export async function labAnalysisAgent(state: typeof AgentState.State) {
   // The frontend may send a greeting AIMessage which would confuse the model
   const humanMessages = messages.filter((msg: any) => {
     const msgType =
-      typeof msg._getType === "function" ? msg._getType() : msg.role;
+      typeof msg.getType === "function" ? msg.getType() : msg.role;
     return msgType === "human";
   });
 
@@ -105,7 +105,7 @@ export async function labAnalysisAgent(state: typeof AgentState.State) {
   } else {
     // Follow-up run (tool calls returned) - include tool call/response messages
     const compatibleMessages = messages.map((msg: any) => {
-      const msgType = msg._getType();
+      const msgType = msg.getType();
 
       if (msgType === "ai") {
         return new AIMessage({
@@ -150,7 +150,7 @@ export async function labAnalysisAgent(state: typeof AgentState.State) {
 
     // Debug: Log message types
     console.log(
-      `[Lab Analysis] Message types: ${messagesWithSystem.map((m: any) => m._getType()).join(", ")}`,
+      `[Lab Analysis] Message types: ${messagesWithSystem.map((m: any) => m.getType()).join(", ")}`,
     );
 
     const response = (await Promise.race([

@@ -23,7 +23,7 @@ export async function clinicalSummaryAgent(state: typeof AgentState.State) {
   // Detect if we have lab report data AND patient messages
   const hasLabData = !!reportData && reportData.trim().length > 0;
   const patientMessages = messages.filter(m => {
-    const type = typeof m._getType === "function" ? m._getType() : (m as any).role;
+    const type = typeof m.getType === "function" ? m.getType() : (m as any).role;
     return type === "human";
   });
   const hasSymptoms = patientMessages.length > 0;

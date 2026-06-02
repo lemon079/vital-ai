@@ -121,7 +121,7 @@ export async function POST(req: Request) {
     // Extract AI response from result - handle both LangChain messages and plain objects
     console.log(`[Route] Total messages in result: ${result.messages.length}`);
     result.messages.forEach((m: any, i: number) => {
-      const type = typeof m._getType === "function" ? m._getType() : m.role;
+      const type = typeof m.getType === "function" ? m.getType() : m.role;
       const hasToolCalls = !!m.tool_calls?.length;
       const contentPreview =
         typeof m.content === "string"
@@ -137,8 +137,8 @@ export async function POST(req: Request) {
     // Find AI messages with actual text content (not just tool calls)
     const aiMessages = result.messages.filter((m: any) => {
       const isAI =
-        typeof m._getType === "function"
-          ? m._getType() === "ai"
+        typeof m.getType === "function"
+          ? m.getType() === "ai"
           : m.role === "assistant";
       if (!isAI) return false;
       // Skip AI messages that only have tool calls but no text content
