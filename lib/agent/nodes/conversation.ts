@@ -1,10 +1,31 @@
+/**
+ * ============================================================================
+ *                         CONVERSATION AGENT NODE
+ * ============================================================================
+ * This agent node manages general health concerns and casual medical dialogue 
+ * Q&A when no active PDF lab reports are present, transitioning naturally.
+ */
+
+// 1. External Library Imports
 import { SystemMessage } from "@langchain/core/messages";
+
+// 2. Internal Project Imports
 import { AgentState } from "../state";
 import { CONVERSATION_PROMPT } from "../prompts";
 import { getModel } from "./models";
 
+// Initialize the conversation model instance (higher temperature for friendly, warm responses)
 const model = getModel("ollama", 0.7);
 
+/**
+ * conversationAgent
+ * 
+ * Directs active conversations about patient concerns, answering general medical Q&A 
+ * and requesting symptom details systematically.
+ * 
+ * @param state - The active LangGraph AgentState containing messages and contexts.
+ * @returns State updates including the generated assistant response message.
+ */
 export async function conversationAgent(state: typeof AgentState.State) {
   console.log("--- Conversation Agent Active ---");
   const {

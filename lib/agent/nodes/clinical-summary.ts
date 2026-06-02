@@ -1,26 +1,49 @@
+/**
+ * ============================================================================
+ *                        CLINICAL SUMMARY AGENT NODE
+ * ============================================================================
+ * This agent node synthesizes the patient conversation history and any abnormal
+ * laboratory report data into a clinical summary formatted for providers.
+ */
+
+// 1. External Library Imports
 import { SystemMessage } from "@langchain/core/messages";
+
+// 2. Internal Project Imports
 import { AgentState } from "../state";
 import { CLINICAL_SUMMARY_PROMPT } from "../prompts";
 import { getModel } from "./models";
 import { MEDICAL_DISCLAIMER } from "./guardrails";
 
+// Initialize the clinical model instance (low temperature for deterministic synthesis)
 const model = getModel("ollama", 0.2);
 
+/**
+ * clinicalSummaryAgent
+ * 
+ * Synthesizes patient conversation history and abnormal lab results to generate
+ * a structured clinical summary.
+ * 
+ * @param state - The active LangGraph AgentState containing messages and report data.
+ * @returns State updates including the generated clinical summary text and system messages.
+ */
 export async function clinicalSummaryAgent(state: typeof AgentState.State) {
   const { messages, reportData, selectedText } = state;
 
-  // Prepend system message
+  // Start building the system instructions
   let systemMsgContent = CLINICAL_SUMMARY_PROMPT;
 
+  // Append raw lab report text context if present
   if (reportData) {
     systemMsgContent += `\n\n[CONTEXT: Lab Data]\n${reportData}`;
   }
 
+  // Append user-highlighted text context if present
   if (selectedText) {
     systemMsgContent += `\n\n[CONTEXT: User Selected Text]\nThe user has highlighted this specific section, please ensure your summary addresses it if relevant:\n"${selectedText}"`;
   }
 
-  // Detect if we have lab report data AND patient messages
+  // Detect if we have both lab data and active user symptoms to trigger clinical reasoning
   const hasLabData = !!reportData && reportData.trim().length > 0;
   const patientMessages = messages.filter(m => {
     const type = typeof m.getType === "function" ? m.getType() : (m as any).role;
@@ -38,6 +61,7 @@ export async function clinicalSummaryAgent(state: typeof AgentState.State) {
 
   const messagesWithSystem = [new SystemMessage(systemMsgContent), ...messages];
 
+  // Invoke the LLM to compile the clinical summary
   const response = await model.invoke(messagesWithSystem);
   const summaryContent = (response.content as string) + MEDICAL_DISCLAIMER;
   response.content = summaryContent;

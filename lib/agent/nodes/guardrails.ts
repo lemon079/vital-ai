@@ -1,10 +1,27 @@
+/**
+ * ============================================================================
+ *                         SAFETY GUARDRAILS NODE
+ * ============================================================================
+ * This agent node intercepts conversations to classify incoming patient messages 
+ * for safety, health-related relevance, restricted queries (prescriptions/diagnoses), 
+ * prompt injections, and evidence-citing constraints.
+ */
 
+// 1. External Library Imports
 import { SystemMessage, AIMessage } from "@langchain/core/messages";
+
+// 2. Internal Project Imports
 import { AgentState } from "../state";
 import { getModel } from "./models";
 
-// Lightweight model for fast classification
+// Lightweight model for fast classification (temperature = 0 for strict classification)
 const model = getModel("ollama", 0.0);
+
+// ============================================================================
+// CONFIGURATION & CONSTANTS
+// ============================================================================
+
+export const MEDICAL_DISCLAIMER = `\n\n⚠️ **Medical Disclaimer:** VitalSense AI is an educational clinical assistant. It does not provide certified medical diagnoses, drug prescriptions, or clinical treatments. This tool does not replace a physical examination or consultation with a qualified healthcare professional.`;
 
 const GUARDRAIL_PROMPT = `You are a safety and relevance classifier for a medical assistant AI.
 Your job is to analyze the user's latest message and determine if it is safe and appropriate.
@@ -37,12 +54,24 @@ If the user asks for diagnosis or meds, set "safe": false and "reason": "I canno
 If irrelevant, set "safe": false and "reason": "I can only help with health-related questions and lab report analysis."
 `;
 
-export const MEDICAL_DISCLAIMER = `\n\n⚠️ **Medical Disclaimer:** VitalSense AI is an educational clinical assistant. It does not provide certified medical diagnoses, drug prescriptions, or clinical treatments. This tool does not replace a physical examination or consultation with a qualified healthcare professional.`;
+// ============================================================================
+// MAIN NODE FUNCTION
+// ============================================================================
 
+/**
+ * guardrailsNode
+ * 
+ * Safety filter that checks incoming user queries, intercepts prompt injection,
+ * and ensures summaries strictly cite factual lab results.
+ * 
+ * @param state - The active LangGraph AgentState containing messages.
+ * @returns State updates mapping blocked flags and AI refusal messages.
+ */
 export async function guardrailsNode(state: typeof AgentState.State) {
     console.log("--- Guardrails Check ---");
     const { messages, reportData } = state;
     
+    // Find the last human message in history to evaluate safety
     const lastHumanMessage = [...messages].reverse().find(m => {
         const type = typeof m.getType === "function" ? m.getType() : (m as any).role;
         return type === "human" || type === "user";
