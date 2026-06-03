@@ -9,8 +9,35 @@ import {
   createReport,
 } from "@/lib/services/chat";
 import { prisma } from "@/lib/db/client";
+import path from "path";
 
 export async function POST(req: Request) {
+  // Read simulation headers
+  const simulateLatency = req.headers.get("x-simulate-latency");
+  const simulateError = req.headers.get("x-simulate-error");
+
+  if (simulateLatency) {
+    const delay = parseInt(simulateLatency, 10);
+    if (!isNaN(delay)) {
+      console.log(`[Simulation] Delaying response by ${delay}ms`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+
+  if (simulateError === "rate-limit") {
+    console.log("[Simulation] Emulating 429 Rate Limit error");
+    return NextResponse.json(
+      { error: "Model capacity or token limit exceeded." },
+      { status: 429 }
+    );
+  } else if (simulateError === "500") {
+    console.log("[Simulation] Emulating 500 Internal Server error");
+    return NextResponse.json(
+      { error: "Internal server error." },
+      { status: 500 }
+    );
+  }
+
   // Parse Payload
   const {
     messages,
@@ -18,6 +45,8 @@ export async function POST(req: Request) {
     userId = "309ad8a9-7802-4acb-bf7e-678b8c84768a",
     fileData,
     selectedText,
+    filePath: clientFilePath,
+    fileUrl: clientFileUrl,
   } = await req.json();
 
   if (!Array.isArray(messages) || messages.length === 0) {
@@ -34,11 +63,11 @@ export async function POST(req: Request) {
   const currentMessageContent = messages[messages.length - 1].content;
   let fileContext = "";
   let extractedReportData = "";
-  let fileUrl: string | undefined;
-  let filePath: string | undefined;
+  let fileUrl = clientFileUrl;
+  let filePath = clientFilePath;
 
-  // Process file if provided
-  if (fileData) {
+  // Process file if provided and not already uploaded
+  if (fileData && !filePath) {
     try {
       // Try to get filename from message info
       const lastMsg = messages[messages.length - 1];
@@ -61,6 +90,14 @@ export async function POST(req: Request) {
         { status: 500 },
       );
     }
+  } else if (filePath) {
+    const filename = path.basename(filePath);
+    const isImage = /\.(png|jpe?g|gif|svg|webp)$/i.test(filename);
+    if (isImage) {
+      fileContext = `[SYSTEM: An image file has been uploaded to ${filePath}. (Image analysis not yet supported via tool, but file is saved.)]`;
+    } else {
+      fileContext = `[SYSTEM: User uploaded a PDF: ${filename}. View it in the split panel.]`;
+    }
   }
 
   try {
@@ -77,6 +114,34 @@ export async function POST(req: Request) {
       currentChatId = crypto.randomUUID();
     }
 
+    // Fetch existing report and lab results if chat exists (Turn 2+ state reconstruction)
+    let dbReportId = undefined;
+    let dbFilePath = filePath;
+    let dbLabResults: any[] = [];
+
+    if (currentChatId && !isGuest) {
+      try {
+        const chat = await prisma.chats.findUnique({
+          where: { id: currentChatId },
+          include: {
+            reports: {
+              include: {
+                lab_results: true
+              }
+            }
+          }
+        });
+        if (chat?.reports) {
+          dbReportId = chat.reports.id;
+          dbFilePath = dbFilePath || chat.reports.file_path || undefined;
+          dbLabResults = chat.reports.lab_results || [];
+          console.log(`[Route] Reconstructed report context from DB: reportId=${dbReportId}, filePath=${dbFilePath}, labResultsCount=${dbLabResults.length}`);
+        }
+      } catch (err) {
+        console.error("Failed to load existing chat report details:", err);
+      }
+    }
+
     // 2. Save User Message (skip for guest)
     const fullUserMessage =
       currentMessageContent + (fileContext ? fileContext : "");
@@ -85,15 +150,15 @@ export async function POST(req: Request) {
     }
 
     // 3. Create Report (Early) if file exists (skip for guest)
-    let reportId = undefined;
-    if (filePath && !isGuest && fileUrl) {
+    if (filePath && !isGuest && fileUrl && !dbReportId) {
       try {
-        reportId = await createReport(safeUserId, undefined, undefined); // Pass undefined for gender/age initially
+        dbReportId = await createReport(safeUserId, undefined, undefined, fileUrl); // Pass fileUrl as path/URL to store in reports.file_path
         // Update Chat with Report ID immediately
         await prisma.chats.update({
           where: { id: currentChatId },
-          data: { report_id: reportId },
+          data: { report_id: dbReportId },
         });
+        console.log(`[Route] Created new early report: reportId=${dbReportId}`);
       } catch (e) {
         console.error("Failed to create early report", e);
       }
@@ -109,73 +174,81 @@ export async function POST(req: Request) {
 
     // Use graph.invoke() to get complete response
     console.log(
-      `[Route] Invoking graph with filePath="${filePath || ""}", reportId=${reportId}, selectedText="${(selectedText || "").substring(0, 30)}"`,
+      `[Route] Invoking graph with filePath="${dbFilePath || ""}", reportId=${dbReportId}, selectedText="${(selectedText || "").substring(0, 30)}", labResultsCount=${dbLabResults.length}`,
     );
-    const result = await graph.invoke({
-      messages: messageHistory,
-      filePath: filePath || "",
-      reportId: reportId,
-      selectedText: selectedText || "",
+    // Use graph.streamEvents() to stream response chunks
+    console.log(
+      `[Route] Streaming graph with filePath="${dbFilePath || ""}", reportId=${dbReportId}, selectedText="${(selectedText || "").substring(0, 30)}", labResultsCount=${dbLabResults.length}`,
+    );
+
+    const encoder = new TextEncoder();
+    const customStream = new ReadableStream({
+      async start(controller) {
+        let fullAIResponse = "";
+        
+        try {
+          // Send metadata at the very beginning
+          const initialMetadata = JSON.stringify({
+            type: "metadata",
+            chatId: currentChatId,
+            fileUrl: fileUrl || null,
+          });
+          controller.enqueue(encoder.encode(`data: ${initialMetadata}\n\n`));
+
+          // Run streamEvents
+          const eventStream = graph.streamEvents(
+            {
+              messages: messageHistory,
+              filePath: dbFilePath || "",
+              reportId: dbReportId,
+              selectedText: selectedText || "",
+              labResults: dbLabResults,
+            },
+            { version: "v2" }
+          );
+
+          for await (const event of eventStream) {
+            const nodeName = event.metadata?.langgraph_node;
+            const isAgentNode = ["conversation", "lab_analysis", "clinical_summary"].includes(nodeName);
+            
+            if (event.event === "on_chat_model_stream" && isAgentNode) {
+              const chunk = event.data.chunk;
+              const content = chunk.content;
+              if (content) {
+                fullAIResponse += content;
+                const tokenData = JSON.stringify({
+                  type: "token",
+                  content: content,
+                });
+                controller.enqueue(encoder.encode(`data: ${tokenData}\n\n`));
+              }
+            }
+          }
+
+          // Save AI Message at the end of streaming (Skip for guest)
+          if (!isGuest && fullAIResponse.trim()) {
+            await saveMessageAsync(currentChatId, "assistant", fullAIResponse);
+          }
+
+          controller.close();
+        } catch (error: any) {
+          console.error("[Route] Stream error:", error);
+          const errorMsg = JSON.stringify({
+            type: "error",
+            message: error.message || "Failed to generate stream response",
+          });
+          controller.enqueue(encoder.encode(`data: ${errorMsg}\n\n`));
+          controller.close();
+        }
+      },
     });
 
-    // Extract AI response from result - handle both LangChain messages and plain objects
-    console.log(`[Route] Total messages in result: ${result.messages.length}`);
-    result.messages.forEach((m: any, i: number) => {
-      const type = typeof m.getType === "function" ? m.getType() : m.role;
-      const hasToolCalls = !!m.tool_calls?.length;
-      const contentPreview =
-        typeof m.content === "string"
-          ? m.content.substring(0, 80)
-          : Array.isArray(m.content)
-            ? "[array]"
-            : "[empty]";
-      console.log(
-        `[Route] Message ${i}: type=${type}, hasToolCalls=${hasToolCalls}, content="${contentPreview}"`,
-      );
-    });
-
-    // Find AI messages with actual text content (not just tool calls)
-    const aiMessages = result.messages.filter((m: any) => {
-      const isAI =
-        typeof m.getType === "function"
-          ? m.getType() === "ai"
-          : m.role === "assistant";
-      if (!isAI) return false;
-      // Skip AI messages that only have tool calls but no text content
-      const hasContent =
-        m.content &&
-        (typeof m.content === "string" ? m.content.trim().length > 0 : true);
-      return hasContent;
-    });
-
-    let fullAIResponse = "I apologize, but I couldn't generate a response.";
-    if (aiMessages.length > 0) {
-      const lastMessage = aiMessages[aiMessages.length - 1];
-      const content = lastMessage.content;
-
-      if (typeof content === "string" && content.trim()) {
-        fullAIResponse = content;
-      } else if (Array.isArray(content)) {
-        fullAIResponse = content
-          .map((block: any) =>
-            typeof block === "string" ? block : block.text || "",
-          )
-          .join("");
-      }
-    }
-
-    console.log(`[Route] Final response length: ${fullAIResponse.length}`);
-
-    // Save AI Message (Skip for guest)
-    if (!isGuest) {
-      await saveMessageAsync(currentChatId, "assistant", fullAIResponse);
-    }
-
-    // Return complete response as JSON
-    return NextResponse.json({
-      response: fullAIResponse,
-      chatId: currentChatId,
-      fileUrl: fileUrl || null,
+    return new Response(customStream, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+      },
     });
   } catch (error: any) {
     console.error("Chat API Error:", error);

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { toast } from "sonner";
 import { useUploadFile } from '@/hooks/use-upload-file';
@@ -53,6 +53,22 @@ export function AgentProvider({
     const { uploadFile, isUploading: isFileUploading } = useUploadFile();
     const [isUploading, setIsUploading] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+
+    // Retry and Simulation States
+    const [lastRequestPayload, setLastRequestPayload] = useState<any | null>(null);
+    const [lastRequestIsFileAnalysis, setLastRequestIsFileAnalysis] = useState<boolean>(false);
+    const [showSlowWarning, setShowSlowWarning] = useState(false);
+    const [simulation, setSimulation] = useState<string>('none');
+    const [retryCount, setRetryCount] = useState<number>(0);
+    const abortControllerRef = useRef<AbortController | null>(null);
+
+    useEffect(() => {
+        return () => {
+            if (abortControllerRef.current) {
+                abortControllerRef.current.abort();
+            }
+        };
+    }, []);
 
     const fetchHistory = useCallback(async () => {
         setChatHistory([]);
@@ -120,6 +136,275 @@ export function AgentProvider({
         });
     };
 
+    const makeChatRequest = async (payload: any, isFileAnalysis: boolean) => {
+        setLastRequestPayload(payload);
+        setLastRequestIsFileAnalysis(isFileAnalysis);
+
+        setIsLoading(true);
+        setShowSlowWarning(false);
+        setRetryCount(0);
+
+        let finalError: any = null;
+
+        for (let attempt = 0; attempt <= 5; attempt++) {
+            if (attempt > 0) {
+                setRetryCount(attempt);
+                console.log(`[Auto-Retry] Starting attempt ${attempt}/5`);
+                // Wait 1 second before retrying
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+
+            // Abort any active request first
+            if (abortControllerRef.current) {
+                abortControllerRef.current.abort();
+            }
+
+            const controller = new AbortController();
+            abortControllerRef.current = controller;
+
+            const slowTimer = setTimeout(() => {
+                setShowSlowWarning(true);
+            }, 15000);
+
+            const hardTimer = setTimeout(() => {
+                controller.abort();
+            }, 35000);
+
+            try {
+                const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+                
+                if (simulation === 'offline') {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    throw new TypeError('Failed to fetch');
+                } else if (simulation === 'slow-response') {
+                    headers['x-simulate-latency'] = '18000';
+                } else if (simulation === 'timeout') {
+                    headers['x-simulate-latency'] = '40000';
+                } else if (simulation === 'rate-limit') {
+                    headers['x-simulate-error'] = 'rate-limit';
+                } else if (simulation === 'server') {
+                    headers['x-simulate-error'] = '500';
+                }
+
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(payload),
+                    signal: controller.signal
+                });
+
+                clearTimeout(slowTimer);
+                clearTimeout(hardTimer);
+
+                if (!res.ok) {
+                    let errorMessage = 'We encountered an unexpected issue connecting to the medical brain. Please try again.';
+                    let errorType: 'rate-limit' | 'server' = 'server';
+                    
+                    if (res.status === 429) {
+                        errorMessage = 'Model capacity or token limit exceeded. Please try simplifying your prompt or wait a moment before retrying.';
+                        errorType = 'rate-limit';
+                    }
+                    
+                    throw { isApiError: true, message: errorMessage, errorType, status: res.status };
+                }
+
+                const reader = res.body?.getReader();
+                const decoder = new TextDecoder('utf-8');
+                if (!reader) {
+                    throw new Error('Failed to read response stream.');
+                }
+
+                let done = false;
+                let buffer = '';
+                let responseChatId = currentChatId;
+                let responseFileUrl = null;
+
+                while (!done) {
+                    const { value, done: readerDone } = await reader.read();
+                    done = readerDone;
+                    if (value) {
+                        buffer += decoder.decode(value, { stream: !done });
+                        const lines = buffer.split('\n');
+                        buffer = lines.pop() || '';
+
+                        for (const line of lines) {
+                            const trimmed = line.trim();
+                            if (trimmed.startsWith('data: ')) {
+                                const jsonStr = trimmed.substring(6).trim();
+                                if (jsonStr) {
+                                    try {
+                                        const eventData = JSON.parse(jsonStr);
+                                        if (eventData.type === 'metadata') {
+                                            responseChatId = eventData.chatId || responseChatId;
+                                            responseFileUrl = eventData.fileUrl || responseFileUrl;
+                                        } else if (eventData.type === 'token') {
+                                            const token = eventData.content;
+                                            
+                                            setMessages(prev => {
+                                                const newMsgs = [...prev];
+                                                if (isFileAnalysis) {
+                                                    const idx = newMsgs.findIndex(m => m.role === 'assistant' && (m.content === 'Analyzing your report... Please wait.' || m.isStreaming));
+                                                    if (idx !== -1) {
+                                                        const currentContent = newMsgs[idx].content === 'Analyzing your report... Please wait.' ? '' : newMsgs[idx].content;
+                                                        newMsgs[idx] = {
+                                                            role: 'assistant',
+                                                            content: currentContent + token,
+                                                            isStreaming: true
+                                                        };
+                                                    } else {
+                                                        newMsgs.push({
+                                                            role: 'assistant',
+                                                            content: token,
+                                                            isStreaming: true
+                                                        });
+                                                    }
+                                                } else {
+                                                    const lastMsg = newMsgs[newMsgs.length - 1];
+                                                    if (lastMsg && lastMsg.role === 'assistant' && lastMsg.isStreaming) {
+                                                        newMsgs[newMsgs.length - 1] = {
+                                                            ...lastMsg,
+                                                            content: lastMsg.content + token
+                                                        };
+                                                    } else {
+                                                        newMsgs.push({
+                                                            role: 'assistant',
+                                                            content: token,
+                                                            isStreaming: true
+                                                        });
+                                                    }
+                                                }
+                                                return newMsgs;
+                                            });
+                                        } else if (eventData.type === 'error') {
+                                            throw { isApiError: true, message: eventData.message, errorType: 'server' };
+                                        }
+                                    } catch (err) {
+                                        console.error('Error parsing stream line:', err, trimmed);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Finalize messages by stripping isStreaming flag
+                setMessages(prev => {
+                    const newMsgs = [...prev];
+                    const lastMsg = newMsgs[newMsgs.length - 1];
+                    if (lastMsg && lastMsg.role === 'assistant' && lastMsg.isStreaming) {
+                        newMsgs[newMsgs.length - 1] = {
+                            role: 'assistant',
+                            content: lastMsg.content
+                        };
+                    }
+                    return newMsgs;
+                });
+
+                if (responseChatId && responseChatId !== currentChatId) {
+                    setCurrentChatId(responseChatId);
+                    window.history.replaceState(null, '', `/agent/${responseChatId}`);
+                    fetchHistory();
+                }
+
+                // Succeeded, cleanup states and return
+                setIsLoading(false);
+                setShowSlowWarning(false);
+                setRetryCount(0);
+                abortControllerRef.current = null;
+                return;
+
+            } catch (error: any) {
+                clearTimeout(slowTimer);
+                clearTimeout(hardTimer);
+
+                console.error(`Attempt ${attempt} failed:`, error);
+                finalError = error;
+
+                if (attempt < 5) {
+                    // Reset slow response notice for next attempt
+                    setShowSlowWarning(false);
+                    continue;
+                }
+            }
+        }
+
+        // If we get here, all attempts failed
+        console.error('All 5 retry attempts failed.');
+        
+        let errorMessage = 'We encountered an unexpected issue connecting to the medical brain. Please try again.';
+        let errorType: 'timeout' | 'network' | 'rate-limit' | 'server' = 'server';
+
+        if (finalError.name === 'AbortError') {
+            errorMessage = 'The medical brain took too long to respond (timeout). Please try again.';
+            errorType = 'timeout';
+        } else if (finalError instanceof TypeError && finalError.message === 'Failed to fetch') {
+            errorMessage = 'Network connection lost. Please verify your internet connection and try again.';
+            errorType = 'network';
+        } else if (finalError.isApiError) {
+            errorMessage = finalError.message;
+            errorType = finalError.errorType;
+        }
+
+        // Display error bubble
+        if (isFileAnalysis) {
+            setMessages(prev => {
+                const placeholderIndex = prev.findIndex(m => m.role === 'assistant' && m.content === 'Analyzing your report... Please wait.');
+                if (placeholderIndex !== -1) {
+                    const newMsgs = [...prev];
+                    newMsgs[placeholderIndex] = {
+                        role: 'assistant',
+                        content: errorMessage,
+                        isError: true,
+                        errorType
+                    };
+                    return newMsgs;
+                }
+                return [...prev, {
+                    role: 'assistant',
+                    content: errorMessage,
+                    isError: true,
+                    errorType
+                }];
+            });
+        } else {
+            setMessages(prev => [...prev, {
+                role: 'assistant',
+                content: errorMessage,
+                isError: true,
+                errorType
+            }]);
+        }
+
+        toast.error('Failed to get response after 5 retries');
+        setIsLoading(false);
+        setShowSlowWarning(false);
+        setRetryCount(0);
+        abortControllerRef.current = null;
+    };
+
+    const handleRetry = async () => {
+        if (!lastRequestPayload) return;
+
+        // Remove the error message from messages
+        setMessages(prev => {
+            const lastMsg = prev[prev.length - 1];
+            if (lastMsg && lastMsg.role === 'assistant' && lastMsg.isError) {
+                return prev.slice(0, -1);
+            }
+            return prev;
+        });
+
+        if (lastRequestIsFileAnalysis) {
+            // Restore placeholder message
+            setMessages(prev => [
+                ...prev,
+                { role: 'assistant', content: 'Analyzing your report... Please wait.' }
+            ]);
+        }
+
+        await makeChatRequest(lastRequestPayload, lastRequestIsFileAnalysis);
+    };
+
     const sendMessage = async (e?: React.FormEvent) => {
         if (e) e.preventDefault();
         if (!input.trim() && !selectedFile) return;
@@ -155,52 +440,15 @@ export function AgentProvider({
         setSelectedFile(null);
         setSelectedText(''); // Clear selection after sending
 
-        setIsLoading(true);
+        const payload = {
+            messages: newMessages,
+            fileData,
+            userId: userId,
+            chatId: currentChatId || undefined,
+            selectedText: selectedText || undefined
+        };
 
-        try {
-            const payload = {
-                messages: newMessages,
-                fileData,
-                userId: userId,
-                chatId: currentChatId || undefined,
-                selectedText: selectedText || undefined
-            };
-
-            const res = await fetch('/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                throw new Error(data.error || 'Failed to send message');
-            }
-
-            // Add AI response to messages
-            setMessages(prev => [...prev, {
-                role: 'assistant',
-                content: data.response
-            }]);
-
-            // Update chatId if needed
-            if (data.chatId && data.chatId !== currentChatId) {
-                setCurrentChatId(data.chatId);
-                window.history.replaceState(null, '', `/agent/${data.chatId}`);
-                fetchHistory(); // Refresh history to show new chat
-            }
-
-        } catch (error: any) {
-            console.error('Chat error:', error);
-            setMessages(prev => [...prev, {
-                role: 'assistant',
-                content: 'Sorry, I am having trouble connecting to the medical brain right now.'
-            }]);
-            toast.error('Failed to send message');
-        } finally {
-            setIsLoading(false);
-        }
+        await makeChatRequest(payload, false);
     };
 
     const processFile = async (file: File) => {
@@ -247,64 +495,13 @@ export function AgentProvider({
                         type: file.type === 'application/pdf' ? 'pdf' : 'image',
                         content: base64
                     },
+                    filePath: result.filePath,
+                    fileUrl: result.fileUrl,
                     userId: userId,
                     chatId: currentChatId || undefined
                 };
 
-                setIsLoading(true);
-
-                try {
-                    const res = await fetch('/api/chat', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    const data = await res.json();
-
-                    if (!res.ok) {
-                        throw new Error(data.error || 'Failed to analyze report');
-                    }
-
-                    // Remove placeholder and add real response
-                    setMessages(prev => {
-                        const placeholderIndex = prev.findIndex(m => m.role === 'assistant' && m.content === 'Analyzing your report... Please wait.');
-                        if (placeholderIndex !== -1) {
-                            const newMsgs = [...prev];
-                            newMsgs[placeholderIndex] = {
-                                role: 'assistant',
-                                content: data.response
-                            };
-                            return newMsgs;
-                        }
-                        return [...prev, { role: 'assistant', content: data.response }];
-                    });
-
-                    // Update chatId if needed
-                    if (data.chatId && !currentChatId) {
-                        setCurrentChatId(data.chatId);
-                        window.history.replaceState(null, '', `/agent/${data.chatId}`);
-                        fetchHistory();
-                    }
-
-                } catch (error: any) {
-                    console.error('File processing error:', error);
-                    setMessages(prev => {
-                        const placeholderIndex = prev.findIndex(m => m.role === 'assistant' && m.content === 'Analyzing your report... Please wait.');
-                        if (placeholderIndex !== -1) {
-                            const newMsgs = [...prev];
-                            newMsgs[placeholderIndex] = {
-                                role: 'assistant',
-                                content: 'Sorry, I failed to analyze the report.'
-                            };
-                            return newMsgs;
-                        }
-                        return [...prev, { role: 'assistant', content: 'Sorry, I failed to analyze the report.' }];
-                    });
-                    toast.error(error.message || 'Failed to analyze report');
-                } finally {
-                    setIsLoading(false);
-                }
+                await makeChatRequest(payload, true);
 
             } else {
                 setMessages(prev => {
@@ -344,11 +541,16 @@ export function AgentProvider({
             isPending: isLoading,
             isUploading,
             isFileUploading,
+            showSlowWarning,
+            retryCount,
+            simulation,
+            setSimulation,
             handleNewChat,
             loadChat,
             sendMessage,
             processFile,
-            fileToBase64
+            fileToBase64,
+            handleRetry
         }}>
             {children}
         </AgentContext.Provider>

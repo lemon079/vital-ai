@@ -6,6 +6,9 @@ export interface Message {
     type: "pdf" | "image";
   };
   selectedText?: string; // Text highlighted from PDF
+  isError?: boolean;
+  errorType?: 'slow-network' | 'timeout' | 'network' | 'rate-limit' | 'server';
+  isStreaming?: boolean;
 }
 
 export interface ChatSession {
@@ -30,6 +33,10 @@ export interface AgentContextType {
   isPending: boolean;
   isUploading: boolean;
   isFileUploading: boolean;
+  showSlowWarning: boolean;
+  retryCount: number;
+  simulation: string;
+  setSimulation: (simulation: string) => void;
 
   // Actions
   handleNewChat: () => void;
@@ -37,4 +44,5 @@ export interface AgentContextType {
   sendMessage: (e?: React.FormEvent) => Promise<void>;
   processFile: (file: File) => Promise<void>;
   fileToBase64: (file: File) => Promise<string>;
+  handleRetry: () => Promise<void>;
 }
