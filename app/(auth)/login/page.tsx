@@ -1,29 +1,24 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Bot, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
 import Link from 'next/link';
+import { useSignin } from '@/hooks/use-auth';
 
 export default function LoginPage() {
-    const router = useRouter();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const { mutate, isPending } = useSignin();
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        setIsLoading(true);
-
-        // Fake login delay
-        await new Promise(resolve => setTimeout(resolve, 800));
-
-        toast.success('Logged in successfully');
-        router.push('/onboarding');
+        const formData = new FormData();
+        formData.append('email', email);
+        formData.append('password', password);
+        mutate(formData);
     };
 
     return (
@@ -54,7 +49,7 @@ export default function LoginPage() {
                                     value={email}
                                     onChange={(e: any) => setEmail(e.target.value)}
                                     required
-                                    disabled={isLoading}
+                                    disabled={isPending}
                                 />
                             </div>
                             <div className="space-y-2">
@@ -67,11 +62,11 @@ export default function LoginPage() {
                                     value={password}
                                     onChange={(e: any) => setPassword(e.target.value)}
                                     required
-                                    disabled={isLoading}
+                                    disabled={isPending}
                                 />
                             </div>
-                            <Button className="w-full" type="submit" disabled={isLoading}>
-                                {isLoading ? (
+                            <Button className="w-full" type="submit" disabled={isPending}>
+                                {isPending ? (
                                     <>
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                         Signing in...
@@ -88,9 +83,6 @@ export default function LoginPage() {
                             <Link href="/signup" className="text-primary hover:underline">
                                 Sign up
                             </Link>
-                        </p>
-                        <p className="text-xs text-muted-foreground text-center">
-                            Mock Authentication Active: Click Sign In to proceed.
                         </p>
                     </CardFooter>
                 </Card>

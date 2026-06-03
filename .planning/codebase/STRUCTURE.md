@@ -25,9 +25,8 @@ vital-ai/
 ├── components/                    # Core UI components
 │   ├── ui/                        # Accessible UI primitives (Shadcn/Radix)
 │   ├── providers/                 # Client React-Query & Theme provider configurations
-│   ├── agent-client-page.tsx      # Multi-panel clinical console dashboard
-│   ├── mode-toggle.tsx            # Dark/light theme selector
-│   └── pdf-viewer.tsx             # Interactive split-screen client-side PDF visualizer
+│   ├── agent-client-page.tsx      # Interactive chat workspace
+│   └── mode-toggle.tsx            # Dark/light theme selector
 ├── context/                       # Global React Context providers
 ├── hooks/                         # Client React custom hook hooks
 ├── lib/                           # Core utilities, database models, and AI engine
@@ -72,8 +71,7 @@ vital-ai/
 - Purpose: Modally reusable React components separated by layout scopes.
 - Contains: Layout elements and user dashboard cards.
 - Key files:
-  - `components/agent-client-page.tsx` - Interactive chat workspace with double split layout panel for PDF viewer.
-  - `components/pdf-viewer.tsx` - Visualizes active lab reports using canvas layers.
+  - `components/agent-client-page.tsx` - Interactive chat workspace containing the chatbot interface.
 
 **lib/agent/**
 - Purpose: Multi-agent system engine.

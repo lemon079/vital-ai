@@ -36,6 +36,7 @@ export async function GET(
       headers: {
         'Content-Type': contentType,
         'Content-Length': fileBuffer.length.toString(),
+        'Content-Disposition': `inline; filename="${filename}"`,
         'Cache-Control': 'public, max-age=3600',
       },
     });

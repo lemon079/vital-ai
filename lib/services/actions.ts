@@ -27,6 +27,7 @@ export async function signup(formData: FormData) {
         // Set session cookie
         const cookieStore = await cookies();
         cookieStore.set('userId', newUser.id, { httpOnly: true, secure: true, sameSite: 'strict' });
+        cookieStore.set('isOnboarded', 'false', { httpOnly: false, secure: true, sameSite: 'strict' });
 
         return { success: true };
     } catch (error: any) {
@@ -60,6 +61,7 @@ export async function login(formData: FormData) {
         // Set session cookie
         const cookieStore = await cookies();
         cookieStore.set('userId', user.id, { httpOnly: true, secure: true, sameSite: 'strict' });
+        cookieStore.set('isOnboarded', user.is_onboarded ? 'true' : 'false', { httpOnly: false, secure: true, sameSite: 'strict' });
 
         return { success: true };
 
@@ -108,9 +110,19 @@ export async function submitOnboarding(formData: FormData) {
             await createProfile(userId, name, age, "Not Specified");
         }
 
+        const cookieStore = await cookies();
+        cookieStore.set('isOnboarded', 'true', { httpOnly: false, secure: true, sameSite: 'strict' });
+
         return { success: true };
     } catch (e) {
         console.error("Onboarding failed", e);
         return { error: 'Failed to save profile', success: false };
     }
+}
+
+export async function logout() {
+    const cookieStore = await cookies();
+    cookieStore.delete('userId');
+    cookieStore.delete('isOnboarded');
+    return { success: true };
 }

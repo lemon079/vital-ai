@@ -13,6 +13,7 @@
 - [ ] **FLOW-04**: Once sufficient symptom details are gathered, the agent synthesizes findings and generates a personalized clinical conclusion of "why it is happening."
 - [ ] **FLOW-05**: Strict factual verification: The agent must never formulate diagnoses or conclusions without citing concrete, validated lab findings and conversational facts in the active session.
 - [ ] **FLOW-06**: Active Medical Disclaimer: Every clinical conclusion must contain a prominent disclaimer noting the AI does not issue certified medical diagnoses.
+- [ ] **FLOW-07**: End-to-End Chat History Persistence: Complete chat history persistence where each authenticated user has their own isolated sessions.
 
 ### Frontend UI & State Management
 
@@ -45,22 +46,23 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FLOW-01 | Phase 2 | Pending |
-| FLOW-02 | Phase 2 | Pending |
-| FLOW-03 | Phase 1 | Pending |
-| FLOW-04 | Phase 1 | Pending |
-| FLOW-05 | Phase 1 | Pending |
-| FLOW-06 | Phase 1 | Pending |
-| UI-01 | Phase 3 | Pending |
-| UI-02 | Phase 4 | Pending |
-| UI-03 | Phase 4 | Pending |
-| UI-04 | Phase 4 | Pending |
-| TEST-01 | Phase 5 | Pending |
-| TEST-02 | Phase 5 | Pending |
+| FLOW-01 | Phase 2 | Complete |
+| FLOW-02 | Phase 2 | Complete |
+| FLOW-03 | Phase 1 | Complete |
+| FLOW-04 | Phase 1 | Complete |
+| FLOW-05 | Phase 1 | Complete |
+| FLOW-06 | Phase 1 | Complete |
+| FLOW-07 | Phase 3 | Pending |
+| UI-01 | Phase 4 | Pending |
+| UI-02 | Phase 5 | Pending |
+| UI-03 | Phase 5 | Pending |
+| UI-04 | Phase 5 | Pending |
+| TEST-01 | Phase 6 | Pending |
+| TEST-02 | Phase 6 | Pending |
 
 **Coverage:**
-- v1 requirements: 12 total
-- Mapped to phases: 12
+- v1 requirements: 13 total
+- Mapped to phases: 13
 - Unmapped: 0 ✓
 
 ---

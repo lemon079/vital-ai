@@ -1,6 +1,6 @@
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
-import { saveLabResultsAsync } from "@/lib/services/chat";
+import { saveLabResults, saveLabResultsAsync } from "@/lib/services/chat";
 
 import { LabResultData } from "@/types/labs";
 
@@ -46,8 +46,14 @@ export const saveLabResultsTool = tool(
             gender: r.gender ? String(r.gender) : undefined
         }));
 
+        const reportId = args?.reportId || args?.report_id;
+
         try {
-            await saveLabResultsAsync(parsedResults as LabResultData[]);
+            if (reportId) {
+                await saveLabResults(reportId, parsedResults as LabResultData[]);
+            } else {
+                await saveLabResultsAsync(parsedResults as LabResultData[]);
+            }
             return `Successfully saved ${parsedResults.length} lab results to report.`;
         } catch (error) {
             console.error("Error saving lab results via tool:", error);

@@ -71,14 +71,68 @@ export function AgentProvider({
     }, []);
 
     const fetchHistory = useCallback(async () => {
-        setChatHistory([]);
-    }, []);
+        if (!userId) return;
+        try {
+            const res = await fetch(`/api/chats?userId=${userId}`);
+            if (res.ok) {
+                const data = await res.json();
+                setChatHistory(data.chats || []);
+            }
+        } catch (e) {
+            console.error("Failed to fetch history:", e);
+        }
+    }, [userId]);
+
+    useEffect(() => {
+        fetchHistory();
+    }, [userId, fetchHistory]);
 
     useEffect(() => {
         if (initialChatId && initialChatId !== currentChatId) {
             setCurrentChatId(initialChatId);
         }
     }, [initialChatId]);
+
+    const deleteChat = async (chatId: string) => {
+        try {
+            const res = await fetch(`/api/chats/${chatId}`, {
+                method: 'DELETE'
+            });
+            if (res.ok) {
+                toast.success('Chat deleted successfully');
+                await fetchHistory();
+                if (currentChatId === chatId) {
+                    handleNewChat();
+                }
+            } else {
+                toast.error('Failed to delete chat');
+            }
+        } catch (e) {
+            console.error('Delete chat error:', e);
+            toast.error('Failed to delete chat');
+        }
+    };
+
+    const renameChat = async (chatId: string, title: string) => {
+        try {
+            const res = await fetch(`/api/chats/${chatId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ title }),
+            });
+            if (res.ok) {
+                toast.success('Chat renamed successfully');
+                await fetchHistory();
+            } else {
+                toast.error('Failed to rename chat');
+            }
+        } catch (e) {
+            console.error('Rename chat error:', e);
+            toast.error('Failed to rename chat');
+        }
+    };
 
     const loadChat = async (chatId: string) => {
         if (!chatId) return;
@@ -92,8 +146,10 @@ export function AgentProvider({
                 })) || [];
                 setMessages(mappedMessages);
                 setCurrentChatId(chat.id);
-                if (chat.file_url) {
-                    setPdfUrl(chat.file_url);
+                
+                const resolvedFileUrl = chat.fileUrl || chat.file_url;
+                if (resolvedFileUrl) {
+                    setPdfUrl(resolvedFileUrl);
                     setIsPdfVisible(true);
                 } else {
                     setPdfUrl(null);
@@ -550,7 +606,9 @@ export function AgentProvider({
             sendMessage,
             processFile,
             fileToBase64,
-            handleRetry
+            handleRetry,
+            deleteChat,
+            renameChat
         }}>
             {children}
         </AgentContext.Provider>

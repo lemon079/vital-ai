@@ -1,17 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import dynamic from 'next/dynamic';
-import { Send, Paperclip, Bot, User, Menu, FileText, ImageIcon, Plus, X, Highlighter } from 'lucide-react';
-// import { PdfViewer } from '@/components/pdf-viewer';
-const PdfViewer = dynamic(() => import('@/components/pdf-viewer').then(mod => mod.PdfViewer), {
-    ssr: false,
-    loading: () => (
-        <div className="flex items-center justify-center h-full bg-muted/20">
-            <span className="text-sm text-muted-foreground animate-pulse">Loading PDF Viewer...</span>
-        </div>
-    )
-});
+import { useRouter } from 'next/navigation';
+import { Send, Paperclip, Bot, User, Menu, FileText, ImageIcon, Plus, X, Highlighter, WifiOff, AlertTriangle, RotateCcw, Pencil, Trash2, Check, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -27,8 +18,10 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet";
 import { AgentProvider, useAgentContext } from '@/context/agent-context';
+import { preprocessMessageContent } from '@/lib/utils';
+import { logout } from '@/lib/services/actions';
 
-function AgentClientInner() {
+function AgentClientInner({ userProfile }: { userProfile?: { name: string | null; age: number | null; gender: string | null } }) {
     const {
         messages,
         input,
@@ -45,11 +38,33 @@ function AgentClientInner() {
         isPending,
         isUploading,
         isFileUploading,
+        showSlowWarning,
+        retryCount,
+        simulation,
+        setSimulation,
         handleNewChat,
         loadChat,
         sendMessage,
         processFile,
+        handleRetry,
+        deleteChat,
+        renameChat,
     } = useAgentContext();
+
+    const [isSheetOpen, setIsSheetOpen] = useState(false);
+    const [editingChatId, setEditingChatId] = useState<string | null>(null);
+    const [editTitle, setEditTitle] = useState<string>('');
+    const [deletingChatId, setDeletingChatId] = useState<string | null>(null);
+
+    const router = useRouter();
+    const handleLogout = async () => {
+        await logout();
+        router.push('/login');
+    };
+    
+    useEffect(()=>{
+        console.log("pdfURL: ", pdfUrl)
+    },[pdfUrl])
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -208,13 +223,13 @@ function AgentClientInner() {
             <header className="flex items-center justify-between border-b bg-background px-6 py-4 shadow-sm z-10">
                 <div className="flex items-center gap-3">
                     {mounted ? (
-                        <Sheet>
+                        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                             <SheetTrigger asChild>
                                 <Button variant="ghost" size="icon" className="-ml-2 mr-2">
                                     <Menu className="h-5 w-5" />
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent side="left" className="w-[260px] sm:w-[280px]">
+                            <SheetContent side="left" className="w-[260px] sm:w-[280px] flex flex-col h-full">
                                 <SheetHeader>
                                     <SheetTitle className="flex items-center gap-2">
                                         <Bot className="h-5 w-5 text-primary" />
@@ -224,27 +239,191 @@ function AgentClientInner() {
                                         Manage your health conversations
                                     </SheetDescription>
                                 </SheetHeader>
-                                <div className="py-6">
+                                <div className="py-6 flex-1 flex flex-col overflow-hidden">
                                     <Button
-                                        onClick={handleNewChat}
+                                        onClick={() => {
+                                            handleNewChat();
+                                            setIsSheetOpen(false);
+                                        }}
                                         variant="outline"
-                                        className="w-full gap-2 border-dashed border-2 hover:border-primary hover:bg-primary/5 transition-colors"
+                                        className="w-full gap-2 border-dashed border-2 hover:border-primary hover:bg-primary/5 transition-colors shrink-0"
                                     >
                                         <Plus className="h-4 w-4" />
                                         New Chat
                                     </Button>
 
-                                    <div className="mt-8">
-                                        <h3 className="mb-2 px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                    <div className="mt-8 flex-1 flex flex-col overflow-hidden">
+                                        <h3 className="mb-3 px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider shrink-0">
                                             Recent History
                                         </h3>
-                                        <div className="space-y-1">
-                                            <div className="px-2 py-4 text-sm text-muted-foreground bg-muted/20 rounded-lg border border-dashed text-center">
-                                                <p>Chat History</p>
-                                                <p className="text-xs font-semibold mt-1">Coming Soon</p>
-                                            </div>
+                                        <div className="space-y-1.5 flex-1 overflow-y-auto pr-1">
+                                            {chatHistory.length === 0 ? (
+                                                <div className="px-2 py-6 text-sm text-muted-foreground bg-muted/20 rounded-lg border border-dashed text-center">
+                                                    <p className="font-semibold text-xs">No chats yet</p>
+                                                    <p className="text-[10px] text-muted-foreground/80 mt-1">Start a conversation to see history</p>
+                                                </div>
+                                            ) : (
+                                                chatHistory.map((chat) => {
+                                                    const isActive = currentChatId === chat.id;
+                                                    const isEditing = editingChatId === chat.id;
+                                                    const isDeleting = deletingChatId === chat.id;
+
+                                                    if (isEditing) {
+                                                        return (
+                                                            <div key={chat.id} className="flex items-center gap-1 w-full px-2 py-1 bg-muted/50 rounded-lg border border-border">
+                                                                <Input
+                                                                    value={editTitle}
+                                                                    onChange={(e) => setEditTitle(e.target.value)}
+                                                                    className="h-7 text-xs flex-1 bg-background px-2"
+                                                                    onKeyDown={(e) => {
+                                                                        if (e.key === 'Enter') {
+                                                                            if (editTitle.trim()) {
+                                                                                renameChat(chat.id, editTitle.trim());
+                                                                                setEditingChatId(null);
+                                                                            }
+                                                                        } else if (e.key === 'Escape') {
+                                                                            setEditingChatId(null);
+                                                                        }
+                                                                    }}
+                                                                    autoFocus
+                                                                />
+                                                                <Button
+                                                                    size="icon"
+                                                                    variant="ghost"
+                                                                    className="h-7 w-7 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950/30"
+                                                                    onClick={() => {
+                                                                        if (editTitle.trim()) {
+                                                                            renameChat(chat.id, editTitle.trim());
+                                                                            setEditingChatId(null);
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    <Check className="h-3.5 w-3.5" />
+                                                                </Button>
+                                                                <Button
+                                                                    size="icon"
+                                                                    variant="ghost"
+                                                                    className="h-7 w-7 text-destructive hover:bg-destructive/10"
+                                                                    onClick={() => setEditingChatId(null)}
+                                                                >
+                                                                    <X className="h-3.5 w-3.5" />
+                                                                </Button>
+                                                            </div>
+                                                        );
+                                                    }
+
+                                                    if (isDeleting) {
+                                                        return (
+                                                            <div key={chat.id} className="flex items-center justify-between w-full px-2 py-1 bg-destructive/10 text-destructive rounded-lg border border-destructive/20 text-xs">
+                                                                <span className="font-semibold px-1">Delete chat?</span>
+                                                                <div className="flex gap-1 shrink-0">
+                                                                    <Button
+                                                                        size="icon"
+                                                                        variant="ghost"
+                                                                        className="h-7 w-7 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950/30"
+                                                                        onClick={() => {
+                                                                            deleteChat(chat.id);
+                                                                            setDeletingChatId(null);
+                                                                        }}
+                                                                        title="Confirm Delete"
+                                                                    >
+                                                                        <Check className="h-3.5 w-3.5" />
+                                                                    </Button>
+                                                                    <Button
+                                                                        size="icon"
+                                                                        variant="ghost"
+                                                                        className="h-7 w-7 text-destructive hover:bg-destructive/10"
+                                                                        onClick={() => setDeletingChatId(null)}
+                                                                        title="Cancel Delete"
+                                                                    >
+                                                                        <X className="h-3.5 w-3.5" />
+                                                                    </Button>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    }
+
+                                                    return (
+                                                        <div
+                                                            key={chat.id}
+                                                            className={`group flex items-center justify-between w-full rounded-lg text-left text-sm transition-all duration-200 ${
+                                                                isActive
+                                                                    ? 'bg-primary/5 text-primary border-l-2 border-l-primary font-semibold'
+                                                                    : 'hover:bg-muted/50 text-muted-foreground hover:text-foreground'
+                                                            }`}
+                                                        >
+                                                            <button
+                                                                onClick={() => {
+                                                                    loadChat(chat.id);
+                                                                    setIsSheetOpen(false);
+                                                                }}
+                                                                className="flex-1 px-3 py-2 truncate text-left cursor-pointer"
+                                                                title={chat.title}
+                                                            >
+                                                                {chat.title}
+                                                            </button>
+                                                            <div className="flex items-center gap-0.5 pr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 shrink-0">
+                                                                <Button
+                                                                    size="icon"
+                                                                    variant="ghost"
+                                                                    className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        setEditingChatId(chat.id);
+                                                                        setEditTitle(chat.title);
+                                                                    }}
+                                                                    title="Rename Chat"
+                                                                >
+                                                                    <Pencil className="h-3.5 w-3.5" />
+                                                                </Button>
+                                                                <Button
+                                                                    size="icon"
+                                                                    variant="ghost"
+                                                                    className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        setDeletingChatId(chat.id);
+                                                                    }}
+                                                                    title="Delete Chat"
+                                                                >
+                                                                    <Trash2 className="h-3.5 w-3.5" />
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })
+                                            )}
                                         </div>
                                     </div>
+                                </div>
+                                
+                                {/* Pinned User Profile & Sign Out Section */}
+                                <div className="mt-auto border-t border-border pt-4 pb-2 flex items-center justify-between gap-2 shrink-0">
+                                    <div className="flex items-center gap-2.5 overflow-hidden">
+                                        <Avatar className="h-9 w-9 border border-border bg-primary/5 text-primary shrink-0 shadow-sm">
+                                            <AvatarFallback className="font-semibold text-sm">
+                                                {(userProfile?.name?.[0] || 'U').toUpperCase()}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div className="flex flex-col text-left overflow-hidden">
+                                            <span className="text-sm font-semibold text-foreground truncate leading-tight">
+                                                {userProfile?.name || 'User Profile'}
+                                            </span>
+                                            <span className="text-[11px] text-muted-foreground truncate">
+                                                {userProfile?.age ? `${userProfile?.age} yrs` : 'Signed In'}
+                                                {userProfile?.gender && userProfile?.gender !== 'Not Specified' ? ` • ${userProfile.gender}` : ''}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={handleLogout}
+                                        className="h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
+                                        title="Sign Out"
+                                    >
+                                        <LogOut className="h-4 w-4" />
+                                    </Button>
                                 </div>
                             </SheetContent>
                         </Sheet>
@@ -261,81 +440,97 @@ function AgentClientInner() {
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    {pdfUrl && (
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setIsPdfVisible(!isPdfVisible)}
-                            className="hidden sm:flex items-center gap-2 text-xs"
-                        >
-                            <FileText size={14} />
-                            {isPdfVisible ? 'Hide PDF' : 'Show PDF'}
-                        </Button>
-                    )}
                     <ModeToggle />
                 </div>
             </header>
 
-            <div className={`flex-1 flex overflow-hidden ${pdfUrl && isPdfVisible ? 'flex-col lg:flex-row' : 'flex-col'}`}>
-                {pdfUrl && isPdfVisible && (
-                    <div className="w-full lg:w-1/2 border-r bg-muted/20 p-4 animation-fade-in flex-1 lg:flex-none h-1/2 lg:h-full">
-                        <div className="h-full w-full rounded-xl border bg-background shadow-sm overflow-hidden flex flex-col">
-                            <div className="bg-muted/50 px-4 py-2 border-b flex justify-between items-center shrink-0">
-                                <span className="text-xs font-medium text-muted-foreground">PDF Preview</span>
-                                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setIsPdfVisible(false)}>
-                                    <Menu size={14} />
-                                </Button>
-                            </div>
-                            <PdfViewer url={pdfUrl} onHighlight={handleHighlight} />
-                        </div>
-                    </div>
-                )}
-
-                <div className={`flex flex-col h-full transition-all duration-300 ${pdfUrl && isPdfVisible ? 'w-full lg:w-1/2 h-1/2 lg:h-full' : 'w-full'}`}>
+            <div className="flex-1 flex overflow-hidden flex-col">
+                <div className="flex flex-col h-full transition-all duration-300 w-full">
                     <main
                         className="flex-1 overflow-y-auto p-4 sm:p-6 scroll-smooth"
                         style={{ scrollbarGutter: 'stable' }}
                         onMouseUp={handleHighlight}
                     >
                         <div className="mx-auto max-w-3xl space-y-6">
-                            {messages.filter(msg => msg.role !== 'system' && msg.role !== 'tool').map((msg, idx) => (
-                                <div key={idx} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                                    <Avatar className={`h-8 w-8 mt-1 border shadow-sm ${msg.role === 'assistant' ? 'bg-card' : 'bg-primary/5'}`}>
-                                        <AvatarFallback className={msg.role === 'assistant' ? 'text-primary' : 'text-muted-foreground'}>
-                                            {msg.role === 'assistant' ? <Bot size={16} /> : <User size={16} />}
-                                        </AvatarFallback>
-                                    </Avatar>
+                            {messages.filter(msg => msg.role !== 'system' && msg.role !== 'tool').map((msg, idx) => {
+                                // Dynamically resolve file info from message content if missing from state (e.g. on database reload)
+                                const uploadMatch = msg.content ? msg.content.match(/^\[Uploaded:\s*([^\]]+)\]/i) : null;
+                                const derivedFileInfo = msg.fileInfo || (uploadMatch ? {
+                                    name: uploadMatch[1],
+                                    type: /\.pdf$/i.test(uploadMatch[1]) ? 'pdf' as const : 'image' as const
+                                } : undefined);
 
-                                    <div className={`max-w-[80%] ${msg.role === 'user' ? 'items-end' : 'items-start'} flex flex-col gap-2`}>
-                                        {msg.fileInfo && (
-                                            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 border text-xs">
-                                                <div className="flex h-6 w-6 items-center justify-center rounded bg-primary/10">
-                                                    {msg.fileInfo.type === 'pdf' ? (
-                                                        <FileText size={14} className="text-primary" />
-                                                    ) : (
-                                                        <ImageIcon size={14} className="text-primary" />
-                                                    )}
+                                // Clean message content to check if the user typed text themselves
+                                const cleanedContent = msg.role === 'user'
+                                    ? msg.content.replace(/^\[Uploaded:\s*([^\]]+)\]/i, '').replace(/\[SYSTEM:\s*[^\]]+\]/g, '').trim()
+                                    : msg.content;
+
+                                const shouldShowBubble = !msg.role || msg.role !== 'user' || cleanedContent.length > 0;
+
+                                return (
+                                    <div key={idx} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                                        <Avatar className={`h-8 w-8 mt-1 border shadow-sm ${msg.role === 'assistant' ? 'bg-card' : 'bg-primary/5'}`}>
+                                            <AvatarFallback className={msg.role === 'assistant' ? 'text-primary' : 'text-muted-foreground'}>
+                                                {msg.role === 'assistant' ? <Bot size={16} /> : <User size={16} />}
+                                            </AvatarFallback>
+                                        </Avatar>
+
+                                        <div className={`max-w-[80%] ${msg.role === 'user' ? 'items-end' : 'items-start'} flex flex-col gap-2`}>
+                                            {derivedFileInfo && (
+                                                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 border text-xs">
+                                                    <div className="flex h-6 w-6 items-center justify-center rounded bg-primary/10">
+                                                        {derivedFileInfo.type === 'pdf' ? (
+                                                            <FileText size={14} className="text-primary" />
+                                                        ) : (
+                                                            <ImageIcon size={14} className="text-primary" />
+                                                        )}
+                                                    </div>
+                                                    <span className="font-medium truncate max-w-[200px]">{derivedFileInfo.name}</span>
                                                 </div>
-                                                <span className="font-medium truncate max-w-[200px]">{msg.fileInfo.name}</span>
-                                            </div>
-                                        )}
-                                        {msg.selectedText && (
-                                            <div className="mb-2 pl-3 border-l-2 border-primary/30">
-                                                <p className="text-xs text-muted-foreground italic line-clamp-3">
-                                                    "{msg.selectedText}"
-                                                </p>
-                                            </div>
-                                        )}
-                                        <div className={`rounded-2xl px-5 py-3.5 text-sm leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-primary text-primary-foreground rounded-tr-none' : 'bg-card text-card-foreground border rounded-tl-none'}`}>
-                                            <div className={`prose ${msg.role === 'user' ? 'prose-invert' : 'dark:prose-invert'} prose-sm max-w-none wrap-break-word`}>
-                                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                                    {msg.content}
-                                                </ReactMarkdown>
-                                            </div>
+                                            )}
+                                            {msg.selectedText && (
+                                                <div className="mb-2 pl-3 border-l-2 border-primary/30">
+                                                    <p className="text-xs text-muted-foreground italic line-clamp-3">
+                                                        "{msg.selectedText}"
+                                                    </p>
+                                                </div>
+                                            )}
+                                            {msg.isError ? (
+                                                <div className="rounded-2xl px-5 py-3.5 text-sm leading-relaxed shadow-sm bg-destructive/10 text-destructive border border-destructive/20 rounded-tl-none flex flex-col gap-3 max-w-md">
+                                                    <div className="flex items-start gap-2.5">
+                                                        {msg.errorType === 'network' ? (
+                                                            <WifiOff className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+                                                        ) : (
+                                                            <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+                                                        )}
+                                                        <p className="font-medium text-destructive/90">{msg.content}</p>
+                                                    </div>
+                                                    <Button 
+                                                        onClick={handleRetry} 
+                                                        type="button"
+                                                        size="sm" 
+                                                        variant="outline" 
+                                                        className="w-fit gap-1.5 border-destructive/30 hover:text-destructive text-destructive font-semibold bg-background hover:bg-destructive/10 transition-colors"
+                                                    >
+                                                        <RotateCcw className="h-3.5 w-3.5" />
+                                                        Retry Request
+                                                    </Button>
+                                                </div>
+                                            ) : (
+                                                shouldShowBubble && (
+                                                    <div className={`rounded-2xl px-5 py-3.5 text-sm leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-primary text-primary-foreground rounded-tr-none' : 'bg-card text-card-foreground border rounded-tl-none'}`}>
+                                                        <div className={`prose ${msg.role === 'user' ? 'prose-invert' : 'dark:prose-invert'} prose-sm max-w-none wrap-break-word`}>
+                                                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                                                {preprocessMessageContent(cleanedContent)}
+                                                            </ReactMarkdown>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            )}
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
 
                             {isPending && (
                                 <div className="flex gap-4 justify-start">
@@ -343,7 +538,14 @@ function AgentClientInner() {
                                         <AvatarFallback className="text-primary"><Bot size={16} /></AvatarFallback>
                                     </Avatar>
                                     <div className="bg-card border rounded-2xl rounded-tl-none px-5 py-4 shadow-sm">
-                                        <span className="text-sm font-medium text-muted-foreground animate-pulse">thinking...</span>
+                                        <span className="text-sm font-medium text-muted-foreground animate-pulse">
+                                            {retryCount > 0 
+                                                ? `Connection issue. Retrying (Attempt ${retryCount} of 5)...` 
+                                                : showSlowWarning 
+                                                    ? "The medical brain is working on a complex response, please wait..." 
+                                                    : "thinking..."
+                                            }
+                                        </span>
                                     </div>
                                 </div>
                             )}
@@ -397,6 +599,38 @@ function AgentClientInner() {
                             <p className="mt-3 text-center text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
                                 AI assistance only • Consult a Doctor for diagnosis
                             </p>
+
+                            {process.env.NODE_ENV === 'development' && (
+                                <div className="mt-4 p-3 bg-muted/40 border rounded-lg text-xs flex flex-col gap-2">
+                                    <div className="flex items-center justify-between font-semibold text-muted-foreground uppercase tracking-wider text-[10px]">
+                                        <span>Simulation Console</span>
+                                        <span className="text-[9px] bg-primary/10 text-primary px-1.5 py-0.5 rounded text-center leading-none">DEV ONLY</span>
+                                    </div>
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {[
+                                            { label: 'Normal', value: 'none' },
+                                            { label: 'Offline', value: 'offline' },
+                                            { label: 'Slow Network (18s)', value: 'slow-response' },
+                                            { label: 'Timeout (40s)', value: 'timeout' },
+                                            { label: 'Rate Limit (429)', value: 'rate-limit' },
+                                            { label: 'Server Error (500)', value: 'server' },
+                                        ].map((opt) => (
+                                            <button
+                                                key={opt.value}
+                                                type="button"
+                                                onClick={() => setSimulation(opt.value)}
+                                                className={`px-2.5 py-1 rounded transition-colors border font-medium ${
+                                                    simulation === opt.value
+                                                        ? 'bg-primary text-primary-foreground border-primary shadow-sm hover:bg-primary/90'
+                                                        : 'bg-background hover:bg-muted text-muted-foreground border-border'
+                                                }`}
+                                            >
+                                                {opt.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -413,6 +647,7 @@ interface AgentClientPageProps {
     initialMessages?: Message[];
     initialFileUrl?: string | null;
     userId: string;
+    userProfile?: { name: string | null; age: number | null; gender: string | null };
 }
 
 export default function AgentClientPage({
@@ -420,7 +655,8 @@ export default function AgentClientPage({
     initialHistory,
     initialMessages,
     initialFileUrl,
-    userId
+    userId,
+    userProfile
 }: AgentClientPageProps) {
     return (
         <AgentProvider
@@ -430,7 +666,7 @@ export default function AgentClientPage({
             initialFileUrl={initialFileUrl}
             userId={userId}
         >
-            <AgentClientInner />
+            <AgentClientInner userProfile={userProfile} />
         </AgentProvider>
     );
 }

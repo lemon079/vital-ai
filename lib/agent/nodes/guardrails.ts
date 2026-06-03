@@ -8,7 +8,7 @@
  */
 
 // 1. External Library Imports
-import { SystemMessage, AIMessage } from "@langchain/core/messages";
+import { SystemMessage, AIMessage, HumanMessage } from "@langchain/core/messages";
 
 // 2. Internal Project Imports
 import { AgentState } from "../state";
@@ -39,6 +39,7 @@ Your job is to analyze the user's latest message and determine if it is safe and
 3. **Restricted Topics**: Is the user asking you to PROVIDE a specific medical diagnosis for them or PRESCRIBE/RECOMMEND specific medication? (YES/NO)
    - "I have a headache, what do I have?" -> DIAGNOSIS REQUEST (UNSAFE)
    - "What pills should I take for this?" -> MEDICATION REQUEST (UNSAFE)
+   - "I have been feeling tired lately and ALT is high" -> SAFE (Reporting symptoms/lab values for HPI mapping - ALLOW THIS)
    - "What does high glucose mean?" -> SAFE (Educational)
    - "Explain my lab results" -> SAFE (Analysis)
 
@@ -102,7 +103,7 @@ export async function guardrailsNode(state: typeof AgentState.State) {
     try {
         const response = await model.invoke([
             new SystemMessage(GUARDRAIL_PROMPT),
-            new SystemMessage(`User Message: "${lastHumanMessage.content}"`)
+            new HumanMessage(lastHumanMessage.content)
         ]);
 
         const content = typeof response.content === "string" ? response.content : "";

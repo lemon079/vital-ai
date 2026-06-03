@@ -17,14 +17,23 @@ export async function createProfile(userId: string, name?: string, age?: number,
     return profile.id;
 }
 
+export async function getUserProfile(userId: string) {
+    const profile = await prisma.profiles.findFirst({
+        where: { user_id: userId },
+        select: { name: true, age: true, gender: true }
+    });
+    return profile;
+}
+
 // --- Reports ---
 
-export async function createReport(userId: string, patientGender?: string, patientAge?: number) {
+export async function createReport(userId: string, patientGender?: string, patientAge?: number, filePath?: string) {
     const report = await prisma.reports.create({
         data: {
             user_id: userId,
             patient_gender: patientGender,
             patient_age: patientAge,
+            file_path: filePath || null,
             analyzed_at: new Date()
         },
         select: { id: true }
@@ -135,6 +144,7 @@ export async function getUserChats(userId: string): Promise<any[]> {
         orderBy: { created_at: 'desc' },
         select: {
             id: true,
+            title: true,
             created_at: true,
             messages: {
                 orderBy: { created_at: 'asc' },
@@ -147,8 +157,21 @@ export async function getUserChats(userId: string): Promise<any[]> {
     return chats.map(c => ({
         id: c.id,
         created_at: c.created_at,
-        title: c.messages[0]?.content || "New Chat"
+        title: c.title || c.messages[0]?.content || "New Chat"
     }));
+}
+
+export async function renameChat(chatId: string, title: string) {
+    await prisma.chats.update({
+        where: { id: chatId },
+        data: { title }
+    });
+}
+
+export async function deleteChat(chatId: string) {
+    await prisma.chats.delete({
+        where: { id: chatId }
+    });
 }
 
 import { Message } from '@/types/chat';

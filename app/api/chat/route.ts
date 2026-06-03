@@ -149,18 +149,54 @@ export async function POST(req: Request) {
       await saveMessage(currentChatId, "user", fullUserMessage);
     }
 
-    // 3. Create Report (Early) if file exists (skip for guest)
-    if (filePath && !isGuest && fileUrl && !dbReportId) {
-      try {
-        dbReportId = await createReport(safeUserId, undefined, undefined, fileUrl); // Pass fileUrl as path/URL to store in reports.file_path
-        // Update Chat with Report ID immediately
-        await prisma.chats.update({
+    // 3. Create or Update Report if file exists (skip for guest)
+    if (filePath && !isGuest && fileUrl) {
+      if (!dbReportId) {
+        try {
+          dbReportId = await createReport(safeUserId, undefined, undefined, fileUrl); // Pass fileUrl as path/URL to store in reports.file_path
+          // Update Chat with Report ID immediately
+          await prisma.chats.update({
+            where: { id: currentChatId },
+            data: { report_id: dbReportId },
+          });
+          console.log(`[Route] Created new early report: reportId=${dbReportId}`);
+        } catch (e) {
+          console.error("Failed to create early report", e);
+        }
+      } else {
+        // Report already exists for the chat. Check if a new file is being uploaded to replace it.
+        const chat = await prisma.chats.findUnique({
           where: { id: currentChatId },
-          data: { report_id: dbReportId },
+          select: {
+            reports: {
+              select: { file_path: true }
+            }
+          }
         });
-        console.log(`[Route] Created new early report: reportId=${dbReportId}`);
-      } catch (e) {
-        console.error("Failed to create early report", e);
+        const existingFilePath = chat?.reports?.file_path;
+
+        if (fileData || (existingFilePath && existingFilePath !== fileUrl)) {
+          try {
+            await prisma.reports.update({
+              where: { id: dbReportId },
+              data: {
+                file_path: fileUrl,
+                analyzed_at: new Date(),
+                patient_gender: null,
+                patient_age: null,
+              }
+            });
+            // Delete existing lab results to prevent duplicates and reset analysis state
+            await prisma.lab_results.deleteMany({
+              where: { report_id: dbReportId }
+            });
+            dbLabResults = [];
+            dbFilePath = filePath;
+            console.log(`[Route] Overwrote existing report: reportId=${dbReportId}, file_path=${fileUrl}. Cleared old lab results.`);
+          } catch (e) {
+            console.error("Failed to overwrite existing report or clear lab results", e);
+          }
+        }
       }
     }
 

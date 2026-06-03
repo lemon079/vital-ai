@@ -1,5 +1,7 @@
 import AgentClientPage from "@/components/agent-client-page";
-import { getChatMessages } from "@/lib/services/chat";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { getChatMessages, getUserChats, getUserProfile } from "@/lib/services/chat";
 import { Message } from "@/types/chat";
 
 export const dynamic = 'force-dynamic';
@@ -7,9 +9,15 @@ export const dynamic = 'force-dynamic';
 export default async function AgentChatPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
 
-    const userId = 'guest-user';
+    const cookieStore = await cookies();
+    const userId = cookieStore.get('userId')?.value;
 
-    const initialHistory: any[] = []; // History disabled
+    if (!userId) {
+        redirect('/login');
+    }
+
+    const initialHistory = await getUserChats(userId);
+    const userProfile = await getUserProfile(userId);
     let initialMessages: Message[] = [];
     let initialFileUrl = null;
 
@@ -33,6 +41,7 @@ export default async function AgentChatPage({ params }: { params: Promise<{ id: 
             initialMessages={initialMessages}
             initialFileUrl={initialFileUrl}
             userId={userId}
+            userProfile={userProfile || undefined}
         />
-    )
+    );
 }

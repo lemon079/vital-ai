@@ -12,16 +12,16 @@ import { guardrailsNode } from "./nodes/guardrails";
  * Decides which agent to activate based on user input and state
  */
 function routeStart(state: typeof AgentState.State) {
-  const { filePath, messages } = state;
+  const { filePath, messages, labResults } = state;
   const lastMessage = messages[messages.length - 1];
   const content =
     typeof lastMessage.content === "string"
       ? lastMessage.content.toLowerCase()
       : "";
 
-  // 1. If PDF is uploaded -> Lab Analysis Agent
-  if (filePath) {
-    console.log("[Router] PDF detected. Routing to lab_analysis");
+  // 1. If PDF is uploaded -> Lab Analysis Agent (only if not yet analyzed)
+  if (filePath && (!labResults || labResults.length === 0)) {
+    console.log("[Router] PDF detected (un-analyzed). Routing to lab_analysis");
     return "lab_analysis";
   }
 

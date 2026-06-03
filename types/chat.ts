@@ -45,4 +45,6 @@ export interface AgentContextType {
   processFile: (file: File) => Promise<void>;
   fileToBase64: (file: File) => Promise<string>;
   handleRetry: () => Promise<void>;
+  deleteChat: (chatId: string) => Promise<void>;
+  renameChat: (chatId: string, title: string) => Promise<void>;
 }

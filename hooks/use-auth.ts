@@ -37,7 +37,7 @@ export function useSignin() {
         },
         onSuccess: () => {
             toast.success('Logged in successfully!');
-            router.push('/agent');
+            router.push('/onboarding');
         },
         onError: (error) => {
             toast.error(error.message || 'Failed to login');

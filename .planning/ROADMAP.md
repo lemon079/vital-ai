@@ -9,10 +9,13 @@ A phased journey from a brownfield Next.js codebase with legacy database redunda
 ## Phases
 
 - [x] **Phase 1: Agentic Diagnosis Guardrails & Logic** - Implement secure clinical reasoning and evidence-citation structures within LangGraph. (completed 2026-06-02)
-- [ ] **Phase 2: Conversation & Graph Flow Improvements** - Refine conversation and summary nodes to guide diagnostic follow-up prompts.
-- [ ] **Phase 3: Clean Client-Side State Management** - Refactor React client states to eliminate concurrency race conditions.
-- [ ] **Phase 4: Smooth UI/UX Visual Polish** - Polishing visual panels with rich loading skeletons and transition animations.
-- [ ] **Phase 5: Automated Testing & Verification** - Setting up Vitest unit testing and isolated graph simulation checks.
+- [x] **Phase 2: Conversation & Graph Flow Improvements** - Refine conversation and summary nodes to guide diagnostic follow-up prompts. (completed 2026-06-03)
+- [x] **Phase 2.1: Model Retry Logic and Error Handling** - Implement timeouts, auto-retries, and custom visual error reporting. (completed 2026-06-03)
+- [x] **Phase 3: End-to-End Chat History Persistence Per User** - Implement isolated user chat session persistence and real user accounts. (completed 2026-06-03)
+- [x] **Phase 3.1: Complete End-to-End Authentication and Onboarding Flow** - Implement real account validation, database cleaning, and global route-guarding middleware. (completed 2026-06-03)
+- [ ] **Phase 4: Clean Client-Side State Management** - Refactor React client states to eliminate concurrency race conditions.
+- [ ] **Phase 5: Smooth UI/UX Visual Polish** - Polishing visual panels with rich loading skeletons and transition animations.
+- [ ] **Phase 6: Automated Testing & Verification** - Setting up Vitest unit testing and isolated graph simulation checks.
 
 ---
 
@@ -29,8 +32,8 @@ A phased journey from a brownfield Next.js codebase with legacy database redunda
 - **Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: Build clinical conclusion synthesizer and citation rules inside `lib/agent/nodes/clinical-summary.ts`.
-- [ ] 01-02: Implement evidence verification checks and automated disclaimers in `lib/agent/nodes/guardrails.ts`.
+- [x] 01-01: Build clinical conclusion synthesizer and citation rules inside `lib/agent/nodes/clinical-summary.ts`. (completed 2026-06-02)
+- [x] 01-02: Implement evidence verification checks and automated disclaimers in `lib/agent/nodes/guardrails.ts`. (completed 2026-06-02)
 
 ---
 
@@ -45,14 +48,59 @@ Plans:
 - **Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: Update conversation node `lib/agent/nodes/conversation.ts` and prompts in `lib/agent/prompts.ts`.
-- [ ] 02-02: Refine lab analysis node `lib/agent/nodes/lab-analysis.ts` to manage state transitions correctly.
+- [x] 02-01: Update conversation node `lib/agent/nodes/conversation.ts` and prompts in `lib/agent/prompts.ts`. (completed 2026-06-03)
+- [x] 02-02: Refine lab analysis node `lib/agent/nodes/lab-analysis.ts` to manage state transitions correctly. (completed 2026-06-03)
 
 ---
 
-### Phase 3: Clean Client-Side State Management
-- **Goal**: Refactor the main interactive dashboard panel state container to ensure safe concurrency and prevent loading race conditions.
+### Phase 2.1: Model Retry Logic and Error Handling
+
+- **Goal**: Implement request timeouts, automatic retries (5x limit), and custom visual error reporting.
 - **Depends on**: Phase 2
+- **Success Criteria**:
+  1. Automatic 5x retry loop for model API exceptions/timeouts.
+  2. Interactive "Retry Request" button in styled assistant error bubbles.
+  3. Collapsible Simulation Console in dev mode.
+- **Plans**: 1 plan
+
+Plans:
+- [x] 02.1-01: Centralize requests, implement abort timeout timers, 5x auto-retry logic, and render error blocks/simulators. (completed 2026-06-03)
+
+---
+
+### Phase 3: End-to-End Chat History Persistence Per User
+- **Goal**: Implement a complete, production-ready chat history system where each authenticated user has their own isolated chat sessions, replacing the current `guest_user` placeholder.
+- **Depends on**: Phase 2
+- **Requirements**: FLOW-07
+- **Success Criteria**:
+  1. User A cannot see or access User B's chats under any circumstance.
+  2. Uploading a PDF in Chat 1 does not affect Chat 2.
+  3. Refreshing the page or logging out and back in restores the exact chat state.
+  4. No residual guest_user logic remains in the codebase.
+- **Plans**: 0 plans
+
+Plans:
+- [x] 03-01: Implement isolated chat session persistence, multi-user isolation, and interactive session management. (completed 2026-06-03)
+
+---
+
+### Phase 03.1: Complete End-to-End Authentication and Onboarding Flow (INSERTED)
+
+**Goal:** Implement real account validation, database cleaning, and global route-guarding middleware to enforce onboarding completion and block auth page access after login.
+**Depends on:** Phase 3
+**Success Criteria:**
+1. Database is cleaned and reset to start fresh.
+2. Non-existent users cannot log in.
+3. Logged-in users are routed to `/onboarding` and cannot revisit `/login` or `/signup`.
+4. Non-onboarded logged-in users are restricted to `/onboarding` and cannot access `/agent`.
+**Plans:** 1 plan
+
+Plans:
+- [x] 03.1-01: Implement database cleaning, login form validation, onboarding cookie synchronization, and global middleware redirects. (completed 2026-06-03)
+
+### Phase 4: Clean Client-Side State Management
+- **Goal**: Refactor the main interactive dashboard panel state container to ensure safe concurrency and prevent loading race conditions.
+- **Depends on**: Phase 3
 - **Requirements**: UI-01
 - **Success Criteria**:
   1. Unified React state handling active chats, messages, and PDF files.
@@ -60,28 +108,28 @@ Plans:
 - **Plans**: 1 plan
 
 Plans:
-- [ ] 03-01: Refactor states and API bindings in `components/agent-client-page.tsx`.
+- [ ] 04-01: Refactor states and API bindings in `components/agent-client-page.tsx`.
 
 ---
 
-### Phase 4: Smooth UI/UX Visual Polish
+### Phase 5: Smooth UI/UX Visual Polish
 - **Goal**: Polish dashboard panels with smooth CSS micro-animations, loading skeletons, and layout transitions.
-- **Depends on**: Phase 3
+- **Depends on**: Phase 4
 - **Requirements**: UI-02, UI-03, UI-04
 - **Success Criteria**:
   1. Warm, responsive HSL tailored colors and premium typographic layout.
   2. Beautiful active-typing indicator animations and skeletons.
-  3. Elegant visual card-to-PDF split panel transitions.
+  3. Elegant chat messages fade-in transitions.
 - **Plans**: 1 plan
 
 Plans:
-- [ ] 04-01: Implement CSS micro-animations, loading skeletons, and interactive state fades in the dashboard layout.
+- [ ] 05-01: Implement CSS micro-animations, loading skeletons, and interactive state fades in the dashboard layout.
 
 ---
 
-### Phase 5: Automated Testing & Verification
+### Phase 6: Automated Testing & Verification
 - **Goal**: Install and configure Vitest to test core business logic, converters, and model nodes in isolation.
-- **Depends on**: Phase 4
+- **Depends on**: Phase 5
 - **Requirements**: TEST-01, TEST-02
 - **Success Criteria**:
   1. Automated unit tests cover all lab tools, unit converters, and file processors.
@@ -89,20 +137,23 @@ Plans:
 - **Plans**: 2 plans
 
 Plans:
-- [ ] 05-01: Configure Vitest and write unit tests for `lib/services/processing.ts` and `lib/agent/tools/lab-tools.ts`.
-- [ ] 05-02: Build mock LLM graph simulation tests to verify node-to-node routing flows.
+- [ ] 06-01: Configure Vitest and write unit tests for `lib/services/processing.ts` and `lib/agent/tools/lab-tools.ts`.
+- [ ] 06-02: Build mock LLM graph simulation tests to verify node-to-node routing flows.
 
 ---
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
+Phases execute in numeric order: 1 → 2 → 2.1 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Agentic Diagnosis Guardrails & Logic | 0/2 | Complete    | 2026-06-02 |
-| 2. Conversation & Graph Flow Improvements | 0/2 | Not started | - |
-| 3. Clean Client-Side State Management | 0/1 | Not started | - |
-| 4. Smooth UI/UX Visual Polish | 0/1 | Not started | - |
-| 5. Automated Testing & Verification | 0/2 | Not started | - |
+| 1. Agentic Diagnosis Guardrails & Logic | 2/2 | Complete    | 2026-06-02 |
+| 2. Conversation & Graph Flow Improvements | 2/2 | Complete    | 2026-06-03 |
+| 2.1. Model Retry Logic and Error Handling | 1/1 | Complete    | 2026-06-03 |
+| 3. End-to-End Chat History Persistence Per User | 1/1 | Complete    | 2026-06-03 |
+| 3.1. Complete End-to-End Authentication and Onboarding Flow | 1/1 | Complete    | 2026-06-03 |
+| 4. Clean Client-Side State Management | 0/1 | Not started | - |
+| 5. Smooth UI/UX Visual Polish | 0/1 | Not started | - |
+| 6. Automated Testing & Verification | 0/2 | Not started | - |

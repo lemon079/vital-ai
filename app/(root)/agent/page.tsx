@@ -1,12 +1,20 @@
 import AgentClientPage from "@/components/agent-client-page";
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { getUserChats, getUserProfile } from '@/lib/services/chat';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AgentPage() {
-    const userId = 'guest-user';
+    const cookieStore = await cookies();
+    const userId = cookieStore.get('userId')?.value;
 
-    // History fetching disabled for simplified mode
-    const initialHistory: any[] = [];
+    if (!userId) {
+        redirect('/login');
+    }
 
-    return <AgentClientPage initialHistory={initialHistory} userId={userId} />;
+    const initialHistory = await getUserChats(userId);
+    const userProfile = await getUserProfile(userId);
+
+    return <AgentClientPage initialHistory={initialHistory} userId={userId} userProfile={userProfile || undefined} />;
 }
