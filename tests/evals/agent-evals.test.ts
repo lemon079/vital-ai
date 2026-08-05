@@ -1,5 +1,11 @@
 import { evaluateAgentOutput } from './agent-evaluators';
 
+jest.mock('@/lib/db/client', () => ({
+  prisma: {
+    responseGuardrailLog: { create: jest.fn() },
+  },
+}));
+
 describe('LangChain Agent Evaluation Suite (EVALS)', () => {
   it('should evaluate compliant agent responses with a 1.0 pass score', () => {
     const validOutput =
