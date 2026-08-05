@@ -1,145 +1,76 @@
-
 import { prisma } from '@/lib/db/client';
-import { lab_flag, message_role } from '@/lib/generated/prisma/client';
-
-// --- Profiles ---
-
-export async function createProfile(userId: string, name?: string, age?: number, gender?: string) {
-    const profile = await prisma.profiles.create({
-        data: {
-            user_id: userId,
-            name,
-            age,
-            gender
-        },
-        select: { id: true }
-    });
-    return profile.id;
-}
+import { MessageRole, AgentType } from '@/lib/generated/prisma/client';
 
 export async function getUserProfile(userId: string) {
-    const profile = await prisma.profiles.findFirst({
-        where: { user_id: userId },
-        select: { name: true, age: true, gender: true }
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { email: true, date_of_birth: true, sex: true, pregnancy_status: true }
     });
-    return profile;
-}
+    if (!user) return null;
 
-// --- Reports ---
-
-export async function createReport(userId: string, patientGender?: string, patientAge?: number, filePath?: string) {
-    const report = await prisma.reports.create({
-        data: {
-            user_id: userId,
-            patient_gender: patientGender,
-            patient_age: patientAge,
-            file_path: filePath || null,
-            analyzed_at: new Date()
-        },
-        select: { id: true }
-    });
-    return report.id;
-}
-
-// --- Lab Results ---
-
-import { LabResultData } from '@/types/labs';
-
-export async function saveLabResults(reportId: string, results: LabResultData[]) {
-    if (results.length === 0) return;
-
-    // Map string flag to enum
-    const mapFlag = (f: string): lab_flag => {
-        const validFlags: lab_flag[] = ['NORMAL', 'LOW', 'HIGH', 'CRITICAL', 'CRITICAL_HIGH', 'CRITICAL_LOW', 'UNDETERMINED'];
-        return validFlags.includes(f as lab_flag) ? (f as lab_flag) : 'UNDETERMINED';
-    };
-
-    const data = results.map(res => ({
-        report_id: reportId,
-        test_name: res.test_name,
-        value: res.value,
-        unit: res.unit,
-        flag: mapFlag(res.flag),
-        specimen: res.specimen,
-        reference_low: res.reference_low,
-        reference_high: res.reference_high,
-        reference_unit: res.reference_unit,
-        gender: (res.gender === 'male' || res.gender === 'female' || res.gender === 'any') ? res.gender : null
-    }));
-
-    await prisma.lab_results.createMany({
-        data
-    });
-}
-
-// Kept for signature compatibility but uses same logic
-export async function saveLabResultsAsync(results: LabResultData[]) {
-    // This function was originally writing without a report_id.
-    // In Prisma schema, report_id is nullable (String?), so we can create these as standalone if needed.
-    if (results.length === 0) return;
-
-    const mapFlag = (f: string): lab_flag => {
-        const validFlags: lab_flag[] = ['NORMAL', 'LOW', 'HIGH', 'CRITICAL', 'CRITICAL_HIGH', 'CRITICAL_LOW', 'UNDETERMINED'];
-        return validFlags.includes(f as lab_flag) ? (f as lab_flag) : 'UNDETERMINED';
-    };
-
-    const data = results.map(res => ({
-        test_name: res.test_name,
-        value: res.value,
-        unit: res.unit,
-        flag: mapFlag(res.flag),
-        specimen: res.specimen,
-        reference_low: res.reference_low,
-        reference_high: res.reference_high,
-        reference_unit: res.reference_unit,
-        gender: (res.gender === 'male' || res.gender === 'female' || res.gender === 'any') ? res.gender : null
-    }));
-
-    await prisma.lab_results.createMany({
-        data
-    });
-}
-
-// --- Chats & Messages ---
-
-export async function getOrCreateChat(chatId: string | null, userId: string, reportId?: string): Promise<string> {
-    if (chatId) {
-        return chatId;
+    let age: number | null = null;
+    if (user.date_of_birth) {
+        const today = new Date();
+        const birthDate = new Date(user.date_of_birth);
+        age = today.getFullYear() - birthDate.getFullYear();
     }
 
-    // Create new chat
-    const chat = await prisma.chats.create({
+    return {
+        name: user.email ? user.email.split('@')[0] : null,
+        age,
+        gender: user.sex ? String(user.sex) : null,
+        email: user.email,
+        sex: user.sex,
+        pregnancy_status: user.pregnancy_status,
+        date_of_birth: user.date_of_birth,
+    };
+}
+
+// --- Conversations & Messages ---
+
+export async function getOrCreateConversation(conversationId: string | null, userId: string, reportId?: string): Promise<string> {
+    if (conversationId) {
+        return conversationId;
+    }
+
+    // Create new conversation
+    const conversation = await prisma.conversation.create({
         data: {
             user_id: userId,
             report_id: reportId || null,
         },
         select: { id: true }
     });
-    return chat.id;
+    return conversation.id;
 }
 
-export async function saveMessage(chatId: string, role: 'user' | 'assistant', content: string) {
-    await prisma.messages.create({
+export async function saveMessage(
+    conversationId: string,
+    role: 'user' | 'assistant',
+    content: string,
+    agentType: 'qna' | 'followup' | 'summary' | 'system' = 'system'
+) {
+    await prisma.message.create({
         data: {
-            chat_id: chatId,
-            role: role.toUpperCase() as message_role,
+            conversation_id: conversationId,
+            role: role as MessageRole,
+            agent_type: agentType as AgentType,
             content
         }
     });
 }
 
-export async function saveMessageAsync(chatId: string, role: 'user' | 'assistant', content: string) {
-    await prisma.messages.create({
-        data: {
-            chat_id: chatId,
-            role: role.toUpperCase() as message_role,
-            content
-        }
-    });
+export async function saveMessageAsync(
+    conversationId: string,
+    role: 'user' | 'assistant',
+    content: string,
+    agentType: 'qna' | 'followup' | 'summary' | 'system' = 'system'
+) {
+    await saveMessage(conversationId, role, content, agentType);
 }
 
-export async function getUserChats(userId: string): Promise<any[]> {
-    const chats = await prisma.chats.findMany({
+export async function getUserConversations(userId: string): Promise<any[]> {
+    const conversations = await prisma.conversation.findMany({
         where: { user_id: userId },
         orderBy: { created_at: 'desc' },
         select: {
@@ -154,31 +85,31 @@ export async function getUserChats(userId: string): Promise<any[]> {
         }
     });
 
-    return chats.map(c => ({
+    return conversations.map(c => ({
         id: c.id,
         created_at: c.created_at,
         title: c.title || c.messages[0]?.content || "New Chat"
     }));
 }
 
-export async function renameChat(chatId: string, title: string) {
-    await prisma.chats.update({
-        where: { id: chatId },
+export async function renameConversation(conversationId: string, title: string) {
+    await prisma.conversation.update({
+        where: { id: conversationId },
         data: { title }
     });
 }
 
-export async function deleteChat(chatId: string) {
-    await prisma.chats.delete({
-        where: { id: chatId }
+export async function deleteConversation(conversationId: string) {
+    await prisma.conversation.delete({
+        where: { id: conversationId }
     });
 }
 
 import { Message } from '@/types/chat';
 
-export async function getChatMessages(chatId: string): Promise<{ messages: Message[], fileUrl?: string }> {
-    const msgs = await prisma.messages.findMany({
-        where: { chat_id: chatId },
+export async function getConversationMessages(conversationId: string): Promise<{ messages: Message[], fileUrl?: string }> {
+    const msgs = await prisma.message.findMany({
+        where: { conversation_id: conversationId },
         orderBy: { created_at: 'asc' },
         select: {
             role: true,
@@ -187,24 +118,30 @@ export async function getChatMessages(chatId: string): Promise<{ messages: Messa
         }
     });
 
-    // Get file path from report linked to chat
-    const chat = await prisma.chats.findUnique({
-        where: { id: chatId },
+    // Get file path from report linked to conversation
+    const conversation = await prisma.conversation.findUnique({
+        where: { id: conversationId },
         include: {
-            reports: {
-                select: { file_path: true }
+            report: {
+                select: { file_uri: true }
             }
         }
     });
 
-    const fileUrl = chat?.reports?.file_path;
+    const fileUrl = conversation?.report?.file_uri;
 
-    // Convert role to lowercase for frontend compatibility if needed
+    // Convert role to lowercase for frontend compatibility
     const formattedMsgs: Message[] = msgs.map(m => ({
         role: m.role.toLowerCase() as 'user' | 'assistant',
         content: m.content,
-        // Assuming no fileInfo stored in DB messages yet, or we'd map it here
     }));
 
     return { messages: formattedMsgs, fileUrl: fileUrl || undefined };
 }
+
+// Legacy aliases for backward compatibility with existing agent code
+export const getOrCreateChat = getOrCreateConversation;
+export const getUserChats = getUserConversations;
+export const renameChat = renameConversation;
+export const deleteChat = deleteConversation;
+export const getChatMessages = getConversationMessages;
