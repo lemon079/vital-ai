@@ -5,9 +5,9 @@
 ## v1 Requirements
 
 ### Phase 0: Foundations
-- [ ] **FOUNDATION-01**: User authentication & demographic profile persistence (`User` schema with DOB, sex, pregnancy status, health consent timestamp).
-- [ ] **FOUNDATION-02**: File storage & report upload API endpoint with Prisma `Report` model (`status = uploaded`).
-- [ ] **FOUNDATION-03**: Async background job queue skeleton for processing PDF reports while user chats.
+- [x] **FOUNDATION-01**: User authentication & demographic profile persistence (`User` schema with DOB, sex, pregnancy status, health consent timestamp).
+- [x] **FOUNDATION-02**: File storage & report upload API endpoint with Prisma `Report` model (`status = uploaded`).
+- [x] **FOUNDATION-03**: Async background job queue skeleton for processing PDF reports while user chats.
 
 ### Phase 1: Extraction & Human-in-the-Loop Review
 - [ ] **EXTRACT-01**: LLM Extraction Agent structuring raw PDF content into test/value/unit JSON with field-level confidence scores.
