@@ -45,3 +45,7 @@ next-env.d.ts
 # uploads
 /public/uploads/*
 !/public/uploads/.gitkeep
+
+# GSD planning (local only)
+.planning/
+
