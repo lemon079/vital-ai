@@ -1,12 +1,12 @@
 {
-    "name": "ai-hackathon-techverse2-nullpointer",
+    "name": "vital-ai",
     "version": "0.1.0",
     "private": true,
     "scripts": {
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
-        "lint": "next lint",
+        "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "test": "tsc --noEmit"
     },
