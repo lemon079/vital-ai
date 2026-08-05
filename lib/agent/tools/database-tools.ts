@@ -1,64 +1,32 @@
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
-import { saveLabResults, saveLabResultsAsync } from "@/lib/services/chat";
 
-import { LabResultData } from "@/types/labs";
-
+/**
+ * Placeholder for the old saveLabResults tool.
+ * In the new data model, lab results are created by the Extraction Agent (Phase 1)
+ * and persisted as LabResultValue rows. This tool stub exists for backward
+ * compatibility with the existing LangGraph graph until it's rewritten in Phase 1-2.
+ */
 export const saveLabResultsTool = tool(
     async (args: any) => {
         console.log("[save_lab_results] Received args:", JSON.stringify(args, null, 2));
-        
-        let resultsList: any[] = [];
-        
+        console.warn("[save_lab_results] This is a Phase 0 stub. Lab result persistence will be implemented in Phase 1.");
+
+        // Count the results for the response message
+        let count = 0;
         if (args && typeof args === "object") {
             if (Array.isArray(args.results)) {
-                resultsList = args.results;
+                count = args.results.length;
             } else if (Array.isArray(args)) {
-                resultsList = args;
+                count = args.length;
             } else if (args.test_name) {
-                resultsList = [args];
-            } else {
-                // Try to find any array field in the object
-                for (const key of Object.keys(args)) {
-                    if (Array.isArray(args[key])) {
-                        resultsList = args[key];
-                        break;
-                    }
-                }
+                count = 1;
             }
         }
-        
-        if (resultsList.length === 0) {
-            console.warn("[save_lab_results] No results list resolved from args");
-            return "No abnormal lab results found to save.";
-        }
 
-        // Clean and coerce values safely
-        const parsedResults = resultsList.map((r: any) => ({
-            test_name: String(r.test_name || r.name || "Unknown Test"),
-            value: Number(r.value !== undefined ? r.value : (r.result || 0)),
-            unit: String(r.unit || ""),
-            flag: String(r.flag || "HIGH"),
-            specimen: r.specimen ? String(r.specimen) : undefined,
-            reference_low: r.reference_low !== undefined && r.reference_low !== null ? Number(r.reference_low) : null,
-            reference_high: r.reference_high !== undefined && r.reference_high !== null ? Number(r.reference_high) : null,
-            reference_unit: r.reference_unit ? String(r.reference_unit) : undefined,
-            gender: r.gender ? String(r.gender) : undefined
-        }));
-
-        const reportId = args?.reportId || args?.report_id;
-
-        try {
-            if (reportId) {
-                await saveLabResults(reportId, parsedResults as LabResultData[]);
-            } else {
-                await saveLabResultsAsync(parsedResults as LabResultData[]);
-            }
-            return `Successfully saved ${parsedResults.length} lab results to report.`;
-        } catch (error) {
-            console.error("Error saving lab results via tool:", error);
-            return "Failed to save lab results. Please try again.";
-        }
+        return count > 0
+            ? `Acknowledged ${count} lab result(s). (Phase 0 stub — full persistence in Phase 1)`
+            : "No lab results provided.";
     },
     {
         name: "save_lab_results",

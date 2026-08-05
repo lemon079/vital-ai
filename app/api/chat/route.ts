@@ -3,11 +3,12 @@ import { NextResponse } from "next/server";
 import { graph } from "@/lib/agent/graph";
 import { saveUploadedFile } from "@/lib/services/processing";
 import {
-  getOrCreateChat,
+  getOrCreateConversation,
   saveMessage,
   saveMessageAsync,
-  createReport,
 } from "@/lib/services/chat";
+import { createReport } from "@/lib/services/reports";
+import { enqueueReportProcessing } from "@/lib/services/job-queue";
 import { prisma } from "@/lib/db/client";
 import path from "path";
 
@@ -62,7 +63,6 @@ export async function POST(req: Request) {
 
   const currentMessageContent = messages[messages.length - 1].content;
   let fileContext = "";
-  let extractedReportData = "";
   let fileUrl = clientFileUrl;
   let filePath = clientFilePath;
 
@@ -74,12 +74,8 @@ export async function POST(req: Request) {
       const originalName = lastMsg.fileInfo ? lastMsg.fileInfo.name : undefined;
 
       const savedFile = await saveUploadedFile(fileData, originalName);
-      // If it's a PDF, file-processor returns description
       fileContext = savedFile.description;
-      filePath = savedFile.filePath; // Store filePath for graph
-
-      // Note: Parallel extraction removed as per user request.
-      extractedReportData = "";
+      filePath = savedFile.filePath;
 
       if (savedFile.fileUrl) {
         fileUrl = savedFile.fileUrl;
@@ -101,44 +97,37 @@ export async function POST(req: Request) {
   }
 
   try {
-    // Mock user ID for now if null for guest support
     const safeUserId = userId;
     const isGuest = safeUserId === "guest-user" || !safeUserId;
 
-    // 1. Create or Get Chat
+    // 1. Create or Get Conversation
     let currentChatId = chatId;
 
     if (!isGuest) {
-      currentChatId = await getOrCreateChat(chatId, safeUserId);
+      currentChatId = await getOrCreateConversation(chatId, safeUserId);
     } else if (!currentChatId) {
       currentChatId = crypto.randomUUID();
     }
 
-    // Fetch existing report and lab results if chat exists (Turn 2+ state reconstruction)
-    let dbReportId = undefined;
+    // Fetch existing report if conversation exists (Turn 2+ state reconstruction)
+    let dbReportId: string | undefined = undefined;
     let dbFilePath = filePath;
-    let dbLabResults: any[] = [];
 
     if (currentChatId && !isGuest) {
       try {
-        const chat = await prisma.chats.findUnique({
+        const conversation = await prisma.conversation.findUnique({
           where: { id: currentChatId },
           include: {
-            reports: {
-              include: {
-                lab_results: true
-              }
-            }
+            report: true,
           }
         });
-        if (chat?.reports) {
-          dbReportId = chat.reports.id;
-          dbFilePath = dbFilePath || chat.reports.file_path || undefined;
-          dbLabResults = chat.reports.lab_results || [];
-          console.log(`[Route] Reconstructed report context from DB: reportId=${dbReportId}, filePath=${dbFilePath}, labResultsCount=${dbLabResults.length}`);
+        if (conversation?.report) {
+          dbReportId = conversation.report.id;
+          dbFilePath = dbFilePath || conversation.report.file_uri || undefined;
+          console.log(`[Route] Reconstructed report context from DB: reportId=${dbReportId}, filePath=${dbFilePath}`);
         }
       } catch (err) {
-        console.error("Failed to load existing chat report details:", err);
+        console.error("Failed to load existing conversation report details:", err);
       }
     }
 
@@ -149,72 +138,41 @@ export async function POST(req: Request) {
       await saveMessage(currentChatId, "user", fullUserMessage);
     }
 
-    // 3. Create or Update Report if file exists (skip for guest)
+    // 3. Create Report and enqueue processing if file exists (skip for guest)
     if (filePath && !isGuest && fileUrl) {
       if (!dbReportId) {
         try {
-          dbReportId = await createReport(safeUserId, undefined, undefined, fileUrl); // Pass fileUrl as path/URL to store in reports.file_path
-          // Update Chat with Report ID immediately
-          await prisma.chats.update({
+          const report = await createReport({
+            userId: safeUserId,
+            fileUri: fileUrl,
+          });
+          dbReportId = report.id;
+
+          // Link report to conversation
+          await prisma.conversation.update({
             where: { id: currentChatId },
             data: { report_id: dbReportId },
           });
-          console.log(`[Route] Created new early report: reportId=${dbReportId}`);
-        } catch (e) {
-          console.error("Failed to create early report", e);
-        }
-      } else {
-        // Report already exists for the chat. Check if a new file is being uploaded to replace it.
-        const chat = await prisma.chats.findUnique({
-          where: { id: currentChatId },
-          select: {
-            reports: {
-              select: { file_path: true }
-            }
-          }
-        });
-        const existingFilePath = chat?.reports?.file_path;
 
-        if (fileData || (existingFilePath && existingFilePath !== fileUrl)) {
-          try {
-            await prisma.reports.update({
-              where: { id: dbReportId },
-              data: {
-                file_path: fileUrl,
-                analyzed_at: new Date(),
-                patient_gender: null,
-                patient_age: null,
-              }
-            });
-            // Delete existing lab results to prevent duplicates and reset analysis state
-            await prisma.lab_results.deleteMany({
-              where: { report_id: dbReportId }
-            });
-            dbLabResults = [];
-            dbFilePath = filePath;
-            console.log(`[Route] Overwrote existing report: reportId=${dbReportId}, file_path=${fileUrl}. Cleared old lab results.`);
-          } catch (e) {
-            console.error("Failed to overwrite existing report or clear lab results", e);
-          }
+          // Enqueue background processing
+          await enqueueReportProcessing(dbReportId);
+
+          console.log(`[Route] Created new report: reportId=${dbReportId}`);
+        } catch (e) {
+          console.error("Failed to create report", e);
         }
       }
     }
 
-    // 4. Generate AI Response using LangGraph (NO STREAMING)
-    // Build message history
+    // 4. Generate AI Response using LangGraph streaming
     const messageHistory = messages.map((m: any) => {
       return m.role === "user"
         ? new HumanMessage(m.content)
         : new AIMessage(m.content);
     });
 
-    // Use graph.invoke() to get complete response
     console.log(
-      `[Route] Invoking graph with filePath="${dbFilePath || ""}", reportId=${dbReportId}, selectedText="${(selectedText || "").substring(0, 30)}", labResultsCount=${dbLabResults.length}`,
-    );
-    // Use graph.streamEvents() to stream response chunks
-    console.log(
-      `[Route] Streaming graph with filePath="${dbFilePath || ""}", reportId=${dbReportId}, selectedText="${(selectedText || "").substring(0, 30)}", labResultsCount=${dbLabResults.length}`,
+      `[Route] Streaming graph with filePath="${dbFilePath || ""}", reportId=${dbReportId}, selectedText="${(selectedText || "").substring(0, 30)}"`,
     );
 
     const encoder = new TextEncoder();
@@ -238,7 +196,7 @@ export async function POST(req: Request) {
               filePath: dbFilePath || "",
               reportId: dbReportId,
               selectedText: selectedText || "",
-              labResults: dbLabResults,
+              labResults: [],
             },
             { version: "v2" }
           );

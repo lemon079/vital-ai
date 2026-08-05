@@ -10,7 +10,6 @@ import { AgentState } from "../state";
 import { LAB_ANALYSIS_PROMPT } from "../prompts";
 import { saveLabResultsTool } from "../tools/database-tools";
 import { convertLabUnits } from "../tools/lab-tools";
-import { LabResultData } from "@/types/labs";
 import { getModel } from "./models";
 
 const tools = [saveLabResultsTool, convertLabUnits];
@@ -166,7 +165,7 @@ export async function labAnalysisAgent(state: typeof AgentState.State) {
     );
 
     // Extract lab results from tool calls and response
-    let labResults: LabResultData[] = state.labResults || [];
+    let labResults: any[] = state.labResults || [];
     let labSummary = state.labAnalysisSummary || "";
 
     // If this is the final response (no tool calls), extract summary
@@ -179,7 +178,7 @@ export async function labAnalysisAgent(state: typeof AgentState.State) {
     if (response.tool_calls) {
       for (const toolCall of response.tool_calls) {
         if (toolCall.name === "save_lab_results" && toolCall.args.results) {
-          labResults = toolCall.args.results as LabResultData[];
+          labResults = toolCall.args.results as any[];
           console.log(
             `[Lab Analysis] Extracted ${labResults.length} lab results for state`,
           );

@@ -1,6 +1,5 @@
 // state.ts
 import { Annotation, MessagesAnnotation } from "@langchain/langgraph";
-import { LabResultData } from "@/types/labs";
 import { BaseMessage } from "@langchain/core/messages";
 
 export const AgentState = Annotation.Root({

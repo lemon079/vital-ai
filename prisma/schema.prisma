@@ -7,93 +7,321 @@ datasource db {
   provider = "postgresql"
 }
 
-model chats {
-  id         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  report_id  String?    @db.Uuid
-  user_id    String     @db.Uuid
-  title      String?
-  created_at DateTime?  @default(now()) @db.Timestamptz(6)
-  reports    reports?   @relation(fields: [report_id], references: [id], onUpdate: NoAction)
-  users      users      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  messages   messages[]
-}
+// ============================================================
+// ENUMS
+// ============================================================
 
-model lab_results {
-  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  report_id      String?      @db.Uuid
-  test_name      String
-  value          Decimal?     @db.Decimal
-  unit           String?
-  specimen       String?
-  flag           lab_flag?    @default(UNDETERMINED)
-  reference_low  Decimal?     @db.Decimal
-  reference_high Decimal?     @db.Decimal
-  reference_unit String?
-  created_at     DateTime?    @default(now()) @db.Timestamptz(6)
-  gender         gender_enum?
-  reports        reports?     @relation(fields: [report_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-}
-
-model messages {
-  id         String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  chat_id    String       @db.Uuid
-  role       message_role
-  content    String
-  created_at DateTime?    @default(now()) @db.Timestamptz(6)
-  chats      chats        @relation(fields: [chat_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-}
-
-model profiles {
-  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id    String    @db.Uuid
-  name       String?
-  age        Int?
-  gender     String?
-  created_at DateTime? @default(now()) @db.Timestamptz(6)
-  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-}
-
-model reports {
-  id             String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id        String        @db.Uuid
-  patient_gender String?
-  patient_age    Int?
-  analyzed_at    DateTime?     @db.Timestamptz(6)
-  created_at     DateTime?     @default(now()) @db.Timestamptz(6)
-  file_path      String?
-  chats          chats[]
-  users          users         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  lab_results    lab_results[]
-}
-
-model users {
-  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email        String     @unique
-  password     String
-  created_at   DateTime?  @default(now()) @db.Timestamptz(6)
-  is_onboarded Boolean?   @default(false)
-  chats        chats[]
-  profiles     profiles[]
-  reports      reports[]
-}
-
-enum gender_enum {
+enum Sex {
   male
   female
-  any
+  other
 }
 
-enum lab_flag {
-  NORMAL
-  LOW
-  HIGH
-  CRITICAL
-  UNDETERMINED
-  CRITICAL_HIGH
-  CRITICAL_LOW
+enum PregnancyStatus {
+  not_pregnant
+  first_trimester
+  second_trimester
+  third_trimester
+  unknown
 }
 
-enum message_role {
-  USER
-  ASSISTANT
+enum ReportStatus {
+  uploaded
+  processing
+  extracted
+  pending_review
+  analyzed
+  failed
+}
+
+enum MessageRole {
+  user
+  assistant
+}
+
+enum AgentType {
+  qna
+  followup
+  summary
+  system
+}
+
+enum ReviewStatus {
+  auto_accepted
+  pending_review
+  user_confirmed
+  user_corrected
+}
+
+enum LabFlag {
+  normal
+  high
+  low
+  critical_high
+  critical_low
+}
+
+enum FlagBasis {
+  report_printed_range
+  internal_reference_db
+}
+
+enum FollowUpState {
+  not_started
+  in_progress
+  paused
+  complete
+  skipped
+}
+
+enum FollowUpQuestionStatus {
+  pending
+  answered
+  skipped
+}
+
+// ============================================================
+// PHASE 0 — Core Foundation Models
+// ============================================================
+
+model User {
+  id                    String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email                 String           @unique
+  password              String
+  auth_provider_id      String?
+  date_of_birth         DateTime?        @db.Date
+  sex                   Sex?
+  pregnancy_status      PregnancyStatus? @default(unknown)
+  consent_health_data_at DateTime?       @db.Timestamptz(6)
+  is_onboarded          Boolean          @default(false)
+  created_at            DateTime         @default(now()) @db.Timestamptz(6)
+
+  reports               Report[]
+  conversations         Conversation[]
+  lab_result_values      LabResultValue[]
+  follow_up_sessions     FollowUpSession[]
+  patient_reported_facts PatientReportedFact[]
+
+  @@map("users")
+}
+
+model Report {
+  id                    String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id               String       @db.Uuid
+  file_uri              String?
+  status                ReportStatus @default(uploaded)
+  sample_collected_date DateTime?    @db.Date
+  uploaded_at           DateTime     @default(now()) @db.Timestamptz(6)
+  source_lab_name       String?
+  has_critical_flag     Boolean      @default(false)
+  critical_ack_at       DateTime?    @db.Timestamptz(6)
+
+  user                  User              @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  conversations         Conversation[]
+  lab_result_values      LabResultValue[]
+  follow_up_sessions     FollowUpSession[]
+  clinical_summaries     ClinicalSummary[]
+
+  @@map("reports")
+}
+
+model Conversation {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id    String    @db.Uuid
+  report_id  String?   @db.Uuid
+  title      String?
+  created_at DateTime  @default(now()) @db.Timestamptz(6)
+
+  user       User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  report     Report?   @relation(fields: [report_id], references: [id], onDelete: SetNull)
+  messages   Message[]
+  guardrail_logs ResponseGuardrailLog[]
+  patient_reported_facts PatientReportedFact[]
+
+  @@map("conversations")
+}
+
+model Message {
+  id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  conversation_id String      @db.Uuid
+  role            MessageRole
+  agent_type      AgentType   @default(system)
+  content         String
+  created_at      DateTime    @default(now()) @db.Timestamptz(6)
+
+  conversation    Conversation @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+// ============================================================
+// PHASE 1–2 — Extraction & Comparison Engine Models
+// ============================================================
+
+model CanonicalTest {
+  test_code    String  @id
+  display_name String
+  default_unit String?
+
+  aliases           TestAlias[]
+  unit_conversions  UnitConversion[]
+  reference_ranges  ReferenceRange[]
+  lab_result_values  LabResultValue[]
+  follow_up_questions FollowUpQuestion[]
+  patient_reported_facts PatientReportedFact[]
+
+  @@map("canonical_tests")
+}
+
+model TestAlias {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  alias_text String @unique
+  test_code  String
+
+  canonical_test CanonicalTest @relation(fields: [test_code], references: [test_code], onDelete: Cascade)
+
+  @@map("test_aliases")
+}
+
+model UnitConversion {
+  id              String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  test_code       String
+  from_unit       String
+  to_unit         String
+  multiply_factor Decimal @db.Decimal
+
+  canonical_test CanonicalTest @relation(fields: [test_code], references: [test_code], onDelete: Cascade)
+
+  @@unique([test_code, from_unit, to_unit])
+  @@map("unit_conversions")
+}
+
+model ReferenceRange {
+  id                  String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  test_code           String
+  sex                 Sex?
+  age_min             Int?
+  age_max             Int?
+  pregnancy_trimester PregnancyStatus?
+  low                 Decimal?         @db.Decimal
+  high                Decimal?         @db.Decimal
+  critical_low        Decimal?         @db.Decimal
+  critical_high       Decimal?         @db.Decimal
+  unit                String?
+  specificity_rank    Int              @default(0)
+  source_citation     String?
+  effective_from      DateTime?        @db.Date
+  effective_to        DateTime?        @db.Date
+
+  canonical_test CanonicalTest @relation(fields: [test_code], references: [test_code], onDelete: Cascade)
+
+  @@map("reference_ranges")
+}
+
+model LabResultValue {
+  id                      String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  report_id               String       @db.Uuid
+  user_id                 String       @db.Uuid
+  test_code               String
+  extracted_value_raw      String?
+  confidence_score        Decimal?     @db.Decimal
+  review_status           ReviewStatus @default(auto_accepted)
+  value                   Decimal?     @db.Decimal
+  unit                    String?
+  report_stated_range_low  Decimal?    @db.Decimal
+  report_stated_range_high Decimal?    @db.Decimal
+  flag                    LabFlag?
+  flag_basis              FlagBasis?
+  created_at              DateTime     @default(now()) @db.Timestamptz(6)
+
+  report         Report        @relation(fields: [report_id], references: [id], onDelete: Cascade)
+  user           User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  canonical_test CanonicalTest @relation(fields: [test_code], references: [test_code], onDelete: Cascade)
+
+  @@map("lab_result_values")
+}
+
+// ============================================================
+// PHASE 3 — Guardrail Logging
+// ============================================================
+
+model ResponseGuardrailLog {
+  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  conversation_id     String   @db.Uuid
+  agent_type          AgentType
+  flagged             Boolean  @default(false)
+  flag_reason         String?
+  final_response_sent String?
+  created_at          DateTime @default(now()) @db.Timestamptz(6)
+
+  conversation Conversation @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+
+  @@map("response_guardrail_logs")
+}
+
+// ============================================================
+// PHASE 4 — Follow-Up Session Models
+// ============================================================
+
+model FollowUpSession {
+  id         String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  report_id  String        @db.Uuid
+  user_id    String        @db.Uuid
+  state      FollowUpState @default(not_started)
+  created_at DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at DateTime      @updatedAt
+
+  report    Report             @relation(fields: [report_id], references: [id], onDelete: Cascade)
+  user      User               @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  questions FollowUpQuestion[]
+
+  @@map("follow_up_sessions")
+}
+
+model FollowUpQuestion {
+  id                 String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  session_id         String                 @db.Uuid
+  related_test_code  String?
+  question_text      String
+  answer_text        String?
+  status             FollowUpQuestionStatus @default(pending)
+  asked_at           DateTime               @default(now()) @db.Timestamptz(6)
+  answered_at        DateTime?              @db.Timestamptz(6)
+
+  session        FollowUpSession @relation(fields: [session_id], references: [id], onDelete: Cascade)
+  canonical_test CanonicalTest?  @relation(fields: [related_test_code], references: [test_code], onDelete: SetNull)
+
+  @@map("follow_up_questions")
+}
+
+// ============================================================
+// PHASE 5 — Patient Reported Facts & Clinical Summary
+// ============================================================
+
+model PatientReportedFact {
+  id                     String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id                String  @db.Uuid
+  related_test_code      String?
+  fact_text              String
+  source_conversation_id String  @db.Uuid
+  created_at             DateTime @default(now()) @db.Timestamptz(6)
+
+  user           User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  canonical_test CanonicalTest? @relation(fields: [related_test_code], references: [test_code], onDelete: SetNull)
+  conversation   Conversation   @relation(fields: [source_conversation_id], references: [id], onDelete: Cascade)
+
+  @@map("patient_reported_facts")
+}
+
+model ClinicalSummary {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  report_id     String   @db.Uuid
+  content       String
+  pdf_uri       String?
+  generated_at  DateTime @default(now()) @db.Timestamptz(6)
+  model_version String?
+
+  report Report @relation(fields: [report_id], references: [id], onDelete: Cascade)
+
+  @@map("clinical_summaries")
 }
