@@ -10,9 +10,9 @@
 - [x] **FOUNDATION-03**: Async background job queue skeleton for processing PDF reports while user chats.
 
 ### Phase 1: Extraction & Human-in-the-Loop Review
-- [ ] **EXTRACT-01**: LLM Extraction Agent structuring raw PDF content into test/value/unit JSON with field-level confidence scores.
-- [ ] **EXTRACT-02**: Human-in-the-loop review UI displaying low-confidence values to user for verification.
-- [ ] **EXTRACT-03**: Persistence of user confirmation / corrections (`auto_accepted`, `user_confirmed`, `user_corrected`).
+- [x] **EXTRACT-01**: LLM Extraction Agent structuring raw PDF content into test/value/unit JSON with field-level confidence scores.
+- [x] **EXTRACT-02**: Human-in-the-loop review UI triggering when extraction confidence falls below threshold (`status = pending_review`).
+- [x] **EXTRACT-03**: Interactive review workflow allowing users to confirm, edit, or reject low-confidence extractions before saving to `LabResultValue`.
 
 ### Phase 2: Deterministic Comparison Engine
 - `ENGINE-01`: Seeded canonical test taxonomy (`CanonicalTest` LOINC codes, `TestAlias`), `UnitConversion`, and demographic `ReferenceRange` tables.

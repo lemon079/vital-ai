@@ -9,7 +9,7 @@ This roadmap directly reflects the architecture, data model, and implementation 
 ## Phases Overview
 
 - [x] **Phase 0: Foundations** - Auth & user demographics schema, upload endpoint, file storage, base relational data model, background job queue skeleton.
-- [ ] **Phase 1: Extraction & Human-in-the-Loop Review** - Extraction LLM agent, field confidence scoring, human-in-the-loop review UI (`pending_review`).
+- [x] **Phase 1: Extraction & Human-in-the-Loop Review** - Extraction LLM agent, field confidence scoring, human-in-the-loop review UI (`pending_review`).
 - [ ] **Phase 2: Deterministic Comparison Engine** - `CanonicalTest`/`TestAlias`, seeded `ReferenceRange` table, `UnitConversion`, deterministic flagging with specificity resolution.
 - [ ] **Phase 3: QnA Agent, Router Skeleton & Output Guardrail** - Always-on QnA agent, orchestrator with status-aware routing, critical-flag override, output guardrail scanner.
 - [ ] **Phase 4: Follow-up Agent & Proactive Turn Injection** - `FollowUpSession`/`FollowUpQuestion` state machine, indirect question generation, proactive agent-initiated turns, interruption & skip handling.
