@@ -50,7 +50,7 @@ PASS tests/00-foundations/auth.test.ts
 Test Suites: 3 passed, 3 total
 Tests:       7 passed, 7 total
 Snapshots:   0 total
-Time:        3.144 s
+Time:        3.084 s
 Ran all test suites.
 ```
 
