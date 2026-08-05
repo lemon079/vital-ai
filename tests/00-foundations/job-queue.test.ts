@@ -1,8 +1,24 @@
 import { enqueueReportProcessing, getJobStatus, clearJobStore } from '@/lib/services/job-queue';
 
-// Mock report status update service so unit tests don't require database connection
+jest.mock('@/lib/db/client', () => ({
+  prisma: {
+    report: { update: jest.fn(), findUnique: jest.fn() },
+    labResultValue: { create: jest.fn() },
+    canonicalTest: { findUnique: jest.fn(), create: jest.fn() },
+  },
+}));
+
 jest.mock('@/lib/services/reports', () => ({
   updateReportStatus: jest.fn().mockResolvedValue({ id: 'test-report-123', status: 'processing' }),
+  getReportById: jest.fn().mockResolvedValue({ id: 'test-report-123', file_uri: '/tmp/report.pdf', user_id: 'user-001' }),
+}));
+
+jest.mock('@/lib/services/extraction', () => ({
+  extractLabResultsFromPdf: jest.fn().mockResolvedValue({ reportId: 'test-report-123', items: [], rawText: '' }),
+}));
+
+jest.mock('@/lib/services/lab-results', () => ({
+  saveExtractedResults: jest.fn().mockResolvedValue({ reportId: 'test-report-123', totalExtracted: 0, pendingReviewCount: 0, reportStatus: 'extracted' }),
 }));
 
 describe('Phase 0: Asynchronous Job Queue Skeleton', () => {
