@@ -1,9 +1,9 @@
 ## Description
 
-Complete implementation of Phase 0: Foundations for the Lab Report AI Assistant (VitalSense AI).
+Complete implementation of Phase 1: Extraction & Human-in-the-Loop Review for the Lab Report AI Assistant (VitalSense AI).
 
-- **Phase**: Phase 0: Foundations
-- **Related Requirements**: FOUNDATION-01, FOUNDATION-02, FOUNDATION-03
+- **Phase**: Phase 1: Extraction & Human-in-the-Loop Review
+- **Related Requirements**: EXTRACT-01, EXTRACT-02, EXTRACT-03
 - **Source of Truth Reference**: [lab_report_ai_system_design.md](file:///d:/Work/Next/vital-ai/lab_report_ai_system_design.md)
 
 ---
@@ -23,18 +23,18 @@ Please mark the relevant options:
 
 ## Key Technical Changes
 
-- **Database Data Model (`schema.prisma`)**: Replaced schema with entities specified in `lab_report_ai_system_design.md` §8 (`User`, `Report`, `Conversation`, `Message`, and stubs for Phase 1-8 models: `CanonicalTest`, `TestAlias`, `UnitConversion`, `ReferenceRange`, `LabResultValue`, `ResponseGuardrailLog`, `FollowUpSession`, `FollowUpQuestion`, `PatientReportedFact`, `ClinicalSummary`). Executed `prisma db push` and generated client.
-- **User Demographics (`FOUNDATION-01`)**: Updated `actions.ts` & `users.ts` to manage user demographic fields (`date_of_birth`, `sex`, `pregnancy_status`, `consent_health_data_at`) directly on `User`.
-- **Report Upload & DB Persistence (`FOUNDATION-02`)**: Added `reports.ts` service and updated `/api/upload` endpoint to create a `Report` row (`status = "uploaded"`) upon file saving and return `reportId`.
-- **Async Job Queue Skeleton (`FOUNDATION-03`)**: Built in-process job queue in `job-queue.ts` (`queued` → `processing` → `extracted`) and added `/api/reports/status` endpoint to track report processing status.
-- **Codebase Compatibility & Testing**: Refactored `chat.ts`, `app/api/chat/route.ts`, and agent tools to consume new models. Modularized test suites in `tests/00-foundations/` (`auth.test.ts`, `reports-upload.test.ts`, `job-queue.test.ts`).
+- **Extraction Service & LLM Parser (`EXTRACT-01`)**: Added `lib/services/extraction.ts` with PDF loader, LLM structured JSON generation, heuristic fallback parser, and field confidence score calculation (0.00 to 1.00).
+- **Lab Results & Confidence Routing (`EXTRACT-02`)**: Added `lib/services/lab-results.ts` implementing `CONFIDENCE_THRESHOLD = 0.85` routing. Saves `LabResultValue` records with `auto_accepted` vs `pending_review` state and advances `Report.status` to `pending_review` or `extracted`.
+- **Job Queue Integration**: Connected `lib/services/job-queue.ts` directly to the extraction agent pipeline and DB persistence layer.
+- **Human-in-the-Loop Review API (`EXTRACT-03`)**: Created `/api/reports/[id]/review` GET/POST endpoints enabling users to inspect low-confidence fields, confirm or correct extracted values, and resolve `pending_review` status.
+- **Phase 1 Unit Tests**: Modularized tests in `tests/01-extraction-and-review/` (`extraction-agent.test.ts`, `confidence-score.test.ts`, `review-workflow.test.ts`).
 
 ---
 
 ## Verification & Testing
 
 ### Automated Verification
-- [x] Ran `npm test` (All Jest unit tests passing)
+- [x] Ran `npm test` (All 6 Jest test suites passing, 15/15 tests)
 - [x] Ran `npm run lint` (ESLint 0 errors)
 - [x] Verified Prisma schema generation (`npx prisma generate`)
 
@@ -43,14 +43,17 @@ Please mark the relevant options:
 > vital-ai@0.1.0 test
 > tsc --noEmit && jest
 
-PASS tests/00-foundations/job-queue.test.ts
-PASS tests/00-foundations/reports-upload.test.ts
 PASS tests/00-foundations/auth.test.ts
+PASS tests/01-extraction-and-review/review-workflow.test.ts
+PASS tests/00-foundations/reports-upload.test.ts
+PASS tests/00-foundations/job-queue.test.ts
+PASS tests/01-extraction-and-review/confidence-score.test.ts
+PASS tests/01-extraction-and-review/extraction-agent.test.ts
 
-Test Suites: 3 passed, 3 total
-Tests:       7 passed, 7 total
+Test Suites: 6 passed, 6 total
+Tests:       15 passed, 15 total
 Snapshots:   0 total
-Time:        3.084 s
+Time:        6.983 s
 Ran all test suites.
 ```
 
