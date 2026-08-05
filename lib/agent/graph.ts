@@ -1,4 +1,4 @@
-import { StateGraph, START, END } from "@langchain/langgraph";
+import { StateGraph, START, END, MemorySaver } from "@langchain/langgraph";
 import { AgentState } from "./state";
 
 import { conversationAgent } from "./nodes/conversation";
@@ -9,13 +9,13 @@ import { guardrailsNode } from "./nodes/guardrails";
 
 /**
  * ROUTER LOGIC
- * Decides which agent to activate based on user input and state
+ * Decides which agent node to activate based on user input and active state
  */
 function routeStart(state: typeof AgentState.State) {
   const { filePath, messages, labResults } = state;
   const lastMessage = messages[messages.length - 1];
   const content =
-    typeof lastMessage.content === "string"
+    typeof lastMessage?.content === "string"
       ? lastMessage.content.toLowerCase()
       : "";
 
@@ -26,7 +26,6 @@ function routeStart(state: typeof AgentState.State) {
   }
 
   // 2. If summary requested -> Clinical Summary Agent
-  // Triggers: "summary for doctor", "create summary", "appointment tomorrow"
   if (
     content.includes("summary for doctor") ||
     content.includes("create summary") ||
@@ -50,15 +49,15 @@ function routeLabAgent(state: typeof AgentState.State) {
   const messages = state.messages;
   const lastMessage = messages[messages.length - 1];
 
-  // If tool calls present, go to tools
-  if ((lastMessage as any).tool_calls?.length) {
+  // If tool calls present, route to tools execution node
+  if ((lastMessage as any)?.tool_calls?.length) {
     console.log(
       `[Router] Lab Analysis made ${(lastMessage as any).tool_calls.length} tool calls. Routing to tools.`,
     );
     return "tools";
   }
 
-  // Lab analysis complete - go directly to END (skip redundant conversation call)
+  // Lab analysis complete -> END
   console.log("[Router] Lab Analysis complete. Routing to END.");
   return END;
 }
@@ -71,7 +70,7 @@ function routeConversation(state: typeof AgentState.State) {
   const messages = state.messages;
   const lastMessage = messages[messages.length - 1];
   const content =
-    typeof lastMessage.content === "string"
+    typeof lastMessage?.content === "string"
       ? lastMessage.content.toLowerCase()
       : "";
 
@@ -95,7 +94,7 @@ function routeConversation(state: typeof AgentState.State) {
 
 /**
  * GUARDRAILS ROUTING
- * Checks if guardrails blocked the message; otherwise routes dynamically
+ * Checks if safety guardrails blocked the message; otherwise routes dynamically
  */
 function routeGuardrails(state: typeof AgentState.State) {
   const { isblocked } = state;
@@ -108,9 +107,8 @@ function routeGuardrails(state: typeof AgentState.State) {
   return routeStart(state);
 }
 
-// Build the Graph
+// Build the StateGraph
 const workflow = new StateGraph(AgentState)
-  // Nodes
   .addNode("guardrails", guardrailsNode)
   .addNode("conversation", conversationAgent)
   .addNode("lab_analysis", labAnalysisAgent)
@@ -120,7 +118,7 @@ const workflow = new StateGraph(AgentState)
   // Starting point routing - START always runs safety guardrails first
   .addEdge(START, "guardrails")
 
-  // Guardrails Conditional Edges - blocked messages go to END, safe messages route dynamically
+  // Guardrails Conditional Edges
   .addConditionalEdges("guardrails", routeGuardrails, {
     conversation: "conversation",
     lab_analysis: "lab_analysis",
@@ -134,10 +132,10 @@ const workflow = new StateGraph(AgentState)
     [END]: END,
   })
 
-  // Tools always return to lab analysis
+  // Tools return to lab analysis
   .addEdge("tools", "lab_analysis")
 
-  // Conversation Flow - can go to summary or end
+  // Conversation Flow
   .addConditionalEdges("conversation", routeConversation, {
     clinical_summary: "clinical_summary",
     [END]: END,
@@ -146,5 +144,8 @@ const workflow = new StateGraph(AgentState)
   // Clinical Summary Flow
   .addEdge("clinical_summary", END);
 
-// Compile with safety limits
-export const graph = workflow.compile();
+// MemorySaver checkpointer for stateful thread persistence
+export const checkpointer = new MemorySaver();
+
+// Compile graph with checkpointer
+export const graph = workflow.compile({ checkpointer });

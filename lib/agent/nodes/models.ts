@@ -1,13 +1,17 @@
 import { ChatOllama } from "@langchain/ollama";
 
-type ModelProvider = "ollama";
+export type ModelProvider = "ollama";
 
 export const getModel = (
   provider: ModelProvider = "ollama",
   temperature: number = 0,
 ) => {
+  const baseUrl = process.env.OLLAMA_BASE_URL || "http://localhost:11434";
+  const modelName = process.env.OLLAMA_MODEL || "gpt-oss:120b-cloud";
+
   return new ChatOllama({
-    model: "gpt-oss:120b-cloud",
-    temperature: temperature,
+    baseUrl,
+    model: modelName,
+    temperature,
   });
 };

@@ -61,10 +61,10 @@ function AgentClientInner({ userProfile }: { userProfile?: { name: string | null
         await logout();
         router.push('/login');
     };
-    
-    useEffect(()=>{
+
+    useEffect(() => {
         console.log("pdfURL: ", pdfUrl)
-    },[pdfUrl])
+    }, [pdfUrl])
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -229,7 +229,7 @@ function AgentClientInner({ userProfile }: { userProfile?: { name: string | null
                                     <Menu className="h-5 w-5" />
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent side="left" className="w-[260px] sm:w-[280px] flex flex-col h-full">
+                            <SheetContent side="left" className="w-65 sm:w-70 flex flex-col h-full">
                                 <SheetHeader>
                                     <SheetTitle className="flex items-center gap-2">
                                         <Bot className="h-5 w-5 text-primary" />
@@ -346,11 +346,10 @@ function AgentClientInner({ userProfile }: { userProfile?: { name: string | null
                                                     return (
                                                         <div
                                                             key={chat.id}
-                                                            className={`group flex items-center justify-between w-full rounded-lg text-left text-sm transition-all duration-200 ${
-                                                                isActive
+                                                            className={`group flex items-center justify-between w-full rounded-lg text-left text-sm transition-all duration-200 ${isActive
                                                                     ? 'bg-primary/5 text-primary border-l-2 border-l-primary font-semibold'
                                                                     : 'hover:bg-muted/50 text-muted-foreground hover:text-foreground'
-                                                            }`}
+                                                                }`}
                                                         >
                                                             <button
                                                                 onClick={() => {
@@ -396,7 +395,7 @@ function AgentClientInner({ userProfile }: { userProfile?: { name: string | null
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 {/* Pinned User Profile & Sign Out Section */}
                                 <div className="mt-auto border-t border-border pt-4 pb-2 flex items-center justify-between gap-2 shrink-0">
                                     <div className="flex items-center gap-2.5 overflow-hidden">
@@ -485,7 +484,7 @@ function AgentClientInner({ userProfile }: { userProfile?: { name: string | null
                                                             <ImageIcon size={14} className="text-primary" />
                                                         )}
                                                     </div>
-                                                    <span className="font-medium truncate max-w-[200px]">{derivedFileInfo.name}</span>
+                                                    <span className="font-medium truncate max-w-50">{derivedFileInfo.name}</span>
                                                 </div>
                                             )}
                                             {msg.selectedText && (
@@ -505,11 +504,11 @@ function AgentClientInner({ userProfile }: { userProfile?: { name: string | null
                                                         )}
                                                         <p className="font-medium text-destructive/90">{msg.content}</p>
                                                     </div>
-                                                    <Button 
-                                                        onClick={handleRetry} 
+                                                    <Button
+                                                        onClick={handleRetry}
                                                         type="button"
-                                                        size="sm" 
-                                                        variant="outline" 
+                                                        size="sm"
+                                                        variant="outline"
                                                         className="w-fit gap-1.5 border-destructive/30 hover:text-destructive text-destructive font-semibold bg-background hover:bg-destructive/10 transition-colors"
                                                     >
                                                         <RotateCcw className="h-3.5 w-3.5" />
@@ -539,10 +538,10 @@ function AgentClientInner({ userProfile }: { userProfile?: { name: string | null
                                     </Avatar>
                                     <div className="bg-card border rounded-2xl rounded-tl-none px-5 py-4 shadow-sm">
                                         <span className="text-sm font-medium text-muted-foreground animate-pulse">
-                                            {retryCount > 0 
-                                                ? `Connection issue. Retrying (Attempt ${retryCount} of 5)...` 
-                                                : showSlowWarning 
-                                                    ? "The medical brain is working on a complex response, please wait..." 
+                                            {retryCount > 0
+                                                ? `Connection issue. Retrying (Attempt ${retryCount} of 5)...`
+                                                : showSlowWarning
+                                                    ? "The medical brain is working on a complex response, please wait..."
                                                     : "thinking..."
                                             }
                                         </span>
@@ -619,11 +618,10 @@ function AgentClientInner({ userProfile }: { userProfile?: { name: string | null
                                                 key={opt.value}
                                                 type="button"
                                                 onClick={() => setSimulation(opt.value)}
-                                                className={`px-2.5 py-1 rounded transition-colors border font-medium ${
-                                                    simulation === opt.value
+                                                className={`px-2.5 py-1 rounded transition-colors border font-medium ${simulation === opt.value
                                                         ? 'bg-primary text-primary-foreground border-primary shadow-sm hover:bg-primary/90'
                                                         : 'bg-background hover:bg-muted text-muted-foreground border-border'
-                                                }`}
+                                                    }`}
                                             >
                                                 {opt.label}
                                             </button>
