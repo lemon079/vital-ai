@@ -121,6 +121,7 @@ model Report {
   lab_result_values      LabResultValue[]
   follow_up_sessions     FollowUpSession[]
   clinical_summaries     ClinicalSummary[]
+  share_tokens          ReportShareToken[]
 
   @@map("reports")
 }
@@ -326,4 +327,16 @@ model ClinicalSummary {
   report Report @relation(fields: [report_id], references: [id], onDelete: Cascade)
 
   @@map("clinical_summaries")
+}
+
+model ReportShareToken {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  report_id  String    @db.Uuid
+  token      String    @unique
+  created_at DateTime  @default(now()) @db.Timestamptz(6)
+  expires_at DateTime? @db.Timestamptz(6)
+
+  report Report @relation(fields: [report_id], references: [id], onDelete: Cascade)
+
+  @@map("report_share_tokens")
 }
