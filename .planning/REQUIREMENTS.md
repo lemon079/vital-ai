@@ -1,70 +1,63 @@
-# Requirements: VitalSense AI
+# Requirements: Lab Report AI Assistant (VitalSense AI)
 
-**Defined:** 2026-06-02
-**Core Value:** Empowering patients with warm, accessible, and clinically grounded explanations of their lab reports and health symptoms to prepare them for productive doctor consultations.
+**Source of Truth:** [lab_report_ai_system_design.md](file:///d:/Work/Next/vital-ai/lab_report_ai_system_design.md)
 
 ## v1 Requirements
 
-### Core Agentic Flows (Clinical & Conversational)
+### Phase 0: Foundations
+- [ ] **FOUNDATION-01**: User authentication & demographic profile persistence (`User` schema with DOB, sex, pregnancy status, health consent timestamp).
+- [ ] **FOUNDATION-02**: File storage & report upload API endpoint with Prisma `Report` model (`status = uploaded`).
+- [ ] **FOUNDATION-03**: Async background job queue skeleton for processing PDF reports while user chats.
 
-- [ ] **FLOW-01**: User can chat about normal health concerns when no PDF is uploaded, receiving empathetic, educational health information.
-- [ ] **FLOW-02**: User can upload a lab PDF, and the agent parses it, identifies all abnormal values, and formats them neatly in a markdown table.
-- [ ] **FLOW-03**: The AI agent guides the conversation by asking focused, one-at-a-time follow-up questions to gather relevant symptom details.
-- [ ] **FLOW-04**: Once sufficient symptom details are gathered, the agent synthesizes findings and generates a personalized clinical conclusion of "why it is happening."
-- [ ] **FLOW-05**: Strict factual verification: The agent must never formulate diagnoses or conclusions without citing concrete, validated lab findings and conversational facts in the active session.
-- [ ] **FLOW-06**: Active Medical Disclaimer: Every clinical conclusion must contain a prominent disclaimer noting the AI does not issue certified medical diagnoses.
-- [ ] **FLOW-07**: End-to-End Chat History Persistence: Complete chat history persistence where each authenticated user has their own isolated sessions.
+### Phase 1: Extraction & Human-in-the-Loop Review
+- [ ] **EXTRACT-01**: LLM Extraction Agent structuring raw PDF content into test/value/unit JSON with field-level confidence scores.
+- [ ] **EXTRACT-02**: Human-in-the-loop review UI displaying low-confidence values to user for verification.
+- [ ] **EXTRACT-03**: Persistence of user confirmation / corrections (`auto_accepted`, `user_confirmed`, `user_corrected`).
 
-### Frontend UI & State Management
+### Phase 2: Deterministic Comparison Engine
+- `ENGINE-01`: Seeded canonical test taxonomy (`CanonicalTest` LOINC codes, `TestAlias`), `UnitConversion`, and demographic `ReferenceRange` tables.
+- `ENGINE-02`: Range resolution algorithm prioritizing report-printed ranges over internal DB and computing `specificity_rank`.
+- `ENGINE-03`: Pure deterministic flagging code assigning `normal`, `high`, `low`, `critical_high`, `critical_low` and `flag_basis`.
 
-- [ ] **UI-01**: The client dashboard must have a clean, unified state container handling active chats, message histories, upload statuses, and PDF canvas panels without race conditions.
-- [ ] **UI-02**: Real-time loading feedback: Clear, beautiful micro-animations for active AI thinking, PDF loading, and message transmissions.
-- [ ] **UI-03**: Interactive layout transitions: Smooth visual animations when transitioning between chat states, and opening/closing the split-screen PDF visualizer.
-- [ ] **UI-04**: Modern Typographic Polish: Harmonic HSL tailored colors, responsive fluid structures, and high-fidelity typography (Inter/Outfit fonts).
+### Phase 3: QnA Agent, Router Skeleton & Guardrail Scanner
+- [ ] **ROUTER-01**: Always-on QnA Agent handling pre-upload, mid-processing, and post-analysis user conversations.
+- [ ] **ROUTER-02**: Orchestrator / Router enforcing deterministic critical flag overrides and intent classification.
+- [ ] **GUARD-01**: Output Guardrail Scanner detecting diagnostic/prescriptive phrasing before message dispatch, logging to `ResponseGuardrailLog`.
 
-### Verification & Testing
+### Phase 4: Follow-up Agent & Proactive Turn Injection
+- [ ] **FOLLOWUP-01**: `FollowUpSession` & `FollowUpQuestion` state tracking for abnormal values.
+- [ ] **FOLLOWUP-02**: Follow-up Agent generating indirect, non-diagnostic questions about symptoms.
+- [ ] **FOLLOWUP-03**: Push notification / polling mechanism to inject agent turns into idle conversations upon report completion.
+- [ ] **FOLLOWUP-04**: Topic-switching & pause/resume handling via intent classifier, plus "skip" command support.
 
-- [ ] **TEST-01**: Automated Unit Tests: Core logic like unit converters (`lib/agent/tools/lab-tools.ts`) and file processors (`lib/services/processing.ts`) verified by automated test suites.
-- [ ] **TEST-02**: Agent Mock Testing: Isolated mock configurations to verify LangGraph router and node transitions under different query profiles.
+### Phase 5: Summary Agent & Clinical PDF Synthesis
+- [ ] **SUMMARY-01**: Extraction of conversational symptom facts into structured `PatientReportedFact` rows.
+- [ ] **SUMMARY-02**: Clinical Summary Agent building grounded summaries strictly from DB facts with prominent medical disclaimer.
+- [ ] **SUMMARY-03**: High-fidelity downloadable Clinical Summary PDF generation.
 
-## v2 Requirements
+### Phase 6: Longitudinal Trends Engine
+- [ ] **TREND-01**: Cross-report query pipeline matching `user_id + test_code + sample_collected_date`.
+- [ ] **TREND-02**: Historical trend visualization and analytical commentary in QnA agent and clinical summary.
 
-### Multimodal Vision OCR
-- **VISION-01**: User can take a photo of a physical report using their mobile camera and have the vision model automatically analyze findings (currently deferred to favor PDF parsing).
+### Phase 7: Observability, Rate Limiting & Hardening
+- [ ] **OBS-01**: Telemetry & structured tracing per agent call (tokens, latency, cost, model).
+- [ ] **OBS-02**: Automated evaluation gates for extraction accuracy, factual consistency, and red-team safety.
+- [ ] **OBS-03**: Rate limiting, request timeouts, retries, and circuit breakers for external AI/OCR endpoints.
 
-### Real-Time Token Streaming
-- **STREAM-01**: Message tokens stream dynamically to the dashboard as they generate, rather than loading in single blocks.
+### Phase 8: Regulatory & Legal Pass
+- [ ] **LEGAL-01**: User health data consent flows, data retention policy, and account deletion functionality.
+- [ ] **LEGAL-02**: Regulatory compliance audit & final red-team safety verification pass.
 
-## Out of Scope
-
-| Feature | Reason |
-|---------|--------|
-| Prescribing Medications | Direct medical prescriptions represent high clinical risk and are legally excluded. |
-| Diagnostic Certifications | The application serves solely as an educational tool; formal diagnoses are out of scope. |
-
-## Traceability
+## Traceability Matrix
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FLOW-01 | Phase 2 | Complete |
-| FLOW-02 | Phase 2 | Complete |
-| FLOW-03 | Phase 1 | Complete |
-| FLOW-04 | Phase 1 | Complete |
-| FLOW-05 | Phase 1 | Complete |
-| FLOW-06 | Phase 1 | Complete |
-| FLOW-07 | Phase 3 | Pending |
-| UI-01 | Phase 4 | Pending |
-| UI-02 | Phase 5 | Pending |
-| UI-03 | Phase 5 | Pending |
-| UI-04 | Phase 5 | Pending |
-| TEST-01 | Phase 6 | Pending |
-| TEST-02 | Phase 6 | Pending |
-
-**Coverage:**
-- v1 requirements: 13 total
-- Mapped to phases: 13
-- Unmapped: 0 ✓
-
----
-*Requirements defined: 2026-06-02*
-*Last updated: 2026-06-02 after initial definition*
+| FOUNDATION-01, FOUNDATION-02, FOUNDATION-03 | Phase 0 | Pending |
+| EXTRACT-01, EXTRACT-02, EXTRACT-03 | Phase 1 | Pending |
+| ENGINE-01, ENGINE-02, ENGINE-03 | Phase 2 | Pending |
+| ROUTER-01, ROUTER-02, GUARD-01 | Phase 3 | Pending |
+| FOLLOWUP-01, FOLLOWUP-02, FOLLOWUP-03, FOLLOWUP-04 | Phase 4 | Pending |
+| SUMMARY-01, SUMMARY-02, SUMMARY-03 | Phase 5 | Pending |
+| TREND-01, TREND-02 | Phase 6 | Pending |
+| OBS-01, OBS-02, OBS-03 | Phase 7 | Pending |
+| LEGAL-01, LEGAL-02 | Phase 8 | Pending |

@@ -1,69 +1,62 @@
-# VitalSense AI
+# Lab Report AI Assistant — VitalSense AI
 
 ## What This Is
 
-A Next.js full-stack medical assistant platform that decodes clinical laboratory reports and responds to general patient health concerns. It extracts unstructured medical findings from uploaded PDF documents, coordinates follow-up dialogues using a stateful LangGraph backend agent, synthesizes conversational patient inputs with parsed lab values, and builds highly accurate summaries and diagnostic conclusions while adhering to strict factual evidence guardrails.
+An AI-powered clinical lab report assistant and patient-facing health platform. It parses unstructured PDF laboratory reports into deterministic structured data, compares extracted values against grounded demographic reference ranges without LLM guessing, conducts indirect non-diagnostic follow-up conversations, scans all outgoing assistant messages through a strict regulatory guardrail, and synthesizes downloadable clinical summaries for doctor consultations.
+
+Source of Truth Document: [lab_report_ai_system_design.md](file:///d:/Work/Next/vital-ai/lab_report_ai_system_design.md)
 
 ## Core Value
 
-Empowering patients with warm, accessible, and clinically grounded explanations of their lab reports and health symptoms to prepare them for productive doctor consultations.
+Empowering patients with warm, accessible, deterministic, and clinically grounded explanations of their lab reports while maintaining strict regulatory safety: zero direct diagnoses, zero direct prescriptions, 100% evidence traceability, and deterministic reference range comparisons.
 
-## Requirements
+## Product Summary & Workflow
 
-### Validated
+1. User authenticates & provides health consent / demographic profile (DOB, sex, pregnancy status).
+2. User uploads a PDF lab report.
+3. While the report processes asynchronously in the background, user can chat normally with an always-on QnA Agent.
+4. Extraction Agent extracts structured lab data with confidence scores; low-confidence items trigger human-in-the-loop review.
+5. Deterministic Comparison Engine checks values against report-printed ranges or internal demographic `ReferenceRange` DB tables.
+6. If a critical flag is detected, an unacknowledged safety override immediately forces an urgent care prompt.
+7. Once analysis completes, system injects indirect, non-diagnostic follow-up questions for abnormal values.
+8. System extracts structured facts (`PatientReportedFact`) and generates a downloadable Clinical Summary PDF for doctor visits.
+9. Longitudinal trend engine allows tracking historical lab trends across multiple reports.
 
-- ✓ [PDF Value Extraction] — Server-side text parsing from uploaded PDF lab reports via `pdf-parse`.
-- ✓ [Stateful Agentic Routing] — Multi-agent state machine managing `conversation`, `lab_analysis`, and `clinical_summary` loops.
-- ✓ [Persistent Clinical Model] — Prisma PostgreSQL relational schema mapping profiles, chats, reports, and messages.
-- ✓ [Credentialed Authentication] — Secure user registration, signups, and custom onboarding profiles.
-- ✓ [Consolidated Data Layer] — Type-safe database queries unified under Prisma Client (legacy raw SQL pools purged).
-- ✓ [Clinical Conclusion Synthesis] — Core clinical reasoning to synthesize symptoms and abnormal lab results to explain "why it is happening". (Validated in Phase 1)
-- ✓ [Factual Clinical Guardrails] — Safety guardrails ensuring disclaimers and concrete factual citations. (Validated in Phase 1)
+## Core Architecture
 
-### Active
+| Component | Type | Responsibility |
+|---|---|---|
+| Orchestrator / Router | Code + small classifier | Decides which agent handles each incoming message; tracks report/session state; enforces critical-flag override |
+| Extraction Agent | LLM | Turns unstructured PDF content into structured test/value/unit data, with confidence scores |
+| Comparison Engine | Deterministic Code | Normalizes units, resolves correct reference ranges by demographic specificity, assigns flags (`normal`, `high`, `low`, `critical_high`, `critical_low`) |
+| Follow-up Agent | LLM, guardrailed | Asks indirect, non-diagnostic questions about abnormal values |
+| QnA Agent | LLM, guardrailed | Always available; handles general conversation, status questions, off-topic queries |
+| Summary Agent | LLM, template-grounded | Drafts the clinical summary from structured data + follow-up answers |
+| Guardrail Scanner | Classifier + rules | Scans every Follow-up/QnA response before sending to user for diagnostic/prescriptive violations |
 
-- [ ] [Clean Dashboard State Management] — Refactoring client-side React state queries, mutation bindings, and visual panels to prevent race conditions during upload or prompt transitions.
-- [ ] [Smooth UI Visual Animations] — Enhancing the split-panel chatbot dashboard with rich micro-animations, loading skeletons, and interactive state feedback.
+## Data Model Entities
 
-### Out of Scope
-
-- [Direct Medical Prescription & Diagnosis] — The application will never issue official drug prescriptions, diagnostic signatures, or treat itself as a replacement for real physicians due to legal and safety concerns.
-- [EPUB / Visual Image OCR] — Ephemeral vision-based file processing (PNG/JPG photos) is deferred to favor high-fidelity structured digital PDF analysis.
-
-## Context
-
-- **Codebase Foundation:** This is a brownfield Next.js 16 (React 19) codebase that leverages LangGraph for conversational multi-agent routing and Neon Serverless PostgreSQL for data persistence.
-- **Technical Debt Addressed:** We successfully resolved all legacy direct SQL connection pools and duplicate actions by refactoring the system entirely to utilize type-safe Prisma bindings.
-- **Identified Fragilities:** Brittle keyword-based routing inside `lib/agent/graph.ts` and file upload persistence constraints on serverless platforms.
+- `User`: Demographic profile (DOB, sex, pregnancy status) & consent timestamps.
+- `Report`: File URI, processing status (`uploaded` \| `processing` \| `extracted` \| `pending_review` \| `analyzed` \| `failed`), source lab, critical flags.
+- `CanonicalTest`: LOINC-mapped standard test identity & default units.
+- `TestAlias`: Synonym mappings to canonical LOINC test codes.
+- `UnitConversion`: Test-specific unit conversion factors.
+- `ReferenceRange`: Demographically constrained ranges (`sex`, `age_min/max`, `pregnancy_trimester`) with `specificity_rank`.
+- `LabResultValue`: Extracted & normalized value, raw text, confidence score, review status, flag, and flag basis.
+- `Conversation`: User chat thread & per-message `agent_type`.
+- `FollowUpSession`: Session state (`not_started` \| `in_progress` \| `paused` \| `complete` \| `skipped`).
+- `FollowUpQuestion`: Individual generated question text, user answer, and status.
+- `PatientReportedFact`: Structured extracted patient-reported facts tied to test codes.
+- `ResponseGuardrailLog`: Safety compliance audit log for scanned responses.
+- `ClinicalSummary`: Synthesized summary content, PDF URI, and model version.
 
 ## Constraints
 
-- **Tech Stack Consistency**: Must build strictly upon Next.js App Router, Tailwind CSS v4, and Prisma ORM client rules.
-- **Clinical Safety**: The agent must always output a disclaimer noting it does not diagnose, and must strictly cite factual evidence for any analysis.
-
-## Key Decisions
-
-| Decision | Rationale | Outcome |
-|----------|-----------|---------|
-| Consolidated Prisma Layer | Replaced raw SQL queries with unified Prisma client queries to prevent database connection leaks. | ✓ Good |
-| Stateful LangGraph Loop | Stateful routing through conversation and clinical agents ensures modular, specialized prompt focuses. | ✓ Good |
+- **Deterministic Flagging**: LLMs MUST NOT judge if a numeric lab value is high/low. Flagging is pure code based on exact reference range tables.
+- **Strict Safety Guardrail**: Scanner runs on ALL generated responses before display. Zero diagnosis, zero prescription.
+- **100% Traceability**: Every claim in the clinical summary must map directly to DB rows (`LabResultValue`, `PatientReportedFact`).
+- **Human-in-the-Loop**: Low-confidence extracted values must be confirmed/corrected by user before feeding downstream agents.
 
 ## Evolution
 
-This document evolves at phase transitions and milestone boundaries.
-
-**After each phase transition** (via `/gsd-transition`):
-1. Requirements invalidated? → Move to Out of Scope with reason
-2. Requirements validated? → Move to Validated with phase reference
-3. New requirements emerged? → Add to Active
-4. Decisions to log? → Add to Key Decisions
-5. "What This Is" still accurate? → Update if drifted
-
-**After each milestone** (via `/gsd-complete-milestone`):
-1. Full review of all sections
-2. Core Value check — still the right priority?
-3. Audit Out of Scope — reasons still valid?
-4. Update Context with current state
-
----
-*Last updated: 2026-06-02 after Phase 1 completion*
+This document is aligned with [lab_report_ai_system_design.md](file:///d:/Work/Next/vital-ai/lab_report_ai_system_design.md).
