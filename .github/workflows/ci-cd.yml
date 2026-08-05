@@ -4,12 +4,10 @@ on:
   push:
     branches:
       - main
-      - master
       - 'feature/**'
   pull_request:
     branches:
       - main
-      - master
 
 jobs:
   lint:
@@ -57,7 +55,7 @@ jobs:
     name: Build & Deploy Verification
     needs: [lint, test]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
