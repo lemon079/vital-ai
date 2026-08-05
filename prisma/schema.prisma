@@ -126,11 +126,13 @@ model Report {
 }
 
 model Conversation {
-  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id    String    @db.Uuid
-  report_id  String?   @db.Uuid
-  title      String?
-  created_at DateTime  @default(now()) @db.Timestamptz(6)
+  id                     String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id                String    @db.Uuid
+  report_id              String?   @db.Uuid
+  title                  String?
+  turn_count             Int       @default(0)
+  proactive_suggested_at DateTime? @db.Timestamptz(6)
+  created_at             DateTime  @default(now()) @db.Timestamptz(6)
 
   user       User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
   report     Report?   @relation(fields: [report_id], references: [id], onDelete: SetNull)
