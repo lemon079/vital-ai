@@ -1,7 +1,10 @@
-// state.ts
-import { Annotation, MessagesAnnotation } from "@langchain/langgraph";
+import { Annotation } from "@langchain/langgraph";
 import { BaseMessage } from "@langchain/core/messages";
 
+/**
+ * VitalSense AI LangGraph Agent State Definition
+ * Aligns strictly with @langchain/langgraph Annotation.Root specifications
+ */
 export const AgentState = Annotation.Root({
   messages: Annotation<BaseMessage[]>({
     reducer: (x, y) => x.concat(y),
@@ -31,28 +34,24 @@ export const AgentState = Annotation.Root({
     reducer: (x, y) => y ?? x,
     default: () => "",
   }),
-
-  // NEW: Store structured lab results
   labResults: Annotation<any[]>({
     reducer: (x, y) => y ?? x,
     default: () => [],
   }),
-
-  // NEW: Store natural language summary of findings
   labAnalysisSummary: Annotation<string>({
     reducer: (x, y) => y ?? x,
     default: () => "",
   }),
-
-  // NEW: Guardrail blocking flag
   isblocked: Annotation<boolean>({
     reducer: (x, y) => y ?? x,
     default: () => false,
   }),
-
-  // NEW: Selected text from PDF highlighting
   selectedText: Annotation<string>({
     reducer: (x, y) => y ?? x,
     default: () => "",
+  }),
+  turnCount: Annotation<number>({
+    reducer: (x, y) => y ?? x,
+    default: () => 0,
   }),
 });
