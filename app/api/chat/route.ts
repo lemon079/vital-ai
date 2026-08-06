@@ -13,6 +13,7 @@ import { enqueueReportProcessing } from "@/lib/services/job-queue";
 import { prisma } from "@/lib/db/client";
 import { generateFollowUpSuggestions } from "@/lib/agent/suggestions";
 import { indexReportDocument } from "@/lib/agent/rag/vector-store";
+import { resolveAbsoluteFilePath } from "@/lib/utils/file-path";
 import path from "path";
 
 export async function POST(req: Request) {
@@ -136,9 +137,10 @@ export async function POST(req: Request) {
             report: true,
           }
         });
+
         if (conversation?.report) {
           dbReportId = conversation.report.id;
-          dbFilePath = dbFilePath || conversation.report.file_uri || undefined;
+          dbFilePath = resolveAbsoluteFilePath(dbFilePath || conversation.report.file_uri || "");
           console.log(`[Route] Reconstructed report context from DB: reportId=${dbReportId}, filePath=${dbFilePath}`);
         }
       } catch (err) {

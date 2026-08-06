@@ -57,6 +57,7 @@ export function AgentProvider({
     const { uploadFile, isUploading: isFileUploading } = useUploadFile();
     const [isUploading, setIsUploading] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [isChatLoading, setIsChatLoading] = useState(false);
 
     // Retry and Simulation States
     const [lastRequestPayload, setLastRequestPayload] = useState<any | null>(null);
@@ -175,6 +176,7 @@ export function AgentProvider({
 
     const loadChat = async (chatId: string) => {
         if (!chatId) return;
+        setIsChatLoading(true);
         try {
             const res = await fetch(`/api/chats/${chatId}`);
             if (res.ok) {
@@ -200,6 +202,8 @@ export function AgentProvider({
             }
         } catch (e) {
             toast.error("Failed to load chat");
+        } finally {
+            setIsChatLoading(false);
         }
     };
 
@@ -671,6 +675,7 @@ export function AgentProvider({
             currentChatId,
             chatHistory: optimisticChatHistory,
             isPending: isLoading,
+            isChatLoading,
             isUploading,
             isFileUploading,
             showSlowWarning,

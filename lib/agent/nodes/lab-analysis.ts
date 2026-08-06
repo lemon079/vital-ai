@@ -12,6 +12,8 @@ import { saveLabResultsTool } from "../tools/database-tools";
 import { convertLabUnits } from "../tools/lab-tools";
 import { getModel } from "./models";
 
+import { resolveAbsoluteFilePath } from "@/lib/utils/file-path";
+
 const tools = [saveLabResultsTool, convertLabUnits];
 
 const model = getModel('ollama', 0).bindTools(tools);
@@ -26,7 +28,8 @@ export async function labAnalysisAgent(state: typeof AgentState.State) {
   let extractedText = state.reportData;
   if (!extractedText && filePath) {
     try {
-      const loader = new PDFLoader(filePath);
+      const resolvedPath = resolveAbsoluteFilePath(filePath);
+      const loader = new PDFLoader(resolvedPath);
       const docs = await loader.load();
       extractedText = docs.map((doc: any) => doc.pageContent).join("\n\n");
       console.log(

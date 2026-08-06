@@ -113,6 +113,8 @@ export function parseRawTextHeuristically(rawText: string): ExtractedLabItem[] {
     return items;
 }
 
+import { resolveAbsoluteFilePath } from '@/lib/utils/file-path';
+
 /**
  * Extracts structured lab results from a PDF report file using LLM structured generation,
  * falling back to heuristic parsing if LLM invocation fails or returns invalid JSON.
@@ -120,7 +122,8 @@ export function parseRawTextHeuristically(rawText: string): ExtractedLabItem[] {
 export async function extractLabResultsFromPdf(filePath: string, reportId: string): Promise<ExtractionResult> {
     let rawText = '';
     try {
-        const loader = new PDFLoader(filePath);
+        const resolvedPath = resolveAbsoluteFilePath(filePath);
+        const loader = new PDFLoader(resolvedPath);
         const docs = await loader.load();
         rawText = docs.map((doc) => doc.pageContent).join('\n\n');
     } catch (err) {

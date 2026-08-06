@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef, useEffect, Suspense } from "react";
 import {
   AssistantRuntimeProvider,
   useExternalStoreRuntime,
@@ -15,6 +15,7 @@ import { FollowUpSuggestions } from "@/components/ui/assistant-ui/follow-up-sugg
 import { SelectionToolbar } from "@/components/ui/assistant-ui/selection-toolbar";
 import { ReasoningIndicator } from "@/components/ui/assistant-ui/reasoning";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ChatThreadSkeleton } from "@/components/ui/chat-thread-skeleton";
 
 export function AssistantUiChat() {
   const {
@@ -26,13 +27,17 @@ export function AssistantUiChat() {
     selectedText,
     setSelectedText,
     pdfUrl,
+    currentChatId,
     isPending,
+    isChatLoading,
     reasoningSteps,
     currentSuggestions,
     sendMessage,
     processFile,
     handleRetry,
   } = useAgentContext();
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { handleMouseUp, toolbar } = SelectionToolbar({
     onQuote: (text) => setSelectedText(text),
@@ -82,72 +87,96 @@ export function AssistantUiChat() {
     (msg) => msg.role !== "system" && msg.role !== "tool",
   );
 
-  const hasAssistantResponse = visibleMessages.some(m => m.role === 'assistant');
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior });
+    }
+  }, []);
+
+  // Auto-scroll to bottom when a chat thread is selected/rendered or messages update
+  useEffect(() => {
+    if (!isChatLoading && visibleMessages.length > 0) {
+      // Immediate scroll to bottom on initial render/selection, smooth scroll on updates
+      const timer = setTimeout(() => {
+        scrollToBottom("smooth");
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [currentChatId, visibleMessages.length, isChatLoading, scrollToBottom]);
+
+  if (isChatLoading) {
+    return <ChatThreadSkeleton />;
+  }
 
   return (
-    <AssistantRuntimeProvider runtime={runtime}>
-      <div className="flex-1 flex flex-col h-full w-full overflow-hidden bg-background">
-        {toolbar}
+    <Suspense fallback={<ChatThreadSkeleton />}>
+      <AssistantRuntimeProvider runtime={runtime}>
+        <div className="flex-1 flex flex-col h-full w-full overflow-hidden bg-background">
+          {toolbar}
 
-        <ScrollArea className="flex-1">
-          <main
-            className="p-4 sm:p-6 scroll-smooth flex flex-col min-h-full"
-            onMouseUp={handleMouseUp}
-          >
-            <div className="mx-auto max-w-3xl w-full flex-1 flex flex-col space-y-6">
-              {visibleMessages.length === 0 ? (
-                <ThreadWelcome onSelectPrompt={handleSelectSuggestedPrompt} />
-              ) : (
-                visibleMessages.map((msg, idx) => (
-                  <CustomMessageBubble
-                    key={idx}
-                    role={msg.role === "user" ? "user" : "assistant"}
-                    content={msg.content}
-                    fileInfo={msg.fileInfo}
-                    selectedText={msg.selectedText}
-                    isError={msg.isError}
-                    errorType={msg.errorType}
-                    onRetry={handleRetry}
-                  />
-                ))
-              )}
+          <ScrollArea className="flex-1">
+            <main
+              className="p-4 sm:p-6 scroll-smooth flex flex-col min-h-full"
+              onMouseUp={handleMouseUp}
+            >
+              <div className="mx-auto max-w-3xl w-full flex-1 flex flex-col space-y-6">
+                {visibleMessages.length === 0 ? (
+                  <ThreadWelcome onSelectPrompt={handleSelectSuggestedPrompt} />
+                ) : (
+                  visibleMessages.map((msg, idx) => (
+                    <CustomMessageBubble
+                      key={idx}
+                      role={msg.role === "user" ? "user" : "assistant"}
+                      content={msg.content}
+                      fileInfo={msg.fileInfo}
+                      selectedText={msg.selectedText}
+                      isError={msg.isError}
+                      errorType={msg.errorType}
+                      onRetry={handleRetry}
+                    />
+                  ))
+                )}
 
-              {/* Reasoning Trace Component */}
-              <ReasoningIndicator steps={reasoningSteps} isActive={isPending} />
+                {/* Reasoning Trace Component */}
+                <ReasoningIndicator steps={reasoningSteps} isActive={isPending} />
 
-              {/* Follow-up Suggestions (Only rendered when AI agent sends dynamic suggestions back) */}
-              {!isPending && currentSuggestions.length > 0 && (
-                <div className="pt-2">
-                  <FollowUpSuggestions
-                    suggestions={currentSuggestions}
-                    onSelect={(prompt) => sendMessage(prompt)}
-                    disabled={isPending}
-                  />
-                </div>
-              )}
-            </div>
-          </main>
-        </ScrollArea>
+                {/* Follow-up Suggestions */}
+                {!isPending && currentSuggestions.length > 0 && (
+                  <div className="pt-2">
+                    <FollowUpSuggestions
+                      suggestions={currentSuggestions}
+                      onSelect={(prompt) => sendMessage(prompt)}
+                      disabled={isPending}
+                    />
+                  </div>
+                )}
 
-        <CustomComposer
-          input={input}
-          setInput={setInput}
-          selectedText={selectedText}
-          setSelectedText={setSelectedText}
-          selectedFile={selectedFile}
-          setSelectedFile={setSelectedFile}
-          pdfUrl={pdfUrl}
-          isPending={isPending}
-          onSend={handleFormSend}
-          onFileUpload={() => {}}
-          onFileChange={async (e) => {
-            const file = e.target.files?.[0];
-            if (file) {
-              await processFile(file);
-            }
-          }}
-        />
-      </div>
-    </AssistantRuntimeProvider>
+                {/* Scroll Target Anchor */}
+                <div ref={messagesEndRef} className="h-px w-full shrink-0" />
+              </div>
+            </main>
+          </ScrollArea>
+
+          <CustomComposer
+            input={input}
+            setInput={setInput}
+            selectedText={selectedText}
+            setSelectedText={setSelectedText}
+            selectedFile={selectedFile}
+            setSelectedFile={setSelectedFile}
+            pdfUrl={pdfUrl}
+            isPending={isPending}
+            onSend={handleFormSend}
+            onFileUpload={() => {}}
+            onFileChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                await processFile(file);
+              }
+            }}
+          />
+        </div>
+      </AssistantRuntimeProvider>
+    </Suspense>
   );
 }

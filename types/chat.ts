@@ -55,6 +55,7 @@ export interface AgentContextType {
   currentChatId: string | null;
   chatHistory: ChatSession[];
   isPending: boolean;
+  isChatLoading: boolean;
   isUploading: boolean;
   isFileUploading: boolean;
   showSlowWarning: boolean;

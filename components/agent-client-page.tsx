@@ -1,14 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, Suspense } from 'react';
 import { AgentProvider, useAgentContext } from '@/context/agent-context';
 import { AssistantUiChat } from '@/components/assistant-ui-chat';
-import { Group, Panel, Separator } from 'react-resizable-panels';
+import { ResizableSplitPanel } from '@/components/ui/resizable-split-panel';
 import { PdfViewer } from '@/components/pdf-viewer';
 import { ChatHeader } from '@/components/chat/chat-header';
 import { ChatSidebar } from '@/components/chat/chat-sidebar';
 import { DevSimulationConsole } from '@/components/chat/dev-simulation-console';
 import { ChatSession, Message } from '@/types/chat';
+import { PdfViewerSkeleton } from '@/components/ui/pdf-viewer-skeleton';
+import { ChatThreadSkeleton } from '@/components/ui/chat-thread-skeleton';
 
 function AgentClientInner({ userProfile }: { userProfile?: { name: string | null; age: number | null; gender: string | null } }) {
   const {
@@ -22,24 +24,40 @@ function AgentClientInner({ userProfile }: { userProfile?: { name: string | null
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const dragCounter = useRef(0);
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (pdfUrl) return;
+
+    dragCounter.current += 1;
+    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+      setDragActive(true);
+    }
+  };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!pdfUrl) {
-      setDragActive(true);
-    }
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setDragActive(false);
+    if (pdfUrl) return;
+
+    dragCounter.current -= 1;
+    if (dragCounter.current <= 0) {
+      dragCounter.current = 0;
+      setDragActive(false);
+    }
   };
 
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    dragCounter.current = 0;
     setDragActive(false);
 
     const file = e.dataTransfer.files?.[0];
@@ -51,6 +69,7 @@ function AgentClientInner({ userProfile }: { userProfile?: { name: string | null
   return (
     <div
       className="flex h-screen w-full flex-col bg-background relative"
+      onDragEnter={handleDragEnter}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -87,21 +106,25 @@ function AgentClientInner({ userProfile }: { userProfile?: { name: string | null
       <div className="flex-1 flex overflow-hidden flex-col">
         <div className="flex flex-col h-full transition-all duration-300 w-full">
           {isPdfVisible && pdfUrl ? (
-            <Group orientation="horizontal" className="flex-1 h-full w-full">
-              <Panel defaultSize={50} minSize={30} maxSize={70} className="h-full">
-                <PdfViewer url={pdfUrl} onClose={() => setIsPdfVisible(false)} />
-              </Panel>
-
-              <Separator className="w-1.5 bg-border hover:bg-primary/50 transition-colors flex items-center justify-center cursor-col-resize group shadow-xs">
-                <div className="w-1 h-8 rounded-full bg-muted-foreground/30 group-hover:bg-primary transition-colors" />
-              </Separator>
-
-              <Panel defaultSize={50} minSize={30} className="h-full flex flex-col">
-                <AssistantUiChat />
-              </Panel>
-            </Group>
+            <ResizableSplitPanel
+              defaultLeftWidth={50}
+              minLeftWidth={25}
+              maxLeftWidth={75}
+              leftContent={
+                <Suspense fallback={<PdfViewerSkeleton />}>
+                  <PdfViewer url={pdfUrl} onClose={() => setIsPdfVisible(false)} />
+                </Suspense>
+              }
+              rightContent={
+                <Suspense fallback={<ChatThreadSkeleton />}>
+                  <AssistantUiChat />
+                </Suspense>
+              }
+            />
           ) : (
-            <AssistantUiChat />
+            <Suspense fallback={<ChatThreadSkeleton />}>
+              <AssistantUiChat />
+            </Suspense>
           )}
 
           {/* Dev Network Error & Latency Simulation Bar */}

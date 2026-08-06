@@ -3,6 +3,7 @@ import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { MemoryVectorStore } from "@langchain/classic/vectorstores/memory";
 import { Document } from "@langchain/core/documents";
+import { resolveAbsoluteFilePath } from "@/lib/utils/file-path";
 
 // In-memory cache of document vector stores per reportId to ensure 0 duplicate embedding operations
 const reportVectorStores = new Map<string, MemoryVectorStore>();
@@ -44,10 +45,11 @@ export async function indexReportDocument(
   }
 
   try {
-    console.log(`[RAG VectorStore] Indexing report PDF from ${filePath} (reportId: ${reportId})...`);
+    const resolvedPath = resolveAbsoluteFilePath(filePath);
+    console.log(`[RAG VectorStore] Indexing report PDF from ${resolvedPath} (reportId: ${reportId})...`);
     
     // 1. Load PDF pages preserving page numbers
-    const loader = new PDFLoader(filePath);
+    const loader = new PDFLoader(resolvedPath);
     const rawDocs = await loader.load();
 
     if (!rawDocs || rawDocs.length === 0) {

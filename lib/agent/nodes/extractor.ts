@@ -1,5 +1,6 @@
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf"
 import { AgentState } from "../state";
+import { resolveAbsoluteFilePath } from "@/lib/utils/file-path";
 
 export async function extractPdfData(state: typeof AgentState.State) {
     const { filePath, reportData } = state;
@@ -10,7 +11,8 @@ export async function extractPdfData(state: typeof AgentState.State) {
     }
 
     try {
-        const loader = new PDFLoader(filePath);
+        const resolvedPath = resolveAbsoluteFilePath(filePath);
+        const loader = new PDFLoader(resolvedPath);
         const docs = await loader.load();
 
         // Join all pages into a single string
