@@ -17,7 +17,9 @@ const SIMULATION_OPTIONS = [
 ];
 
 export function DevSimulationConsole({ simulation, setSimulation }: DevSimulationConsoleProps) {
-  if (process.env.NODE_ENV !== 'development') {
+  const isEnabled = process.env.NEXT_PUBLIC_ENABLE_SIMULATION_CONSOLE === 'true';
+
+  if (!isEnabled) {
     return null;
   }
 

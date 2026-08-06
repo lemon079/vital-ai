@@ -120,7 +120,7 @@ export function PdfViewer({ url, onClose }: PdfViewerProps) {
           ) : (
             <iframe
               src={`${url}#toolbar=0&navpanes=0`}
-              className="w-full h-full rounded border bg-background shadow-md min-h-[500px]"
+              className="w-full h-full rounded border bg-background shadow-md min-h-125"
               title="PDF Report Document"
             />
           )}
