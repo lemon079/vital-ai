@@ -87,9 +87,16 @@ export function ChatSidebar({ isOpen, onOpenChange, userProfile }: ChatSidebarPr
               const isEditing = editingChatId === chat.id;
               const isDeleting = deletingChatId === chat.id;
 
+              const isPending = chat.isPending;
+
               if (isEditing) {
                 return (
-                  <div key={chat.id} className="flex items-center gap-1 w-full px-2 py-1 bg-muted/50 rounded-lg border border-border">
+                  <div
+                    key={chat.id}
+                    className={`flex items-center gap-1 w-full px-2 py-1 bg-muted/50 rounded-lg border border-border transition-all duration-200 ${
+                      isPending ? 'opacity-40 pointer-events-none cursor-wait' : ''
+                    }`}
+                  >
                     <Input
                       value={editTitle}
                       onChange={(e) => setEditTitle(e.target.value)}
@@ -133,8 +140,13 @@ export function ChatSidebar({ isOpen, onOpenChange, userProfile }: ChatSidebarPr
 
               if (isDeleting) {
                 return (
-                  <div key={chat.id} className="flex items-center justify-between w-full px-2 py-1 bg-destructive/10 text-destructive rounded-lg border border-destructive/20 text-xs">
-                    <span className="font-semibold px-1">Delete chat?</span>
+                  <div
+                    key={chat.id}
+                    className={`flex items-center justify-between w-full px-2 py-1 bg-destructive/10 text-destructive rounded-lg border border-destructive/20 text-xs transition-all duration-200 ${
+                      isPending ? 'opacity-40 pointer-events-none cursor-wait' : ''
+                    }`}
+                  >
+                    <span className="font-semibold px-1">Deleting...</span>
                     <div className="flex gap-1 shrink-0">
                       <Button
                         size="icon"
@@ -166,6 +178,8 @@ export function ChatSidebar({ isOpen, onOpenChange, userProfile }: ChatSidebarPr
                 <div
                   key={chat.id}
                   className={`group flex items-center justify-between w-full rounded-lg text-left text-sm transition-all duration-200 ${
+                    isPending ? 'opacity-40 pointer-events-none cursor-wait' : ''
+                  } ${
                     isActive
                       ? 'bg-primary/5 text-primary border-l-2 border-l-primary font-semibold'
                       : 'hover:bg-muted/50 text-muted-foreground hover:text-foreground'

@@ -70,7 +70,7 @@ export function AgentProvider({
 
     const [, startTransition] = useTransition();
 
-    // Optimistic UI updates for chat history (deleting and editing titles)
+    // Optimistic UI updates for chat history (dimming container while deleting or editing titles)
     const [optimisticChatHistory, setOptimisticChatHistory] = useOptimistic<
         ChatSession[],
         ChatHistoryAction
@@ -78,11 +78,13 @@ export function AgentProvider({
         chatHistory,
         (currentHistory, action) => {
             if (action.type === 'delete') {
-                return currentHistory.filter((chat) => chat.id !== action.chatId);
+                return currentHistory.map((chat) =>
+                    chat.id === action.chatId ? { ...chat, isPending: true, pendingAction: 'delete' } : chat
+                );
             }
             if (action.type === 'rename') {
                 return currentHistory.map((chat) =>
-                    chat.id === action.chatId ? { ...chat, title: action.title } : chat
+                    chat.id === action.chatId ? { ...chat, title: action.title, isPending: true, pendingAction: 'rename' } : chat
                 );
             }
             return currentHistory;
