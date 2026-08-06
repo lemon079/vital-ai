@@ -14,8 +14,8 @@ import { SystemMessage, AIMessage, HumanMessage } from "@langchain/core/messages
 import { AgentState } from "../state";
 import { getModel } from "./models";
 
-// Lightweight model for fast classification (temperature = 0 for strict classification)
-const model = getModel('ollama', 0.0);
+// Model instance for fast classification (temperature = 0 for strict classification)
+const model = getModel(undefined, 0.0);
 
 // ============================================================================
 // CONFIGURATION & CONSTANTS
@@ -51,8 +51,7 @@ Your job is to analyze the user's latest message and determine if it is safe and
   "reason": string     // If unsafe, explain why briefly. If safe, leave empty.
 }
 
-If the user asks for diagnosis or meds, set "safe": false and "reason": "I cannot provide medical diagnoses or prescribe medications. Please consult a doctor."
-If irrelevant, set "safe": false and "reason": "I can only help with health-related questions and lab report analysis."
+If unsafe or irrelevant, set "safe": false and "reason": "I cannot help you with that."
 `;
 
 // ============================================================================
@@ -116,7 +115,7 @@ export async function guardrailsNode(state: typeof AgentState.State) {
 
         if (!result.safe) {
             // Append the prominent medical disclaimer block to refusal responses
-            const refusalMessage = (result.reason || "I cannot answer this request.") + MEDICAL_DISCLAIMER;
+            const refusalMessage = "I cannot help you with that." + MEDICAL_DISCLAIMER;
             return {
                 messages: [new AIMessage(refusalMessage)],
                 isblocked: true
@@ -130,7 +129,7 @@ export async function guardrailsNode(state: typeof AgentState.State) {
         console.error("[Guardrails] Error:", e);
         // Fail closed for clinical safety in production
         return {
-            messages: [new AIMessage("I encountered an issue processing safety guardrails. Please try again." + MEDICAL_DISCLAIMER)],
+            messages: [new AIMessage("I cannot help you with that." + MEDICAL_DISCLAIMER)],
             isblocked: true
         };
     }
