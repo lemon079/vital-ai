@@ -14,7 +14,7 @@ import { SystemMessage, AIMessage, HumanMessage } from "@langchain/core/messages
 import { AgentState } from "../state";
 import { getModel } from "./models";
 
-// Lightweight model for fast classification (temperature = 0 for strict classification)
+// Model instance for fast classification (temperature = 0 for strict classification)
 const model = getModel(undefined, 0.0);
 
 // ============================================================================
@@ -51,8 +51,7 @@ Your job is to analyze the user's latest message and determine if it is safe and
   "reason": string     // If unsafe, explain why briefly. If safe, leave empty.
 }
 
-If the user asks for diagnosis or meds, set "safe": false and "reason": "I cannot provide medical diagnoses or prescribe medications. Please consult a doctor."
-If irrelevant, set "safe": false and "reason": "I can only help with health-related questions and lab report analysis."
+If unsafe or irrelevant, set "safe": false and "reason": "I cannot help you with that."
 `;
 
 // ============================================================================
@@ -71,7 +70,7 @@ If irrelevant, set "safe": false and "reason": "I can only help with health-rela
 export async function guardrailsNode(state: typeof AgentState.State) {
     console.log("--- Guardrails Check ---");
     const { messages, reportData } = state;
-    
+
     // Find the last human message in history to evaluate safety
     const lastHumanMessage = [...messages].reverse().find(m => {
         const type = typeof m.getType === "function" ? m.getType() : (m as any).role;
@@ -85,10 +84,10 @@ export async function guardrailsNode(state: typeof AgentState.State) {
 
     // 1. Check if user is requesting a clinical summary/conclusion
     const contentLower = lastHumanMessage.content.toLowerCase();
-    const isSummaryRequest = 
-        contentLower.includes("summary for doctor") || 
-        contentLower.includes("create summary") || 
-        contentLower.includes("appointment tomorrow") || 
+    const isSummaryRequest =
+        contentLower.includes("summary for doctor") ||
+        contentLower.includes("create summary") ||
+        contentLower.includes("appointment tomorrow") ||
         contentLower.includes("generate summary");
 
     // Evidence check: block clinical summaries/conclusions if there's no lab report uploaded
@@ -116,7 +115,7 @@ export async function guardrailsNode(state: typeof AgentState.State) {
 
         if (!result.safe) {
             // Append the prominent medical disclaimer block to refusal responses
-            const refusalMessage = (result.reason || "I cannot answer this request.") + MEDICAL_DISCLAIMER;
+            const refusalMessage = "I cannot help you with that." + MEDICAL_DISCLAIMER;
             return {
                 messages: [new AIMessage(refusalMessage)],
                 isblocked: true
@@ -129,9 +128,9 @@ export async function guardrailsNode(state: typeof AgentState.State) {
     } catch (e) {
         console.error("[Guardrails] Error:", e);
         // Fail closed for clinical safety in production
-        return { 
-            messages: [new AIMessage("I encountered an issue processing safety guardrails. Please try again." + MEDICAL_DISCLAIMER)],
-            isblocked: true 
+        return {
+            messages: [new AIMessage("I cannot help you with that." + MEDICAL_DISCLAIMER)],
+            isblocked: true
         };
     }
 }

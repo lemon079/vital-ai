@@ -1,7 +1,7 @@
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { getModel } from "./nodes/models";
 
-const suggestionModel = getModel(undefined, 0.4);
+const suggestionModel = getModel('ollama', 0.4);
 
 const SYSTEM_PROMPT = `You are a medical AI assistant. Based on the assistant's previous medical explanation to the patient, generate 3 short, natural, single-sentence follow-up questions that the patient might ask next.
 
@@ -21,14 +21,14 @@ export async function generateFollowUpSuggestions(
 
   try {
     const inputContent = `User asked: "${userMessage || 'Health query'}"\n\nAssistant responded: "${aiResponse.substring(0, 1000)}"`;
-    
+
     const response = await suggestionModel.invoke([
       new SystemMessage(SYSTEM_PROMPT),
       new HumanMessage(inputContent),
     ]);
 
     const content = typeof response.content === "string" ? response.content.trim() : "";
-    
+
     // Extract JSON array from text
     const jsonMatch = content.match(/\[[\s\S]*\]/);
     if (jsonMatch) {

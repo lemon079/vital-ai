@@ -37,6 +37,8 @@ export interface ChatSession {
   id: string;
   title: string;
   created_at: string;
+  isPending?: boolean;
+  pendingAction?: 'delete' | 'rename';
 }
 
 export interface AgentContextType {
