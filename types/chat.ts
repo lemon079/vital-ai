@@ -64,6 +64,7 @@ export interface AgentContextType {
   setSimulation: (simulation: string) => void;
   reasoningSteps: ReasoningStep[];
   currentSuggestions: string[];
+  isSuggestionsLoading: boolean;
 
   // Actions
   handleNewChat: () => void;

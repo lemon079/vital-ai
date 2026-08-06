@@ -20,9 +20,15 @@ function routeStart(state: typeof AgentState.State) {
       ? lastMessage.content.toLowerCase()
       : "";
 
-  // 1. If PDF is uploaded -> Lab Analysis Agent (only if not yet analyzed)
-  if (filePath && (!labResults || labResults.length === 0)) {
-    console.log("[Router] PDF detected (un-analyzed). Routing to lab_analysis");
+  // Check if initial lab analysis has already been performed in this conversation
+  const hasAssistantResponse = messages.some((m: any) => {
+    const role = typeof m.getType === "function" ? m.getType() : m.role;
+    return role === "ai" || role === "assistant";
+  });
+
+  // 1. If PDF is uploaded AND initial analysis has not been performed yet -> Lab Analysis Agent
+  if (filePath && !hasAssistantResponse && (!labResults || labResults.length === 0)) {
+    console.log("[Router] New PDF detected (un-analyzed). Routing to lab_analysis");
     return "lab_analysis";
   }
 

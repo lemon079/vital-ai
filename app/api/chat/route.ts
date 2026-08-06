@@ -12,6 +12,7 @@ import { createReport } from "@/lib/services/reports";
 import { enqueueReportProcessing } from "@/lib/services/job-queue";
 import { prisma } from "@/lib/db/client";
 import { generateFollowUpSuggestions } from "@/lib/agent/suggestions";
+import { getLabResultsByReportId } from "@/lib/services/lab-results";
 import { indexReportDocument } from "@/lib/agent/rag/vector-store";
 import { resolveAbsoluteFilePath } from "@/lib/utils/file-path";
 import path from "path";
@@ -192,6 +193,24 @@ export async function POST(req: Request) {
       `[Route] Streaming graph with filePath="${dbFilePath || ""}", reportId=${dbReportId}, selectedText="${(selectedText || "").substring(0, 30)}"`,
     );
 
+    // Fetch lab results from DB if reportId exists (Turn 2+ context)
+    let dbLabResults: any[] = [];
+    if (dbReportId) {
+      try {
+        const fetched = await getLabResultsByReportId(dbReportId);
+        dbLabResults = fetched.map((r: any) => ({
+          test_name: r.canonical_test?.display_name || r.test_code,
+          value: r.value ?? r.extracted_value_raw,
+          unit: r.unit || "",
+          flag: r.review_status === "user_corrected" ? "CORRECTED" : "ABNORMAL",
+          reference_low: r.report_stated_range_low,
+          reference_high: r.report_stated_range_high,
+        }));
+      } catch (err) {
+        console.warn("[Route] Failed to fetch lab results for graph context:", err);
+      }
+    }
+
     const encoder = new TextEncoder();
     const customStream = new ReadableStream({
       async start(controller) {
@@ -213,7 +232,7 @@ export async function POST(req: Request) {
               filePath: dbFilePath || "",
               reportId: dbReportId,
               selectedText: selectedText || "",
-              labResults: [],
+              labResults: dbLabResults,
             },
             {
               version: "v2",
@@ -280,6 +299,10 @@ export async function POST(req: Request) {
           // Generate and emit dynamic follow-up suggestions
           if (fullAIResponse.trim()) {
             try {
+              // Notify client that suggestions are being generated
+              const loadingData = JSON.stringify({ type: "suggestions_loading" });
+              controller.enqueue(encoder.encode(`data: ${loadingData}\n\n`));
+
               const suggestions = await generateFollowUpSuggestions(
                 fullAIResponse,
                 currentMessageContent

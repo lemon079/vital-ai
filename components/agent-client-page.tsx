@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, Suspense } from 'react';
+import { useState, useRef } from 'react';
 import { AgentProvider, useAgentContext } from '@/context/agent-context';
 import { AssistantUiChat } from '@/components/assistant-ui-chat';
 import { ResizableSplitPanel } from '@/components/ui/resizable-split-panel';
@@ -10,13 +10,13 @@ import { ChatSidebar } from '@/components/chat/chat-sidebar';
 import { DevSimulationConsole } from '@/components/chat/dev-simulation-console';
 import { ChatSession, Message } from '@/types/chat';
 import { PdfViewerSkeleton } from '@/components/ui/pdf-viewer-skeleton';
-import { ChatThreadSkeleton } from '@/components/ui/chat-thread-skeleton';
 
 function AgentClientInner({ userProfile }: { userProfile?: { name: string | null; age: number | null; gender: string | null } }) {
   const {
     pdfUrl,
     isPdfVisible,
     setIsPdfVisible,
+    isChatLoading,
     simulation,
     setSimulation,
     processFile,
@@ -111,20 +111,18 @@ function AgentClientInner({ userProfile }: { userProfile?: { name: string | null
               minLeftWidth={25}
               maxLeftWidth={75}
               leftContent={
-                <Suspense fallback={<PdfViewerSkeleton />}>
+                isChatLoading ? (
+                  <PdfViewerSkeleton />
+                ) : (
                   <PdfViewer url={pdfUrl} onClose={() => setIsPdfVisible(false)} />
-                </Suspense>
+                )
               }
               rightContent={
-                <Suspense fallback={<ChatThreadSkeleton />}>
-                  <AssistantUiChat />
-                </Suspense>
+                <AssistantUiChat />
               }
             />
           ) : (
-            <Suspense fallback={<ChatThreadSkeleton />}>
-              <AssistantUiChat />
-            </Suspense>
+            <AssistantUiChat />
           )}
 
           {/* Dev Network Error & Latency Simulation Bar */}

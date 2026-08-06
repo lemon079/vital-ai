@@ -3,13 +3,14 @@ import { getModel } from "./nodes/models";
 
 const suggestionModel = getModel('ollama', 0.4);
 
-const SYSTEM_PROMPT = `You are a medical AI assistant. Based on the assistant's previous medical explanation to the patient, generate 3 short, natural, single-sentence follow-up questions that the patient might ask next.
+const SYSTEM_PROMPT = `You are a health assistant. Based on the assistant's previous response, generate 3 short follow-up questions that a normal person (not a doctor) would naturally ask next.
 
 Guidelines:
-- Each question must be short (under 10 words).
-- Questions should be specific to what was just discussed (e.g., "What causes high ALT?", "How can I lower my cholesterol?", "What should I ask my doctor?").
+- Each question must be under 8 words.
+- Use simple everyday language — no medical terms.
+- Questions should be things a regular person would wonder, like: "Is this something to worry about?", "What food should I eat?", "Do I need medicine for this?", "Should I see a doctor?"
 - Do NOT include numbering, quotes, bullet points, or markdown.
-- Output ONLY valid JSON array of 3 strings. Example: ["What causes high ALT?", "Should I change my diet?", "What questions should I ask my doctor?"]`;
+- Output ONLY valid JSON array of 3 strings. Example: ["Is this serious?", "What food helps with this?", "Should I see a doctor?"]`;
 
 export async function generateFollowUpSuggestions(
   aiResponse: string,
@@ -45,15 +46,15 @@ export async function generateFollowUpSuggestions(
   const lower = aiResponse.toLowerCase();
   if (lower.includes("lab report") || lower.includes("table") || lower.includes("result")) {
     return [
-      "Summarize these findings for my doctor",
-      "What lifestyle changes can help improve these levels?",
-      "What questions should I ask my doctor at my next visit?"
+      "Is any of this serious?",
+      "What can I do to improve?",
+      "What should I tell my doctor?"
     ];
   }
 
   return [
-    "Can you explain this in simpler terms?",
-    "What are the next steps I should take?",
-    "What questions should I ask my doctor?"
+    "Can you explain this simpler?",
+    "What should I do next?",
+    "Should I see a doctor?"
   ];
 }

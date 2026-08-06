@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
-import { Bot, Menu } from 'lucide-react';
+import { Bot, Menu, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ModeToggle } from '@/components/mode-toggle';
+import { useAgentContext } from '@/context/agent-context';
 
 interface ChatHeaderProps {
   onOpenSidebar?: () => void;
@@ -11,6 +11,8 @@ interface ChatHeaderProps {
 }
 
 export function ChatHeader({ onOpenSidebar, showSidebarToggle }: ChatHeaderProps) {
+  const { pdfUrl, isPdfVisible, setIsPdfVisible } = useAgentContext();
+
   return (
     <header className="flex items-center justify-between border-b border-border bg-card px-4 py-3 shadow-xs shrink-0">
       <div className="flex items-center gap-3">
@@ -36,6 +38,18 @@ export function ChatHeader({ onOpenSidebar, showSidebarToggle }: ChatHeaderProps
       </div>
 
       <div className="flex items-center gap-2">
+        {pdfUrl && !isPdfVisible && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsPdfVisible(true)}
+            className="gap-1.5 text-xs"
+            title="Reopen uploaded report"
+          >
+            <FileText className="h-3.5 w-3.5" />
+            View Report
+          </Button>
+        )}
         <ModeToggle />
       </div>
     </header>
