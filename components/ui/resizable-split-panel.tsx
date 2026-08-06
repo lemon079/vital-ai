@@ -58,7 +58,7 @@ export function ResizableSplitPanel({
   return (
     <div
       ref={containerRef}
-      className={`relative flex h-full w-full overflow-hidden select-none ${className}`}
+      className={`relative flex h-full w-full overflow-hidden ${isResizing ? 'select-none' : ''} ${className}`}
     >
       {/* Left Panel */}
       <div

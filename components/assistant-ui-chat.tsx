@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useRef, useEffect, Suspense } from "react";
+import { useCallback, useMemo, useRef, useEffect } from "react";
 import {
   AssistantRuntimeProvider,
   useExternalStoreRuntime,
@@ -14,6 +14,7 @@ import { ThreadWelcome } from "@/components/ui/assistant-ui/thread";
 import { FollowUpSuggestions } from "@/components/ui/assistant-ui/follow-up-suggestions";
 import { SelectionToolbar } from "@/components/ui/assistant-ui/selection-toolbar";
 import { ReasoningIndicator } from "@/components/ui/assistant-ui/reasoning";
+import { SuggestionsLoadingSkeleton } from "@/components/ui/assistant-ui/suggestions-skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChatThreadSkeleton } from "@/components/ui/chat-thread-skeleton";
 
@@ -35,6 +36,7 @@ export function AssistantUiChat() {
     sendMessage,
     processFile,
     handleRetry,
+    isSuggestionsLoading,
   } = useAgentContext();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -109,16 +111,15 @@ export function AssistantUiChat() {
   }
 
   return (
-    <Suspense fallback={<ChatThreadSkeleton />}>
-      <AssistantRuntimeProvider runtime={runtime}>
-        <div className="flex-1 flex flex-col h-full w-full overflow-hidden bg-background">
-          {toolbar}
+    <AssistantRuntimeProvider runtime={runtime}>
+      <div className="flex-1 flex flex-col h-full w-full overflow-hidden bg-background">
+        {toolbar}
 
-          <ScrollArea className="flex-1">
-            <main
-              className="p-4 sm:p-6 scroll-smooth flex flex-col min-h-full"
-              onMouseUp={handleMouseUp}
-            >
+        <ScrollArea className="flex-1">
+          <main
+            className="p-4 sm:p-6 scroll-smooth flex flex-col min-h-full"
+            onMouseUp={handleMouseUp}
+          >
               <div className="mx-auto max-w-3xl w-full flex-1 flex flex-col space-y-6">
                 {visibleMessages.length === 0 ? (
                   <ThreadWelcome onSelectPrompt={handleSelectSuggestedPrompt} />
@@ -141,7 +142,12 @@ export function AssistantUiChat() {
                 <ReasoningIndicator steps={reasoningSteps} isActive={isPending} />
 
                 {/* Follow-up Suggestions */}
-                {!isPending && currentSuggestions.length > 0 && (
+                {isSuggestionsLoading && currentSuggestions.length === 0 && (
+                  <div className="pt-2">
+                    <SuggestionsLoadingSkeleton />
+                  </div>
+                )}
+                {!isPending && !isSuggestionsLoading && currentSuggestions.length > 0 && (
                   <div className="pt-2">
                     <FollowUpSuggestions
                       suggestions={currentSuggestions}
@@ -175,8 +181,7 @@ export function AssistantUiChat() {
               }
             }}
           />
-        </div>
-      </AssistantRuntimeProvider>
-    </Suspense>
+      </div>
+    </AssistantRuntimeProvider>
   );
 }

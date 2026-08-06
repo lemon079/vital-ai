@@ -67,6 +67,7 @@ export function AgentProvider({
     const [retryCount, setRetryCount] = useState<number>(0);
     const [reasoningSteps, setReasoningSteps] = useState<ReasoningStep[]>([]);
     const [currentSuggestions, setCurrentSuggestions] = useState<string[]>([]);
+    const [isSuggestionsLoading, setIsSuggestionsLoading] = useState(false);
     const abortControllerRef = useRef<AbortController | null>(null);
 
     const [, startTransition] = useTransition();
@@ -244,6 +245,7 @@ export function AgentProvider({
         setRetryCount(0);
         setReasoningSteps([]);
         setCurrentSuggestions([]);
+        setIsSuggestionsLoading(false);
 
         let finalError: any = null;
 
@@ -398,7 +400,10 @@ export function AgentProvider({
                                                     }];
                                                 }
                                             });
+                                         } else if (eventData.type === 'suggestions_loading') {
+                                             setIsSuggestionsLoading(true);
                                          } else if (eventData.type === 'suggestions') {
+                                             setIsSuggestionsLoading(false);
                                              if (Array.isArray(eventData.suggestions)) {
                                                  setCurrentSuggestions(eventData.suggestions);
                                              }
@@ -684,6 +689,7 @@ export function AgentProvider({
             setSimulation,
             reasoningSteps,
             currentSuggestions,
+            isSuggestionsLoading,
             handleNewChat,
             loadChat,
             sendMessage,
