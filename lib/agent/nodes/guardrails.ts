@@ -15,7 +15,7 @@ import { AgentState } from "../state";
 import { getModel } from "./models";
 
 // Lightweight model for fast classification (temperature = 0 for strict classification)
-const model = getModel("ollama", 0.0);
+const model = getModel(undefined, 0.0);
 
 // ============================================================================
 // CONFIGURATION & CONSTANTS

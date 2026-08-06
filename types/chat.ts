@@ -1,3 +1,16 @@
+export type {
+  User,
+  Report,
+  Conversation as DbConversation,
+  Message as DbMessage,
+  LabResultValue,
+  MessageRole,
+  AgentType,
+  ReportStatus,
+  LabFlag,
+  ReviewStatus
+} from '@/lib/db/client';
+
 export interface Message {
   role: "user" | "assistant" | "system" | "tool";
   content: string;
@@ -9,6 +22,15 @@ export interface Message {
   isError?: boolean;
   errorType?: 'slow-network' | 'timeout' | 'network' | 'rate-limit' | 'server';
   isStreaming?: boolean;
+  suggestions?: string[];
+}
+
+export interface ReasoningStep {
+  node: string;
+  label: string;
+  status: 'running' | 'complete';
+  startedAt: number;
+  completedAt?: number;
 }
 
 export interface ChatSession {
@@ -37,11 +59,13 @@ export interface AgentContextType {
   retryCount: number;
   simulation: string;
   setSimulation: (simulation: string) => void;
+  reasoningSteps: ReasoningStep[];
+  currentSuggestions: string[];
 
   // Actions
   handleNewChat: () => void;
   loadChat: (chatId: string) => Promise<void>;
-  sendMessage: (e?: React.FormEvent) => Promise<void>;
+  sendMessage: (e?: React.FormEvent | string, textOverride?: string) => Promise<void>;
   processFile: (file: File) => Promise<void>;
   fileToBase64: (file: File) => Promise<string>;
   handleRetry: () => Promise<void>;

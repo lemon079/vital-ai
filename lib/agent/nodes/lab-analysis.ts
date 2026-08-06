@@ -14,7 +14,7 @@ import { getModel } from "./models";
 
 const tools = [saveLabResultsTool, convertLabUnits];
 
-const model = getModel("ollama", 0).bindTools(tools);
+const model = getModel(undefined, 0).bindTools(tools);
 
 export async function labAnalysisAgent(state: typeof AgentState.State) {
   console.log("--- Lab Analysis Agent Active ---");
@@ -69,6 +69,22 @@ export async function labAnalysisAgent(state: typeof AgentState.State) {
       `[Lab Analysis] User highlighted text: "${selectedText.substring(0, 50)}..."`,
     );
     systemPrompt += `\n\n### USER HIGHLIGHTED TEXT:\nThe user has highlighted the following section of the document:\n"${selectedText}"\n\nPrioritize analyzing this specific section if relevant to the user's query.`;
+  }
+
+  // Add retrieved document RAG chunks if available
+  const retrievedChunks = state.retrievedChunks;
+  if (retrievedChunks && retrievedChunks.length > 0) {
+    console.log(`[Lab Analysis] Injecting ${retrievedChunks.length} retrieved document RAG chunks into prompt`);
+    systemPrompt += `\n\n### RETRIEVED REPORT SECTIONS (DOCUMENT RAG):
+The following relevant sections were retrieved directly from the patient's uploaded PDF report:
+
+`;
+    retrievedChunks.forEach((chunk, idx) => {
+      systemPrompt += `--- SECTION ${idx + 1} (Page ${chunk.pageNumber}) ---\n"${chunk.pageContent}"\n\n`;
+    });
+
+    systemPrompt += `**PAGE CITATION RULE**:
+Whenever referencing information from the retrieved sections above, cite the specific page number (e.g. "According to Page ${retrievedChunks[0].pageNumber} of your uploaded report..."). Do not fabricate page numbers.`;
   }
 
   // GUARDRAIL: Check if tool was already called

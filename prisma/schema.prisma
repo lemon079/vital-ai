@@ -66,22 +66,8 @@ enum FlagBasis {
   internal_reference_db
 }
 
-enum FollowUpState {
-  not_started
-  in_progress
-  paused
-  complete
-  skipped
-}
-
-enum FollowUpQuestionStatus {
-  pending
-  answered
-  skipped
-}
-
 // ============================================================
-// PHASE 0 — Core Foundation Models
+// CORE MODELS
 // ============================================================
 
 model User {
@@ -99,8 +85,6 @@ model User {
   reports               Report[]
   conversations         Conversation[]
   lab_result_values      LabResultValue[]
-  follow_up_sessions     FollowUpSession[]
-  patient_reported_facts PatientReportedFact[]
 
   @@map("users")
 }
@@ -119,7 +103,6 @@ model Report {
   user                  User              @relation(fields: [user_id], references: [id], onDelete: Cascade)
   conversations         Conversation[]
   lab_result_values      LabResultValue[]
-  follow_up_sessions     FollowUpSession[]
   clinical_summaries     ClinicalSummary[]
   share_tokens          ReportShareToken[]
 
@@ -135,11 +118,10 @@ model Conversation {
   proactive_suggested_at DateTime? @db.Timestamptz(6)
   created_at             DateTime  @default(now()) @db.Timestamptz(6)
 
-  user       User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  report     Report?   @relation(fields: [report_id], references: [id], onDelete: SetNull)
-  messages   Message[]
+  user           User                   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  report         Report?                @relation(fields: [report_id], references: [id], onDelete: SetNull)
+  messages       Message[]
   guardrail_logs ResponseGuardrailLog[]
-  patient_reported_facts PatientReportedFact[]
 
   @@map("conversations")
 }
@@ -158,7 +140,7 @@ model Message {
 }
 
 // ============================================================
-// PHASE 1–2 — Extraction & Comparison Engine Models
+// EXTRACTION & COMPARISON ENGINE MODELS
 // ============================================================
 
 model CanonicalTest {
@@ -170,8 +152,6 @@ model CanonicalTest {
   unit_conversions  UnitConversion[]
   reference_ranges  ReferenceRange[]
   lab_result_values  LabResultValue[]
-  follow_up_questions FollowUpQuestion[]
-  patient_reported_facts PatientReportedFact[]
 
   @@map("canonical_tests")
 }
@@ -245,7 +225,7 @@ model LabResultValue {
 }
 
 // ============================================================
-// PHASE 3 — Guardrail Logging
+// AUDIT & LOGGING MODELS
 // ============================================================
 
 model ResponseGuardrailLog {
@@ -260,60 +240,6 @@ model ResponseGuardrailLog {
   conversation Conversation @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
 
   @@map("response_guardrail_logs")
-}
-
-// ============================================================
-// PHASE 4 — Follow-Up Session Models
-// ============================================================
-
-model FollowUpSession {
-  id         String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  report_id  String        @db.Uuid
-  user_id    String        @db.Uuid
-  state      FollowUpState @default(not_started)
-  created_at DateTime      @default(now()) @db.Timestamptz(6)
-  updated_at DateTime      @updatedAt
-
-  report    Report             @relation(fields: [report_id], references: [id], onDelete: Cascade)
-  user      User               @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  questions FollowUpQuestion[]
-
-  @@map("follow_up_sessions")
-}
-
-model FollowUpQuestion {
-  id                 String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  session_id         String                 @db.Uuid
-  related_test_code  String?
-  question_text      String
-  answer_text        String?
-  status             FollowUpQuestionStatus @default(pending)
-  asked_at           DateTime               @default(now()) @db.Timestamptz(6)
-  answered_at        DateTime?              @db.Timestamptz(6)
-
-  session        FollowUpSession @relation(fields: [session_id], references: [id], onDelete: Cascade)
-  canonical_test CanonicalTest?  @relation(fields: [related_test_code], references: [test_code], onDelete: SetNull)
-
-  @@map("follow_up_questions")
-}
-
-// ============================================================
-// PHASE 5 — Patient Reported Facts & Clinical Summary
-// ============================================================
-
-model PatientReportedFact {
-  id                     String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id                String  @db.Uuid
-  related_test_code      String?
-  fact_text              String
-  source_conversation_id String  @db.Uuid
-  created_at             DateTime @default(now()) @db.Timestamptz(6)
-
-  user           User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  canonical_test CanonicalTest? @relation(fields: [related_test_code], references: [test_code], onDelete: SetNull)
-  conversation   Conversation   @relation(fields: [source_conversation_id], references: [id], onDelete: Cascade)
-
-  @@map("patient_reported_facts")
 }
 
 model ClinicalSummary {

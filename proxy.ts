@@ -9,7 +9,7 @@ export function proxy(request: NextRequest) {
 
     const isAuthPage = pathname === '/login' || pathname === '/signup' || pathname === '/register';
     const isOnboardingPage = pathname === '/onboarding';
-    const isAgentPage = pathname.startsWith('/agent');
+    const isChatPage = pathname.startsWith('/chat');
 
     // 1. User is logged in
     if (userId) {
@@ -17,21 +17,21 @@ export function proxy(request: NextRequest) {
             if (!isOnboarded) {
                 return NextResponse.redirect(new URL('/onboarding', request.url));
             } else {
-                return NextResponse.redirect(new URL('/agent', request.url));
+                return NextResponse.redirect(new URL('/chat', request.url));
             }
         }
 
-        if (isAgentPage && !isOnboarded) {
+        if (isChatPage && !isOnboarded) {
             return NextResponse.redirect(new URL('/onboarding', request.url));
         }
 
         if (isOnboardingPage && isOnboarded) {
-            return NextResponse.redirect(new URL('/agent', request.url));
+            return NextResponse.redirect(new URL('/chat', request.url));
         }
     } 
     // 2. User is NOT logged in
     else {
-        if (isAgentPage || isOnboardingPage || pathname === '/') {
+        if (isChatPage || isOnboardingPage || pathname === '/') {
             return NextResponse.redirect(new URL('/login', request.url));
         }
     }

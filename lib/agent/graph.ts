@@ -6,6 +6,7 @@ import { labAnalysisAgent } from "./nodes/lab-analysis";
 import { clinicalSummaryAgent } from "./nodes/clinical-summary";
 import { executeTools } from "./nodes/execute-tools";
 import { guardrailsNode } from "./nodes/guardrails";
+import { retrieverNode } from "./nodes/retriever";
 
 /**
  * ROUTER LOGIC
@@ -94,7 +95,7 @@ function routeConversation(state: typeof AgentState.State) {
 
 /**
  * GUARDRAILS ROUTING
- * Checks if safety guardrails blocked the message; otherwise routes dynamically
+ * Checks if safety guardrails blocked the message; otherwise routes through conditional retriever
  */
 function routeGuardrails(state: typeof AgentState.State) {
   const { isblocked } = state;
@@ -103,13 +104,22 @@ function routeGuardrails(state: typeof AgentState.State) {
     return END;
   }
 
-  // Safe: proceed to routeStart dynamic routing
+  // Safe: proceed to retriever node first
+  return "retriever";
+}
+
+/**
+ * RETRIEVER ROUTING
+ * Routes to the target agent node after document-centric retrieval completes
+ */
+function routeAfterRetriever(state: typeof AgentState.State) {
   return routeStart(state);
 }
 
 // Build the StateGraph
 const workflow = new StateGraph(AgentState)
   .addNode("guardrails", guardrailsNode)
+  .addNode("retriever", retrieverNode)
   .addNode("conversation", conversationAgent)
   .addNode("lab_analysis", labAnalysisAgent)
   .addNode("clinical_summary", clinicalSummaryAgent)
@@ -118,12 +128,17 @@ const workflow = new StateGraph(AgentState)
   // Starting point routing - START always runs safety guardrails first
   .addEdge(START, "guardrails")
 
-  // Guardrails Conditional Edges
+  // Guardrails Conditional Edges -> Retriever
   .addConditionalEdges("guardrails", routeGuardrails, {
+    retriever: "retriever",
+    [END]: END,
+  })
+
+  // Retriever Conditional Edges -> Destination Agent Node
+  .addConditionalEdges("retriever", routeAfterRetriever, {
     conversation: "conversation",
     lab_analysis: "lab_analysis",
     clinical_summary: "clinical_summary",
-    [END]: END,
   })
 
   // Lab Analysis Flow

@@ -2,28 +2,33 @@ import { prisma } from '@/lib/db/client';
 import { MessageRole, AgentType } from '@/lib/generated/prisma/client';
 
 export async function getUserProfile(userId: string) {
-    const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { email: true, date_of_birth: true, sex: true, pregnancy_status: true }
-    });
-    if (!user) return null;
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { email: true, date_of_birth: true, sex: true, pregnancy_status: true }
+        });
+        if (!user) return null;
 
-    let age: number | null = null;
-    if (user.date_of_birth) {
-        const today = new Date();
-        const birthDate = new Date(user.date_of_birth);
-        age = today.getFullYear() - birthDate.getFullYear();
+        let age: number | null = null;
+        if (user.date_of_birth) {
+            const today = new Date();
+            const birthDate = new Date(user.date_of_birth);
+            age = today.getFullYear() - birthDate.getFullYear();
+        }
+
+        return {
+            name: user.email ? user.email.split('@')[0] : null,
+            age,
+            gender: user.sex ? String(user.sex) : null,
+            email: user.email,
+            sex: user.sex,
+            pregnancy_status: user.pregnancy_status,
+            date_of_birth: user.date_of_birth,
+        };
+    } catch (e) {
+        console.error("getUserProfile error:", e);
+        return null;
     }
-
-    return {
-        name: user.email ? user.email.split('@')[0] : null,
-        age,
-        gender: user.sex ? String(user.sex) : null,
-        email: user.email,
-        sex: user.sex,
-        pregnancy_status: user.pregnancy_status,
-        date_of_birth: user.date_of_birth,
-    };
 }
 
 // --- Conversations & Messages ---
@@ -70,26 +75,31 @@ export async function saveMessageAsync(
 }
 
 export async function getUserConversations(userId: string): Promise<any[]> {
-    const conversations = await prisma.conversation.findMany({
-        where: { user_id: userId },
-        orderBy: { created_at: 'desc' },
-        select: {
-            id: true,
-            title: true,
-            created_at: true,
-            messages: {
-                orderBy: { created_at: 'asc' },
-                take: 1,
-                select: { content: true }
+    try {
+        const conversations = await prisma.conversation.findMany({
+            where: { user_id: userId },
+            orderBy: { created_at: 'desc' },
+            select: {
+                id: true,
+                title: true,
+                created_at: true,
+                messages: {
+                    orderBy: { created_at: 'asc' },
+                    take: 1,
+                    select: { content: true }
+                }
             }
-        }
-    });
+        });
 
-    return conversations.map(c => ({
-        id: c.id,
-        created_at: c.created_at,
-        title: c.title || c.messages[0]?.content || "New Chat"
-    }));
+        return conversations.map(c => ({
+            id: c.id,
+            created_at: c.created_at,
+            title: c.title || c.messages[0]?.content || "New Chat"
+        }));
+    } catch (e) {
+        console.error("getUserConversations error:", e);
+        return [];
+    }
 }
 
 export async function renameConversation(conversationId: string, title: string) {

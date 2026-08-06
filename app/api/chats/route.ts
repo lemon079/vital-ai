@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { getUserChats } from '@/lib/services/chat';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
-    const userId = searchParams.get('userId');
+    const cookieStore = await cookies();
+    const userId = searchParams.get('userId') || cookieStore.get('userId')?.value;
 
     if (!userId) {
         return NextResponse.json({ error: 'User ID is required' }, { status: 400 });

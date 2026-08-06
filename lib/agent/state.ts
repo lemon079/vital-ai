@@ -54,4 +54,8 @@ export const AgentState = Annotation.Root({
     reducer: (x, y) => y ?? x,
     default: () => 0,
   }),
+  retrievedChunks: Annotation<Array<{ pageContent: string; pageNumber: number }>>({
+    reducer: (x, y) => y ?? x,
+    default: () => [],
+  }),
 });
