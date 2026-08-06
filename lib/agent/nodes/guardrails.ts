@@ -15,7 +15,7 @@ import { AgentState } from "../state";
 import { getModel } from "./models";
 
 // Model instance for fast classification (temperature = 0 for strict classification)
-const model = getModel(undefined, 0.0);
+const model = getModel("google", 0.0);
 
 // ============================================================================
 // CONFIGURATION & CONSTANTS
