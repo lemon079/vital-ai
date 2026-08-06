@@ -15,7 +15,7 @@ import { AgentState } from "../state";
 import { getModel } from "./models";
 
 // Lightweight model for fast classification (temperature = 0 for strict classification)
-const model = getModel(undefined, 0.0);
+const model = getModel('ollama', 0.0);
 
 // ============================================================================
 // CONFIGURATION & CONSTANTS
@@ -71,7 +71,7 @@ If irrelevant, set "safe": false and "reason": "I can only help with health-rela
 export async function guardrailsNode(state: typeof AgentState.State) {
     console.log("--- Guardrails Check ---");
     const { messages, reportData } = state;
-    
+
     // Find the last human message in history to evaluate safety
     const lastHumanMessage = [...messages].reverse().find(m => {
         const type = typeof m.getType === "function" ? m.getType() : (m as any).role;
@@ -85,10 +85,10 @@ export async function guardrailsNode(state: typeof AgentState.State) {
 
     // 1. Check if user is requesting a clinical summary/conclusion
     const contentLower = lastHumanMessage.content.toLowerCase();
-    const isSummaryRequest = 
-        contentLower.includes("summary for doctor") || 
-        contentLower.includes("create summary") || 
-        contentLower.includes("appointment tomorrow") || 
+    const isSummaryRequest =
+        contentLower.includes("summary for doctor") ||
+        contentLower.includes("create summary") ||
+        contentLower.includes("appointment tomorrow") ||
         contentLower.includes("generate summary");
 
     // Evidence check: block clinical summaries/conclusions if there's no lab report uploaded
@@ -129,9 +129,9 @@ export async function guardrailsNode(state: typeof AgentState.State) {
     } catch (e) {
         console.error("[Guardrails] Error:", e);
         // Fail closed for clinical safety in production
-        return { 
+        return {
             messages: [new AIMessage("I encountered an issue processing safety guardrails. Please try again." + MEDICAL_DISCLAIMER)],
-            isblocked: true 
+            isblocked: true
         };
     }
 }

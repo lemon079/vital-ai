@@ -15,7 +15,7 @@ import { CONVERSATION_PROMPT } from "../prompts";
 import { getModel } from "./models";
 
 // Initialize the conversation model instance (higher temperature for friendly, warm responses)
-const model = getModel(undefined, 0.7);
+const model = getModel('ollama', 0.7);
 
 /**
  * conversationAgent

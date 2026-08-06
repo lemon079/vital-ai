@@ -14,7 +14,7 @@ import { getModel } from "./models";
 
 const tools = [saveLabResultsTool, convertLabUnits];
 
-const model = getModel(undefined, 0).bindTools(tools);
+const model = getModel('ollama', 0).bindTools(tools);
 
 export async function labAnalysisAgent(state: typeof AgentState.State) {
   console.log("--- Lab Analysis Agent Active ---");

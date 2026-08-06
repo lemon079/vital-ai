@@ -1,12 +1,16 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef, useTransition, useOptimistic } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { toast } from "sonner";
 import { useUploadFile } from '@/hooks/use-upload-file';
 
 // Types
 import { Message, ChatSession, AgentContextType, ReasoningStep } from '@/types/chat';
+
+type ChatHistoryAction =
+    | { type: 'delete'; chatId: string }
+    | { type: 'rename'; chatId: string; title: string };
 
 const AgentContext = createContext<AgentContextType | undefined>(undefined);
 
@@ -64,6 +68,27 @@ export function AgentProvider({
     const [currentSuggestions, setCurrentSuggestions] = useState<string[]>([]);
     const abortControllerRef = useRef<AbortController | null>(null);
 
+    const [, startTransition] = useTransition();
+
+    // Optimistic UI updates for chat history (deleting and editing titles)
+    const [optimisticChatHistory, setOptimisticChatHistory] = useOptimistic<
+        ChatSession[],
+        ChatHistoryAction
+    >(
+        chatHistory,
+        (currentHistory, action) => {
+            if (action.type === 'delete') {
+                return currentHistory.filter((chat) => chat.id !== action.chatId);
+            }
+            if (action.type === 'rename') {
+                return currentHistory.map((chat) =>
+                    chat.id === action.chatId ? { ...chat, title: action.title } : chat
+                );
+            }
+            return currentHistory;
+        }
+    );
+
     useEffect(() => {
         return () => {
             if (abortControllerRef.current) {
@@ -96,44 +121,54 @@ export function AgentProvider({
     }, [initialChatId, currentChatId]);
 
     const deleteChat = async (chatId: string) => {
-        try {
-            const res = await fetch(`/api/chats/${chatId}`, {
-                method: 'DELETE'
-            });
-            if (res.ok) {
-                toast.success('Chat deleted successfully');
-                await fetchHistory();
-                if (currentChatId === chatId) {
-                    handleNewChat();
+        startTransition(async () => {
+            setOptimisticChatHistory({ type: 'delete', chatId });
+            try {
+                const res = await fetch(`/api/chats/${chatId}`, {
+                    method: 'DELETE'
+                });
+                if (res.ok) {
+                    toast.success('Chat deleted successfully');
+                    await fetchHistory();
+                    if (currentChatId === chatId) {
+                        handleNewChat();
+                    }
+                } else {
+                    toast.error('Failed to delete chat');
+                    await fetchHistory();
                 }
-            } else {
+            } catch (e) {
+                console.error('Delete chat error:', e);
                 toast.error('Failed to delete chat');
+                await fetchHistory();
             }
-        } catch (e) {
-            console.error('Delete chat error:', e);
-            toast.error('Failed to delete chat');
-        }
+        });
     };
 
     const renameChat = async (chatId: string, title: string) => {
-        try {
-            const res = await fetch(`/api/chats/${chatId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ title }),
-            });
-            if (res.ok) {
-                toast.success('Chat renamed successfully');
-                await fetchHistory();
-            } else {
+        startTransition(async () => {
+            setOptimisticChatHistory({ type: 'rename', chatId, title });
+            try {
+                const res = await fetch(`/api/chats/${chatId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ title }),
+                });
+                if (res.ok) {
+                    toast.success('Chat renamed successfully');
+                    await fetchHistory();
+                } else {
+                    toast.error('Failed to rename chat');
+                    await fetchHistory();
+                }
+            } catch (e) {
+                console.error('Rename chat error:', e);
                 toast.error('Failed to rename chat');
+                await fetchHistory();
             }
-        } catch (e) {
-            console.error('Rename chat error:', e);
-            toast.error('Failed to rename chat');
-        }
+        });
     };
 
     const loadChat = async (chatId: string) => {
@@ -632,7 +667,7 @@ export function AgentProvider({
             isPdfVisible,
             setIsPdfVisible,
             currentChatId,
-            chatHistory,
+            chatHistory: optimisticChatHistory,
             isPending: isLoading,
             isUploading,
             isFileUploading,
