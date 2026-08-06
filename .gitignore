@@ -49,3 +49,6 @@ next-env.d.ts
 # GSD planning (local only)
 .planning/
 
+# Playwright test results
+/test-results/
+

@@ -51,17 +51,9 @@ jobs:
       - name: Run Tests & Type Checks
         run: npm test
 
-  verify:
-    name: Quality & Security Verification
-    needs: [lint, test]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Verify Quality Gate
-        run: echo "Quality & Security Verification checks completed successfully."
-
   build-and-deploy:
     name: Build & Deploy Verification
-    needs: [verify]
+    needs: [lint, test]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:

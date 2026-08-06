@@ -1,5 +1,6 @@
 import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { graph } from "@/lib/agent/graph";
 import { saveUploadedFile } from "@/lib/services/processing";
 import {
@@ -10,6 +11,8 @@ import {
 import { createReport } from "@/lib/services/reports";
 import { enqueueReportProcessing } from "@/lib/services/job-queue";
 import { prisma } from "@/lib/db/client";
+import { generateFollowUpSuggestions } from "@/lib/agent/suggestions";
+import { indexReportDocument } from "@/lib/agent/rag/vector-store";
 import path from "path";
 
 export async function POST(req: Request) {
@@ -43,7 +46,7 @@ export async function POST(req: Request) {
   const {
     messages,
     chatId,
-    userId = "309ad8a9-7802-4acb-bf7e-678b8c84768a",
+    userId: payloadUserId,
     fileData,
     selectedText,
     filePath: clientFilePath,
@@ -57,9 +60,9 @@ export async function POST(req: Request) {
     );
   }
 
-  if (!userId) {
-    console.warn("Chat request received without userId.");
-  }
+  // Resolve userId dynamically from payload or cookie
+  const cookieStore = await cookies();
+  const userId = payloadUserId || cookieStore.get("userId")?.value;
 
   const currentMessageContent = messages[messages.length - 1].content;
   let fileContext = "";
@@ -80,6 +83,13 @@ export async function POST(req: Request) {
       if (savedFile.fileUrl) {
         fileUrl = savedFile.fileUrl;
       }
+
+      // Index PDF report for Document-Centric RAG (cached by reportId / filePath)
+      if (filePath && filePath.endsWith('.pdf')) {
+        indexReportDocument(filePath, filePath, userId || "default_user").catch((err) => {
+          console.warn("[RAG] Background indexing error:", err);
+        });
+      }
     } catch (error) {
       return NextResponse.json(
         { error: "Failed to process uploaded file." },
@@ -93,6 +103,11 @@ export async function POST(req: Request) {
       fileContext = `[SYSTEM: An image file has been uploaded to ${filePath}. (Image analysis not yet supported via tool, but file is saved.)]`;
     } else {
       fileContext = `[SYSTEM: User uploaded a PDF: ${filename}. View it in the split panel.]`;
+      if (filePath.endsWith('.pdf')) {
+        indexReportDocument(filePath, filePath, userId || "default_user").catch((err) => {
+          console.warn("[RAG] Background indexing error:", err);
+        });
+      }
     }
   }
 
@@ -198,11 +213,47 @@ export async function POST(req: Request) {
               selectedText: selectedText || "",
               labResults: [],
             },
-            { version: "v2" }
+            {
+              version: "v2",
+              configurable: { thread_id: currentChatId || "default_thread" }
+            }
           );
+          const NODE_LABELS: Record<string, string> = {
+            guardrails: "Checking safety guardrails...",
+            retriever: "Searching report sections...",
+            conversation: "Generating response...",
+            lab_analysis: "Analyzing lab results...",
+            clinical_summary: "Creating clinical summary...",
+            tools: "Running analysis tools...",
+          };
+          const activeNodes = new Set<string>();
 
           for await (const event of eventStream) {
             const nodeName = event.metadata?.langgraph_node;
+
+            // Emit reasoning events for node transitions
+            if (nodeName && NODE_LABELS[nodeName]) {
+              if (event.event === "on_chain_start" && !activeNodes.has(nodeName)) {
+                activeNodes.add(nodeName);
+                const reasoningData = JSON.stringify({
+                  type: "reasoning",
+                  node: nodeName,
+                  label: NODE_LABELS[nodeName],
+                  status: "running",
+                });
+                controller.enqueue(encoder.encode(`data: ${reasoningData}\n\n`));
+              } else if (event.event === "on_chain_end" && activeNodes.has(nodeName)) {
+                activeNodes.delete(nodeName);
+                const reasoningData = JSON.stringify({
+                  type: "reasoning",
+                  node: nodeName,
+                  label: NODE_LABELS[nodeName],
+                  status: "complete",
+                });
+                controller.enqueue(encoder.encode(`data: ${reasoningData}\n\n`));
+              }
+            }
+
             const isAgentNode = ["conversation", "lab_analysis", "clinical_summary"].includes(nodeName);
             
             if (event.event === "on_chat_model_stream" && isAgentNode) {
@@ -222,6 +273,25 @@ export async function POST(req: Request) {
           // Save AI Message at the end of streaming (Skip for guest)
           if (!isGuest && fullAIResponse.trim()) {
             await saveMessageAsync(currentChatId, "assistant", fullAIResponse);
+          }
+
+          // Generate and emit dynamic follow-up suggestions
+          if (fullAIResponse.trim()) {
+            try {
+              const suggestions = await generateFollowUpSuggestions(
+                fullAIResponse,
+                currentMessageContent
+              );
+              if (suggestions.length > 0) {
+                const suggestionsData = JSON.stringify({
+                  type: "suggestions",
+                  suggestions,
+                });
+                controller.enqueue(encoder.encode(`data: ${suggestionsData}\n\n`));
+              }
+            } catch (err) {
+              console.error("[Route] Error sending follow-up suggestions:", err);
+            }
           }
 
           controller.close();

@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useUploadFile } from '@/hooks/use-upload-file';
 
 // Types
-import { Message, ChatSession, AgentContextType } from '@/types/chat';
+import { Message, ChatSession, AgentContextType, ReasoningStep } from '@/types/chat';
 
 const AgentContext = createContext<AgentContextType | undefined>(undefined);
 
@@ -60,6 +60,8 @@ export function AgentProvider({
     const [showSlowWarning, setShowSlowWarning] = useState(false);
     const [simulation, setSimulation] = useState<string>('none');
     const [retryCount, setRetryCount] = useState<number>(0);
+    const [reasoningSteps, setReasoningSteps] = useState<ReasoningStep[]>([]);
+    const [currentSuggestions, setCurrentSuggestions] = useState<string[]>([]);
     const abortControllerRef = useRef<AbortController | null>(null);
 
     useEffect(() => {
@@ -91,7 +93,7 @@ export function AgentProvider({
         if (initialChatId && initialChatId !== currentChatId) {
             setCurrentChatId(initialChatId);
         }
-    }, [initialChatId]);
+    }, [initialChatId, currentChatId]);
 
     const deleteChat = async (chatId: string) => {
         try {
@@ -157,7 +159,7 @@ export function AgentProvider({
                 }
             }
             if (!pathname.includes(chatId)) {
-                router.push(`/agent/${chatId}`);
+                router.push(`/chat/${chatId}`);
             }
         } catch (e) {
             toast.error("Failed to load chat");
@@ -174,8 +176,8 @@ export function AgentProvider({
         setIsPdfVisible(false);
         setCurrentChatId(null);
 
-        if (pathname !== '/agent') {
-            router.push('/agent');
+        if (pathname !== '/chat') {
+            router.push('/chat');
         }
     };
 
@@ -199,6 +201,8 @@ export function AgentProvider({
         setIsLoading(true);
         setShowSlowWarning(false);
         setRetryCount(0);
+        setReasoningSteps([]);
+        setCurrentSuggestions([]);
 
         let finalError: any = null;
 
@@ -331,7 +335,33 @@ export function AgentProvider({
                                                 }
                                                 return newMsgs;
                                             });
-                                        } else if (eventData.type === 'error') {
+                                        } else if (eventData.type === 'reasoning') {
+                                            const { node, label, status } = eventData;
+                                            setReasoningSteps(prev => {
+                                                const existingIdx = prev.findIndex(s => s.node === node);
+                                                if (existingIdx !== -1) {
+                                                    const updated = [...prev];
+                                                    updated[existingIdx] = {
+                                                        ...updated[existingIdx],
+                                                        status,
+                                                        completedAt: status === 'complete' ? Date.now() : undefined
+                                                    };
+                                                    return updated;
+                                                } else {
+                                                    return [...prev, {
+                                                        node,
+                                                        label,
+                                                        status,
+                                                        startedAt: Date.now(),
+                                                        completedAt: status === 'complete' ? Date.now() : undefined
+                                                    }];
+                                                }
+                                            });
+                                         } else if (eventData.type === 'suggestions') {
+                                             if (Array.isArray(eventData.suggestions)) {
+                                                 setCurrentSuggestions(eventData.suggestions);
+                                             }
+                                         } else if (eventData.type === 'error') {
                                             throw { isApiError: true, message: eventData.message, errorType: 'server' };
                                         }
                                     } catch (err) {
@@ -358,7 +388,7 @@ export function AgentProvider({
 
                 if (responseChatId && responseChatId !== currentChatId) {
                     setCurrentChatId(responseChatId);
-                    window.history.replaceState(null, '', `/agent/${responseChatId}`);
+                    window.history.replaceState(null, '', `/chat/${responseChatId}`);
                     fetchHistory();
                 }
 
@@ -461,11 +491,20 @@ export function AgentProvider({
         await makeChatRequest(lastRequestPayload, lastRequestIsFileAnalysis);
     };
 
-    const sendMessage = async (e?: React.FormEvent) => {
-        if (e) e.preventDefault();
-        if (!input.trim() && !selectedFile) return;
+    const sendMessage = async (e?: React.FormEvent | string, textOverride?: string) => {
+        let textPrompt = input;
+        if (typeof e === 'string') {
+            textPrompt = e;
+        } else if (e && typeof e.preventDefault === 'function') {
+            e.preventDefault();
+        }
+        if (textOverride) {
+            textPrompt = textOverride;
+        }
 
-        const userMsg = input || (selectedFile ? `[Uploaded: ${selectedFile.name}]` : '');
+        if (!textPrompt.trim() && !selectedFile) return;
+
+        const userMsg = textPrompt || (selectedFile ? `[Uploaded: ${selectedFile.name}]` : '');
         setInput('');
 
         let fileData: { type: string; content: string } | null = null;
@@ -601,6 +640,8 @@ export function AgentProvider({
             retryCount,
             simulation,
             setSimulation,
+            reasoningSteps,
+            currentSuggestions,
             handleNewChat,
             loadChat,
             sendMessage,

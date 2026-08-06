@@ -15,7 +15,7 @@ import { CONVERSATION_PROMPT } from "../prompts";
 import { getModel } from "./models";
 
 // Initialize the conversation model instance (higher temperature for friendly, warm responses)
-const model = getModel("ollama", 0.7);
+const model = getModel(undefined, 0.7);
 
 /**
  * conversationAgent
@@ -104,6 +104,23 @@ Note: This is raw text. Extract relevant values carefully when answering questio
   if (summary) {
     systemMsgContent += `\n\n### CONVERSATION SUMMARY SO FAR:
 ${summary}`;
+  }
+
+  // Add retrieved document chunks if available via Document RAG
+  const retrievedChunks = state.retrievedChunks;
+  if (retrievedChunks && retrievedChunks.length > 0) {
+    console.log(`[Conversation] Injecting ${retrievedChunks.length} retrieved document chunks into prompt`);
+    systemMsgContent += `\n\n### RETRIEVED REPORT SECTIONS (DOCUMENT RAG):
+The following relevant sections were retrieved directly from the patient's uploaded PDF report:
+
+`;
+    retrievedChunks.forEach((chunk, idx) => {
+      systemMsgContent += `--- SECTION ${idx + 1} (Page ${chunk.pageNumber}) ---\n"${chunk.pageContent}"\n\n`;
+    });
+
+    systemMsgContent += `**PAGE CITATION RULE**:
+Whenever you refer to information found in the retrieved sections above, cite the specific page number in your response (for example: "According to Page ${retrievedChunks[0].pageNumber} of your report...").
+DO NOT invent or fabricate page numbers.`;
   }
 
   const messagesWithSystem = [new SystemMessage(systemMsgContent), ...messages];

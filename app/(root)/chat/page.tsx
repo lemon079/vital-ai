@@ -5,7 +5,7 @@ import { getUserChats, getUserProfile } from '@/lib/services/chat';
 
 export const dynamic = 'force-dynamic';
 
-export default async function AgentPage() {
+export default async function ChatPage() {
     const cookieStore = await cookies();
     const userId = cookieStore.get('userId')?.value;
 

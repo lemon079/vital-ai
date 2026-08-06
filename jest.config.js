@@ -10,6 +10,7 @@ const config = {
     '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: 'tsconfig.json' }],
   },
   testMatch: ['**/*.test.ts', '**/*.spec.ts'],
+  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/tests/e2e/'],
 };
 
 module.exports = config;

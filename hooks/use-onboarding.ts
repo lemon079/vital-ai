@@ -17,7 +17,7 @@ export function useOnboarding() {
         },
         onSuccess: () => {
             toast.success('Profile updated successfully!');
-            router.push('/agent');
+            router.push('/chat');
         },
         onError: (error) => {
             toast.error(error.message || 'Failed to update profile');
