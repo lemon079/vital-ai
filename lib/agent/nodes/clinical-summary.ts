@@ -16,7 +16,7 @@ import { getModel } from "./models";
 import { MEDICAL_DISCLAIMER } from "./guardrails";
 
 // Initialize the clinical model instance (low temperature for deterministic synthesis)
-const model = getModel(undefined, 0.2);
+const model = getModel("google", 0.2);
 
 /**
  * clinicalSummaryAgent
